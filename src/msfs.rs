@@ -45,7 +45,10 @@ pub type GaugeCallback = fn(&FsContext, PanelServiceID) -> GuageCallbackResult;
 macro_rules! gauge {
     ($name:ident) => {
         #[no_mangle]
-        pub extern "C" fn RUST_gauge_callback(ctx: $crate::sys::FsContext, service_id: i32) -> bool {
+        pub extern "C" fn RUST_gauge_callback(
+            ctx: $crate::sys::FsContext,
+            service_id: i32,
+        ) -> bool {
             let external: $crate::GaugeCallback = $name;
             let ctx = $crate::FsContext::from(ctx);
             let service_id = service_id as PanelServiceID;
@@ -54,5 +57,5 @@ macro_rules! gauge {
                 Err(()) => false,
             }
         }
-    }
+    };
 }
