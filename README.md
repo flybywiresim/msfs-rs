@@ -1,7 +1,11 @@
 # msfs-rs
 
-Bindings to the MSFS SDK for Rust.
+These bindings include:
 
-## Building for Development
+- MSFS Gauge API
+- SimConnect API
 
-Set `MSFS_SDK` to your SDK path
+## Building
+
+If your MSFS SDK is not installed to `C:\MSFS SDK` you will need to set the
+`MSFS_SDK` env variable to the correct path.

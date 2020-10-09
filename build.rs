@@ -2,7 +2,10 @@ fn main() {
     println!("cargo:rerun-if-changed=src/wrapper.hpp");
 
     let bindings = bindgen::Builder::default()
-        .clang_arg(format!("-I{}", std::env::var("MSFS_SDK").unwrap()))
+        .clang_arg(format!(
+            "-I{}",
+            std::env::var("MSFS_SDK").unwrap_or_else(calculate_msfs_sdk_path)
+        ))
         .header("src/wrapper.hpp")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
@@ -11,4 +14,16 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .unwrap();
+}
+
+fn calculate_msfs_sdk_path(_: std::env::VarError) -> String {
+    const WSL_PATH: &str = "/mnt/c/MSFS SDK";
+    const WIN_PATH: &str = r"C:\MSFS SDK";
+
+    if std::path::Path::new(WSL_PATH).exists() {
+        WSL_PATH
+    } else {
+        WIN_PATH
+    }
+    .to_string()
 }
