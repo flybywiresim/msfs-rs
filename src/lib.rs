@@ -13,12 +13,10 @@
 //! ## Known Issues
 //!
 //! Until https://github.com/rust-lang/rfcs/issues/2771 is fixed, you will have to
-//! manually modify your output wasm file to re-export `malloc` and `free`. It
-//! usually looks something like this:
-//!
-//! ```wat
-//! (export "malloc" (func $malloc))
-//! (export "free" (func $free))
+//! run the `msfs-fix` util on your output wasm files, like so:
+//! ```shell
+//! $ cargo build
+//! $ msfs-fix target/wasm32-wasi/release/foo.wasm > target/wasm32-wasi/release/foo.wasm
 //! ```
 
 pub mod msfs;

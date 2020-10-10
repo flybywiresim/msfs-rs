@@ -1,5 +1,3 @@
-#![crate_type = "cdylib"]
-
 use ::msfs::{msfs, sim_connect::SimConnect};
 
 static mut SIM: Option<SimConnect> = None;
