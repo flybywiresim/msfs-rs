@@ -13,14 +13,14 @@ impl From<sys::FsContext> for FsContext {
 /// `PanelServiceID` is used in `GaugeCallback`s and is generated from
 /// `sys::PANEL_SERVICE_*` constants.
 #[repr(u32)]
-#[derive(PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum PanelServiceID {
     PreQuery = sys::PANEL_SERVICE_PRE_QUERY,
     PostQuery = sys::PANEL_SERVICE_POST_QUERY,
     PreInstall = sys::PANEL_SERVICE_PRE_INSTALL,
     PostInstall = sys::PANEL_SERVICE_POST_INSTALL,
     PreInitialize = sys::PANEL_SERVICE_PRE_INITIALIZE,
-    PostInitializer = sys::PANEL_SERVICE_POST_INITIALIZE,
+    PostInitialize = sys::PANEL_SERVICE_POST_INITIALIZE,
     PreUpdate = sys::PANEL_SERVICE_PRE_UPDATE,
     PostUpdate = sys::PANEL_SERVICE_POST_UPDATE,
     PreGenerate = sys::PANEL_SERVICE_PRE_GENERATE,

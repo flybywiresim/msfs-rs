@@ -1,20 +1,18 @@
 // Windows.h support
 #ifndef DWORD
-#include <linux/limits.h>
-#include <stdint.h>
 #define WINAPI
-#define MAX_PATH PATH_MAX
+#define MAX_PATH 4096
 #define FALSE false
-#define CALLBACK
+#define CALLBACK __stdcall
 typedef short WCHAR;
-typedef void* HANDLE;
 typedef unsigned int BOOL;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef long HRESULT;
-typedef HANDLE HWND;
 typedef const char* LPCSTR;
+typedef void* HANDLE;
+typedef HANDLE HWND;
 typedef struct _GUID {
   unsigned long Data1;
   unsigned short Data2;

@@ -1,0 +1,8 @@
+[package]
+authors = ["Gus Caplan <me@gus.host>"]
+edition = "2018"
+name = "log"
+version = "0.1.0"
+
+[dependencies]
+msfs = { path = "../../" }
