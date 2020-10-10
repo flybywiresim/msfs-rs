@@ -7,6 +7,7 @@ fn main() {
         .clang_arg(format!("-I{}", msfs_sdk))
         .header("src/wrapper.hpp")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .impl_debug(true)
         .generate()
         .unwrap();
     let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());

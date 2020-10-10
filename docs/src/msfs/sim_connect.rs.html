@@ -69,6 +69,8 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
 
@@ -127,6 +129,8 @@
     }
 }
 
+<span class="doccomment">/// Message received from `SimConnect::get_next_dispatch`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SimConnectRecv</span> {
     <span class="ident">Null</span>,
     <span class="ident">Exception</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_EXCEPTION</span><span class="op">&gt;</span>),

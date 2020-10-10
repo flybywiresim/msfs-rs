@@ -1,3 +1,4 @@
 /target
 /msfs_derive/target
+/examples/log/target
 Cargo.lock

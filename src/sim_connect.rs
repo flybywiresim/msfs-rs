@@ -55,6 +55,8 @@ impl SimConnect {
     }
 }
 
+/// Message received from `SimConnect::get_next_dispatch`.
+#[derive(Debug)]
 pub enum SimConnectRecv {
     Null,
     Exception(Box<sys::SIMCONNECT_RECV_EXCEPTION>),
