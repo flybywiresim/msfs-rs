@@ -23,7 +23,7 @@ pub fn gauge(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #input
 
         #[no_mangle]
-        pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: i32) -> bool {
+        pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: i32, _: *mut u8) -> bool {
             let rusty: ::msfs::msfs::GaugeCallback = #rusty_name;
             let ctx = ::msfs::msfs::FsContext::from(ctx);
             let service_id = unsafe { std::mem::transmute(service_id) };

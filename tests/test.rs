@@ -1,10 +1,15 @@
-extern crate msfs;
+extern crate msfs as msfs_root;
 
-#[msfs::msfs::gauge]
-pub fn x(
-    _: &msfs::msfs::FsContext,
-    _: msfs::msfs::PanelServiceID,
-) -> msfs::msfs::GaugeCallbackResult {
+use msfs_root::{msfs, sim_connect::SimConnect};
+
+#[msfs::gauge]
+pub fn x(_: &msfs::FsContext, service_id: msfs::PanelServiceID) -> msfs::GaugeCallbackResult {
+    match service_id {
+        msfs::PanelServiceID::PreInstall => {
+            let _ = SimConnect::open("test").unwrap();
+        }
+        _ => {}
+    }
     Ok(())
 }
 
