@@ -1,6 +1,12 @@
 extern crate msfs;
 
-fn callback(ctx: &msfs::FsContext) -> bool {
-    false
+#[msfs::msfs::gauge]
+pub fn x(
+    _: &msfs::msfs::FsContext,
+    _: msfs::msfs::PanelServiceID,
+) -> msfs::msfs::GaugeCallbackResult {
+    Ok(())
 }
-msfs::gauge!(callback);
+
+#[test]
+fn test() {}

@@ -36,40 +36,7 @@ pub enum PanelServiceID {
 }
 
 /// MSFS Gauges are managed using this lifecycle callback.
-pub type GaugeCallback = fn(&FsContext, PanelServiceID) -> GuageCallbackResult;
-pub type GuageCallbackResult = Result<(), ()>;
+pub type GaugeCallback = fn(&FsContext, PanelServiceID) -> GaugeCallbackResult;
+pub type GaugeCallbackResult = Result<(), ()>;
 
-/// `gauge!` is used to generate the exported function which is exposed to
-/// MSFS when it loads the WASM binary. Use it like so:
-/// ```rs
-/// fn my_gauge(ctx: &FsContext, servce_id: PanelServiceID) -> GaugeResult {
-///     Ok(())
-/// }
-/// gauge!(my_gauge);
-/// ```
-// FIXME: this should be a proc macro like:
-// ```rs
-// #[msfs::gauge]
-// fn XYZ(ctx: &FsContext, service_id: PanelServiceID) {
-//   // ...
-// }
-// ```
-// which generates XYZ_gauge_callback
-#[macro_export]
-macro_rules! gauge {
-    ($name:ident) => {
-        #[no_mangle]
-        pub extern "C" fn RUST_gauge_callback(
-            ctx: $crate::sys::FsContext,
-            service_id: i32,
-        ) -> bool {
-            let external: $crate::GaugeCallback = $name;
-            let ctx = $crate::FsContext::from(ctx);
-            let service_id = service_id as PanelServiceID;
-            match external(&ctx, service_id) {
-                Ok(()) => true,
-                Err(()) => false,
-            }
-        }
-    };
-}
+pub use msfs_derive::gauge;

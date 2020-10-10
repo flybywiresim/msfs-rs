@@ -6,9 +6,8 @@ edition = "2018"
 description = "Rust bindings for the MSFS SDK"
 license-file = "LICENSE"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+msfs_derive = { path = "./msfs_derive" }
 
 [build-dependencies]
 bindgen = "0.53"
