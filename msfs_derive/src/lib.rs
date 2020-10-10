@@ -19,7 +19,7 @@ impl Parse for Args {
                     name: Some(input.parse::<Ident>()?.to_string()),
                 })
             }
-            _ => Ok(Args { name: None })
+            _ => Ok(Args { name: None }),
         }
     }
 }

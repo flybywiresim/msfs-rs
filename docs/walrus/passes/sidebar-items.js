@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["gc","Removes any non-referenced items from a module"],["validate","Validation of a wasm module"]],"struct":[["Roots","Set of all root used items in a wasm module."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["gauge","Declare a gauge callback. It will be automatically exported with the name `NAME_gauge_callback`, where `NAME` is the name of the decorated function. `rs // Declare and export `FOO_gauge_callback` #[msfs::gauge] fn FOO(ctx: &msfs::FsContext, service_id: msfs::PanelServiceID) -> msfs::GaugeCallbackResult {   // ... } `"]]});

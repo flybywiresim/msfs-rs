@@ -1,0 +1,13 @@
+[package]
+name = "msfs"
+version = "0.0.0-pre.1"
+authors = ["snek"]
+edition = "2018"
+description = "Rust bindings for the MSFS SDK"
+license-file = "LICENSE"
+
+[dependencies]
+msfs_derive = { path = "../msfs_derive" }
+
+[build-dependencies]
+bindgen = "0.53"

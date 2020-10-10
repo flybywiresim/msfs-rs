@@ -2,4 +2,4 @@
 
 rm -rf docs
 cargo doc
-mv target/wasm32-wasi/doc docs
+mv target/doc docs
