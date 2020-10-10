@@ -1,11 +1,10 @@
 fn main() {
-    println!("cargo:rerun-if-changed=src/wrapper.hpp");
+    let msfs_sdk = std::env::var("MSFS_SDK").unwrap_or_else(calculate_msfs_sdk_path);
+    println!("Found MSFS SDK: {:?}", msfs_sdk);
 
+    println!("cargo:rerun-if-changed=src/wrapper.hpp");
     let bindings = bindgen::Builder::default()
-        .clang_arg(format!(
-            "-I{}",
-            std::env::var("MSFS_SDK").unwrap_or_else(calculate_msfs_sdk_path)
-        ))
+        .clang_arg(format!("-I{}", msfs_sdk))
         .header("src/wrapper.hpp")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
@@ -17,13 +16,10 @@ fn main() {
 }
 
 fn calculate_msfs_sdk_path(_: std::env::VarError) -> String {
-    const WSL_PATH: &str = "/mnt/c/MSFS SDK";
-    const WIN_PATH: &str = r"C:\MSFS SDK";
-
-    if std::path::Path::new(WSL_PATH).exists() {
-        WSL_PATH
-    } else {
-        WIN_PATH
+    for p in ["/mnt/c/MSFS SDK", r"C:\MSFS SDK"].iter() {
+        if std::path::Path::new(p).exists() {
+            return p.to_string();
+        }
     }
-    .to_string()
+    panic!("Could not locate MSFS SDK. Make sure you have it installed or try setting the MSFS_SDK env var.");
 }
