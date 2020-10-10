@@ -23,6 +23,7 @@ typedef struct _GUID {
 
 // Compat defines
 #define _MSFS_WASM 1
+#define SIMCONNECTAPI __attribute__((visibility("default"))) extern "C" HRESULT
 
 // External API headers, assumes MSFS_SDK in include path
 #include <WASM/include/MSFS/MSFS.h>

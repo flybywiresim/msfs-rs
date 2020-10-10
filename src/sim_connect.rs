@@ -1,20 +1,7 @@
-// use crate::sys;
-
-// FIXME: these should be provided in `sys`, but bindgen is ignoring them for some reason.
-extern "C" {
-    fn SimConnect_Open(
-        sim_connect: *mut u8,
-        name: *const std::os::raw::c_char,
-        hwnd: *mut u8,
-        user_event_win32: i32,
-        event_handle: *mut u8,
-        config_index: i32,
-    ) -> i32;
-    fn SimConnect_Close(sim_connect: *mut u8) -> i32;
-}
+use crate::sys;
 
 /// A SimConnect session. This provides access to data within the MSFS sim.
-pub struct SimConnect(*mut u8);
+pub struct SimConnect(*mut sys::HANDLE);
 
 impl SimConnect {
     /// The `SimConnect::open` function is used to send a request to the Microsoft
@@ -23,7 +10,7 @@ impl SimConnect {
         unsafe {
             let ptr = std::ptr::null_mut();
             let name = std::ffi::CString::new(name).unwrap();
-            if SimConnect_Open(
+            if sys::SimConnect_Open(
                 ptr,
                 name.as_ptr(),
                 std::ptr::null_mut(),
@@ -42,6 +29,6 @@ impl SimConnect {
 
 impl Drop for SimConnect {
     fn drop(&mut self) {
-        assert!(unsafe { SimConnect_Close(self.0) } >= 0);
+        assert!(unsafe { sys::SimConnect_Close(*self.0) } >= 0);
     }
 }

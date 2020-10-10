@@ -33,37 +33,11 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// use crate::sys;</span>
-
-<span class="comment">// FIXME: these should be provided in `sys`, but bindgen is ignoring them for some reason.</span>
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">SimConnect_Open</span>(
-        <span class="ident">sim_connect</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
-        <span class="ident">name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_char</span>,
-        <span class="ident">hwnd</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
-        <span class="ident">user_event_win32</span>: <span class="ident">i32</span>,
-        <span class="ident">event_handle</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
-        <span class="ident">config_index</span>: <span class="ident">i32</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">i32</span>;
-    <span class="kw">fn</span> <span class="ident">SimConnect_Close</span>(<span class="ident">sim_connect</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">i32</span>;
-}
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
 
 <span class="doccomment">/// A SimConnect session. This provides access to data within the MSFS sim.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimConnect</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimConnect</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>);
 
 <span class="kw">impl</span> <span class="ident">SimConnect</span> {
     <span class="doccomment">/// The `SimConnect::open` function is used to send a request to the Microsoft</span>
@@ -72,7 +46,7 @@
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>();
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">SimConnect_Open</span>(
+            <span class="kw">if</span> <span class="ident">sys</span>::<span class="ident">SimConnect_Open</span>(
                 <span class="ident">ptr</span>,
                 <span class="ident">name</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
@@ -91,7 +65,7 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SimConnect</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">unsafe</span> { <span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="number">0</span>) } <span class="op">&gt;=</span> <span class="number">0</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>) } <span class="op">&gt;=</span> <span class="number">0</span>);
     }
 }
 </pre></div>
