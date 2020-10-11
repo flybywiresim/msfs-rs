@@ -4,3 +4,4 @@ members = [
   "msfs_derive",
   "msfs_fix",
 ]
+exclude = ["examples"]
