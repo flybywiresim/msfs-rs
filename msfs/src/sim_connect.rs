@@ -2,6 +2,11 @@
 
 use crate::sys;
 
+pub use msfs_derive::sim_connect_data_definition as data_definition;
+pub trait DataDefinition {
+    const DEFINITIONS: &'static [(&'static str, &'static str, sys::SIMCONNECT_DATATYPE)];
+}
+
 pub type Result<T> = std::result::Result<T, sys::HRESULT>;
 #[inline(always)]
 fn map_err(result: sys::HRESULT) -> Result<()> {
@@ -61,21 +66,24 @@ impl SimConnect {
                 0,
                 std::ptr::null_mut(),
                 0,
+            ))?;
+            debug_assert!(!ptr.is_null());
+            let mut sim = SimConnect {
+                handle: ptr,
+                callback,
+            };
+            sim.call_dispatch()?;
+            Ok(sim)
+        }
+    }
+
+    fn call_dispatch(&mut self) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_CallDispatch(
+                self.handle,
+                Some(dispatch_cb),
+                self as *mut SimConnect as *mut std::ffi::c_void,
             ))
-            .map(|_| {
-                debug_assert!(!ptr.is_null());
-                let mut sim = SimConnect {
-                    handle: ptr,
-                    callback,
-                };
-                map_err(sys::SimConnect_CallDispatch(
-                    ptr,
-                    Some(dispatch_cb),
-                    &mut sim as *mut SimConnect as *mut std::ffi::c_void,
-                ))
-                .expect("failed to run SimConnect_CallDispatch");
-                sim
-            })
         }
     }
 
@@ -151,6 +159,28 @@ impl SimConnect {
                 event_id,
             ))
         }
+    }
+
+    pub fn add_data_definition<T: DataDefinition>(
+        &self,
+        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
+    ) -> Result<()> {
+        for (datum_name, units_type, datatype) in T::DEFINITIONS {
+            let datum_name = std::ffi::CString::new(*datum_name).unwrap();
+            let units_type = std::ffi::CString::new(*units_type).unwrap();
+            unsafe {
+                map_err(sys::SimConnect_AddToDataDefinition(
+                    self.handle,
+                    define_id,
+                    datum_name.as_ptr(),
+                    units_type.as_ptr(),
+                    *datatype,
+                    0.0,
+                    0,
+                ))?;
+            }
+        }
+        Ok(())
     }
 }
 
