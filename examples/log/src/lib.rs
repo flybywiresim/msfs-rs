@@ -1,6 +1,10 @@
-use ::msfs::{msfs, sim_connect::SimConnect};
+use ::msfs::{msfs, sim_connect::{SimConnect, SimConnectRecv}};
 
 static mut SIM: Option<SimConnect> = None;
+
+fn simconnect_cb(_sim: &SimConnect, recv: SimConnectRecv) {
+    println!("SimConnect Dispatch {:?}", recv);
+}
 
 /// ```cfg
 /// [VCockpit0]
@@ -13,7 +17,7 @@ static mut SIM: Option<SimConnect> = None;
 fn log(_: &msfs::FsContext, service_id: msfs::PanelServiceID) -> msfs::GaugeCallbackResult {
     println!("RUST: FBWCB {:?}", service_id);
     match service_id {
-        msfs::PanelServiceID::PreInstall => match SimConnect::open("log") {
+        msfs::PanelServiceID::PreInstall => match SimConnect::open("log", simconnect_cb) {
             Ok(s) => {
                 unsafe { SIM = Some(s) };
                 Ok(())
@@ -22,12 +26,6 @@ fn log(_: &msfs::FsContext, service_id: msfs::PanelServiceID) -> msfs::GaugeCall
         },
         msfs::PanelServiceID::PreKill => {
             drop(unsafe { SIM.take() });
-            Ok(())
-        }
-        msfs::PanelServiceID::PreUpdate => {
-            println!("SimConnect Dispatch {:?}", unsafe {
-                SIM.as_ref().unwrap().get_next_dispatch()
-            });
             Ok(())
         }
         _ => Ok(()),
