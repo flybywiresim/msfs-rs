@@ -1,12 +1,19 @@
+#![allow(clippy::too_many_arguments)]
+
 use crate::sys;
 
+pub type Result<T> = std::result::Result<T, sys::HRESULT>;
 #[inline(always)]
-fn check(result: sys::HRESULT) {
-    assert!(result >= 0);
+fn map_err(result: sys::HRESULT) -> Result<()> {
+    if result >= 0 {
+        Ok(())
+    } else {
+        Err(result)
+    }
 }
 
 /// Callback provided to SimConnect session.
-type SimConnectRecvCallback = fn(&SimConnect, SimConnectRecv);
+pub type SimConnectRecvCallback = fn(sim: &SimConnect, recv: SimConnectRecv);
 
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect {
@@ -43,45 +50,106 @@ extern "C" fn dispatch_cb(
 impl SimConnect {
     /// The `SimConnect::open` function is used to send a request to the Microsoft
     /// Flight Simulator server to open up communications with a new client.
-    pub fn open(name: &str, callback: SimConnectRecvCallback) -> Result<SimConnect, ()> {
+    pub fn open(name: &str, callback: SimConnectRecvCallback) -> Result<SimConnect> {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             let name = std::ffi::CString::new(name).unwrap();
-            if sys::SimConnect_Open(
+            map_err(sys::SimConnect_Open(
                 &mut ptr,
                 name.as_ptr(),
                 std::ptr::null_mut(),
                 0,
                 std::ptr::null_mut(),
                 0,
-            ) >= 0
-            {
+            ))
+            .map(|_| {
                 debug_assert!(!ptr.is_null());
                 let mut sim = SimConnect {
                     handle: ptr,
                     callback,
                 };
-                check(sys::SimConnect_CallDispatch(
+                map_err(sys::SimConnect_CallDispatch(
                     ptr,
                     Some(dispatch_cb),
                     &mut sim as *mut SimConnect as *mut std::ffi::c_void,
-                ));
-                Ok(sim)
-            } else {
-                Err(())
-            }
+                ))
+                .expect("failed to run SimConnect_CallDispatch");
+                sim
+            })
         }
     }
 
-    /// Register a sim event to be relayed to the `callback`, mapped by the client event `id`.
-    pub fn map_client_event_to_sim_event(&self, id: u32, name: &str) {
+    /// Add an individual client defined event to a notification group.
+    pub fn add_client_event_to_notification_group(
+        &self,
+        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
+        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        maskable: bool,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_AddClientEventToNotificationGroup(
+                self.handle,
+                group_id,
+                event_id,
+                maskable as u32,
+            ))
+        }
+    }
+
+    /// Associate a client defined event ID with a Prepar3D event name.
+    pub fn map_client_event_to_sim_event(
+        &self,
+        id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        name: &str,
+    ) -> Result<()> {
         unsafe {
             let name = std::ffi::CString::new(name).unwrap();
-            check(sys::SimConnect_MapClientEventToSimEvent(
+            map_err(sys::SimConnect_MapClientEventToSimEvent(
                 self.handle,
                 id,
                 name.as_ptr(),
-            ));
+            ))
+        }
+    }
+
+    /// Connect an input event (such as a keystroke, joystick or mouse movement) with the sending of an appropriate event notification.
+    pub fn map_input_event_to_client_event(
+        &self,
+        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
+        input_definition: &str,
+        down_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        down_value: u32,
+        up_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        up_value: u32,
+        maskable: bool,
+    ) -> Result<()> {
+        unsafe {
+            let input_definition = std::ffi::CString::new(input_definition).unwrap();
+            map_err(sys::SimConnect_MapInputEventToClientEvent(
+                self.handle,
+                group_id,
+                input_definition.as_ptr(),
+                down_event_id,
+                down_value,
+                up_event_id,
+                up_value,
+                maskable as u32,
+            ))
+        }
+    }
+
+    /// Remove a client defined event from a notification group.
+    pub fn remove_client_event(
+        &self,
+        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
+        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_RemoveClientEvent(
+                self.handle,
+                group_id,
+                event_id,
+            ))
         }
     }
 }
