@@ -40,3 +40,28 @@ pub type GaugeCallback = fn(&FsContext, PanelServiceID) -> GaugeCallbackResult;
 pub type GaugeCallbackResult = Result<(), ()>;
 
 pub use msfs_derive::gauge;
+
+/// Bindings to the Legacy/gauges.h API
+pub struct Legacy {}
+impl Legacy {
+    /// aircraft_varget
+    pub fn aircraft_varget(simvar: sys::ENUM, units: sys::ENUM, index: sys::SINT32) -> f64 {
+        unsafe { sys::aircraft_varget(simvar, units, index) }
+    }
+
+    /// get_aircraft_var_enum
+    pub fn get_aircraft_var_enum(name: &str) -> sys::ENUM {
+        unsafe {
+            let name = std::ffi::CString::new(name).unwrap();
+            sys::get_aircraft_var_enum(name.as_ptr())
+        }
+    }
+
+    /// get_units_enum
+    pub fn get_units_enum(unitname: &str) -> sys::ENUM {
+        unsafe {
+            let name = std::ffi::CString::new(unitname).unwrap();
+            sys::get_units_enum(name.as_ptr())
+        }
+    }
+}

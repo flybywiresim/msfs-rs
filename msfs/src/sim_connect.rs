@@ -131,9 +131,9 @@ impl SimConnect {
         group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
         input_definition: &str,
         down_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        down_value: u32,
+        down_value: sys::DWORD,
         up_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        up_value: u32,
+        up_value: sys::DWORD,
         maskable: bool,
     ) -> Result<()> {
         unsafe {
@@ -203,7 +203,7 @@ impl SimConnect {
                 object_id,
                 0,
                 0,
-                std::mem::size_of_val(data) as u32,
+                std::mem::size_of_val(data) as sys::DWORD,
                 data as *const T as *mut std::ffi::c_void,
             ))
         }
