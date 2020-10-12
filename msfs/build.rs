@@ -2,10 +2,12 @@ fn main() {
     let msfs_sdk = std::env::var("MSFS_SDK").unwrap_or_else(calculate_msfs_sdk_path);
     println!("Found MSFS SDK: {:?}", msfs_sdk);
 
-    println!("cargo:rerun-if-changed=src/wrapper.hpp");
+    println!("cargo:rerun-if-changed=src/bindgen_support/wrapper.hpp");
     let bindings = bindgen::Builder::default()
         .clang_arg(format!("-I{}", msfs_sdk))
-        .header("src/wrapper.hpp")
+        .clang_arg(format!("-I{}", "src/bindgen_support"))
+        .clang_arg("-fms-extensions")
+        .header("src/bindgen_support/wrapper.hpp")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .impl_debug(true)
         .generate()

@@ -1,8 +1,3 @@
 (function() {var implementors = {};
-implementors["id_arena"] = [{"text":"impl&lt;T&gt; PartialOrd&lt;Id&lt;T&gt;&gt; for Id&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["log"] = [{"text":"impl PartialOrd&lt;Level&gt; for Level","synthetic":false,"types":[]},{"text":"impl PartialOrd&lt;LevelFilter&gt; for Level","synthetic":false,"types":[]},{"text":"impl PartialOrd&lt;LevelFilter&gt; for LevelFilter","synthetic":false,"types":[]},{"text":"impl PartialOrd&lt;Level&gt; for LevelFilter","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; PartialOrd&lt;Metadata&lt;'a&gt;&gt; for Metadata&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; PartialOrd&lt;MetadataBuilder&lt;'a&gt;&gt; for MetadataBuilder&lt;'a&gt;","synthetic":false,"types":[]}];
-implementors["proc_macro2"] = [{"text":"impl PartialOrd&lt;Ident&gt; for Ident","synthetic":false,"types":[]}];
-implementors["syn"] = [{"text":"impl PartialOrd&lt;Lifetime&gt; for Lifetime","synthetic":false,"types":[]}];
-implementors["walrus"] = [{"text":"impl PartialOrd&lt;Type&gt; for Type","synthetic":false,"types":[]},{"text":"impl PartialOrd&lt;ValType&gt; for ValType","synthetic":false,"types":[]}];
-implementors["wasmparser"] = [{"text":"impl PartialOrd&lt;Range&gt; for Range","synthetic":false,"types":[]},{"text":"impl PartialOrd&lt;CustomSectionKind&gt; for CustomSectionKind","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; PartialOrd&lt;SectionCode&lt;'a&gt;&gt; for SectionCode&lt;'a&gt;","synthetic":false,"types":[]}];
+implementors["msfs"] = [{"text":"impl&lt;Storage:&nbsp;PartialOrd, Align:&nbsp;PartialOrd&gt; PartialOrd&lt;__BindgenBitfieldUnit&lt;Storage, Align&gt;&gt; for __BindgenBitfieldUnit&lt;Storage, Align&gt;","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

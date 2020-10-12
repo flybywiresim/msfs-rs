@@ -2,8 +2,13 @@
 
 use crate::sys;
 
+pub use sys::SIMCONNECT_OBJECT_ID_USER;
+
 pub use msfs_derive::sim_connect_data_definition as data_definition;
+
+/// A trait implemented by the `data_definition` attribute.
 pub trait DataDefinition {
+    #[doc(hidden)]
     const DEFINITIONS: &'static [(&'static str, &'static str, sys::SIMCONNECT_DATATYPE)];
 }
 
@@ -33,7 +38,7 @@ extern "C" fn dispatch_cb(
 ) {
     let sim = unsafe { &*(p_context as *mut SimConnect) };
     let recv = unsafe {
-        match (*recv).dwID {
+        match (*recv).dwID as sys::SIMCONNECT_RECV_ID {
             sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_NULL => Some(SimConnectRecv::Null),
             sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_OPEN => Some(SimConnectRecv::Open(
                 &*(recv as *mut sys::SIMCONNECT_RECV_OPEN),
@@ -57,17 +62,17 @@ impl SimConnect {
     /// Flight Simulator server to open up communications with a new client.
     pub fn open(name: &str, callback: SimConnectRecvCallback) -> Result<SimConnect> {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = 0;
             let name = std::ffi::CString::new(name).unwrap();
             map_err(sys::SimConnect_Open(
                 &mut ptr,
                 name.as_ptr(),
                 std::ptr::null_mut(),
                 0,
-                std::ptr::null_mut(),
+                0,
                 0,
             ))?;
-            debug_assert!(!ptr.is_null());
+            debug_assert!(ptr != 0);
             let mut sim = SimConnect {
                 handle: ptr,
                 callback,
@@ -99,7 +104,7 @@ impl SimConnect {
                 self.handle,
                 group_id,
                 event_id,
-                maskable as u32,
+                maskable as i32,
             ))
         }
     }
@@ -141,7 +146,7 @@ impl SimConnect {
                 down_value,
                 up_event_id,
                 up_value,
-                maskable as u32,
+                maskable as i32,
             ))
         }
     }
@@ -161,6 +166,7 @@ impl SimConnect {
         }
     }
 
+    /// Associate a data definition with a client defined object definition.
     pub fn add_data_definition<T: DataDefinition>(
         &self,
         define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
@@ -181,6 +187,26 @@ impl SimConnect {
             }
         }
         Ok(())
+    }
+
+    /// Make changes to the data properties of an object.
+    pub fn set_data_on_sim_object<T: DataDefinition>(
+        &self,
+        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        data: &T,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_SetDataOnSimObject(
+                self.handle,
+                define_id,
+                object_id,
+                0,
+                0,
+                std::mem::size_of_val(data) as u32,
+                data as *const T as *mut std::ffi::c_void,
+            ))
+        }
     }
 }
 
