@@ -61,8 +61,8 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
         pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: u32, _: *mut u8) -> bool {
             fn remap(
                 gauge: ::msfs::msfs::Gauge,
-            ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), Box<dyn std::error::Error>>> + 'static>> {
-                Box::pin(#rusty_name(gauge))
+            ) -> std::pin::Pin<std::boxed::Box<dyn std::future::Future<Output = std::result::Result<(), std::boxed::Box<dyn std::error::Error>>> + 'static>> {
+                std::boxed::Box::pin(#rusty_name(gauge))
             }
             static mut executor: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
                 handle: remap,
