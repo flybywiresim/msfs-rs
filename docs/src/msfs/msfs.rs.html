@@ -131,6 +131,7 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel</span>::<span class="ident">mpsc</span>, <span class="ident">Future</span>};
@@ -163,8 +164,9 @@
 }
 
 <span class="doccomment">/// Bindings to the Legacy/gauges.h API</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Legacy</span> {}
-<span class="kw">impl</span> <span class="ident">Legacy</span> {
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">legacy</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">sys</span>;
+
     <span class="doccomment">/// aircraft_varget</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aircraft_varget</span>(<span class="ident">simvar</span>: <span class="ident">sys</span>::<span class="ident">ENUM</span>, <span class="ident">units</span>: <span class="ident">sys</span>::<span class="ident">ENUM</span>, <span class="ident">index</span>: <span class="ident">sys</span>::<span class="ident">SINT32</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">aircraft_varget</span>(<span class="ident">simvar</span>, <span class="ident">units</span>, <span class="ident">index</span>) }

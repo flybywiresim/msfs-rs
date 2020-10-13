@@ -29,8 +29,9 @@ pub enum PanelServiceID {
 }
 
 /// Bindings to the Legacy/gauges.h API
-pub struct Legacy {}
-impl Legacy {
+pub mod legacy {
+    use super::sys;
+
     /// aircraft_varget
     pub fn aircraft_varget(simvar: sys::ENUM, units: sys::ENUM, index: sys::SINT32) -> f64 {
         unsafe { sys::aircraft_varget(simvar, units, index) }
