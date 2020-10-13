@@ -241,6 +241,18 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -256,23 +268,33 @@
     <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATATYPE</span>)];
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">sys</span>::<span class="ident">HRESULT</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Rusty HRESULT wrapper.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HResult</span>(<span class="ident">sys</span>::<span class="ident">HRESULT</span>);
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">HResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>::<span class="ident">fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
+    }
+}
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">HResult</span> {}
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HResult</span><span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="kw">fn</span> <span class="ident">map_err</span>(<span class="ident">result</span>: <span class="ident">sys</span>::<span class="ident">HRESULT</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">result</span> <span class="op">&gt;=</span> <span class="number">0</span> {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">result</span>)
+        <span class="prelude-val">Err</span>(<span class="ident">HResult</span>(<span class="ident">result</span>))
     }
 }
 
 <span class="doccomment">/// Callback provided to SimConnect session.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SimConnectRecvCallback</span> <span class="op">=</span> <span class="kw">fn</span>(<span class="ident">sim</span>: <span class="kw-2">&amp;</span><span class="ident">SimConnect</span>, <span class="ident">recv</span>: <span class="ident">SimConnectRecv</span>);
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SimConnectRecvCallback</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">SimConnect</span>, <span class="ident">SimConnectRecv</span>);
 
 <span class="doccomment">/// A SimConnect session. This provides access to data within the MSFS sim.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimConnect</span> {
     <span class="ident">handle</span>: <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
-    <span class="ident">callback</span>: <span class="ident">SimConnectRecvCallback</span>,
+    <span class="ident">callback</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SimConnectRecvCallback</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">dispatch_cb</span>(
@@ -302,9 +324,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SimConnect</span> {
-    <span class="doccomment">/// The `SimConnect::open` function is used to send a request to the Microsoft</span>
-    <span class="doccomment">/// Flight Simulator server to open up communications with a new client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">SimConnectRecvCallback</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SimConnect</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SimConnect</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">SimConnect</span>, <span class="ident">SimConnectRecv</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
@@ -319,7 +343,7 @@
             <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">ptr</span> <span class="op">!=</span> <span class="number">0</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">SimConnect</span> {
                 <span class="ident">handle</span>: <span class="ident">ptr</span>,
-                <span class="ident">callback</span>,
+                <span class="ident">callback</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">callback</span>),
             };
             <span class="ident">sim</span>.<span class="ident">call_dispatch</span>()<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)

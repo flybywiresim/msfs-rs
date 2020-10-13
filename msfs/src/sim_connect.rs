@@ -12,23 +12,33 @@ pub trait DataDefinition {
     const DEFINITIONS: &'static [(&'static str, &'static str, sys::SIMCONNECT_DATATYPE)];
 }
 
-pub type Result<T> = std::result::Result<T, sys::HRESULT>;
+/// Rusty HRESULT wrapper.
+#[derive(Debug)]
+pub struct HResult(sys::HRESULT);
+impl std::fmt::Display for HResult {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        std::fmt::Debug::fmt(self, fmt)
+    }
+}
+impl std::error::Error for HResult {}
+
+pub type Result<T> = std::result::Result<T, HResult>;
 #[inline(always)]
 fn map_err(result: sys::HRESULT) -> Result<()> {
     if result >= 0 {
         Ok(())
     } else {
-        Err(result)
+        Err(HResult(result))
     }
 }
 
 /// Callback provided to SimConnect session.
-pub type SimConnectRecvCallback = fn(sim: &SimConnect, recv: SimConnectRecv);
+pub type SimConnectRecvCallback = dyn Fn(&SimConnect, SimConnectRecv);
 
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect {
     handle: sys::HANDLE,
-    callback: SimConnectRecvCallback,
+    callback: Box<SimConnectRecvCallback>,
 }
 
 extern "C" fn dispatch_cb(
@@ -58,9 +68,11 @@ extern "C" fn dispatch_cb(
 }
 
 impl SimConnect {
-    /// The `SimConnect::open` function is used to send a request to the Microsoft
-    /// Flight Simulator server to open up communications with a new client.
-    pub fn open(name: &str, callback: SimConnectRecvCallback) -> Result<SimConnect> {
+    /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
+    pub fn open<F>(name: &str, callback: F) -> Result<SimConnect>
+    where
+        F: Fn(&SimConnect, SimConnectRecv) + 'static,
+    {
         unsafe {
             let mut ptr = 0;
             let name = std::ffi::CString::new(name).unwrap();
@@ -75,7 +87,7 @@ impl SimConnect {
             debug_assert!(ptr != 0);
             let mut sim = SimConnect {
                 handle: ptr,
-                callback,
+                callback: Box::new(callback),
             };
             sim.call_dispatch()?;
             Ok(sim)

@@ -28,10 +28,13 @@ impl Parse for GaugeArgs {
 /// Declare a gauge callback. It will be automatically exported with the name
 /// `NAME_gauge_callback`, where `NAME` is the name of the decorated function.
 /// ```rs
+/// use futures::stream::{Stream, StreamExt};
 /// // Declare and export `FOO_gauge_callback`
 /// #[msfs::gauge]
-/// fn FOO(ctx: &msfs::FsContext, service_id: msfs::PanelServiceID) -> msfs::GaugeCallbackResult {
-///   // ...
+/// async fn FOO(mut gauge: msfs::Gauge) -> Result<(), Box<dyn std::error::Error>> {
+///   while let Some(event) = gauge.next_event().await {
+///     // ...
+///   }
 /// }
 /// ```
 ///
@@ -39,7 +42,7 @@ impl Parse for GaugeArgs {
 /// ```rs
 /// // Declare and export `FOO_gauge_callback`
 /// #[msfs::gauge(name=FOO)]
-/// fn xyz(...) {}
+/// async fn xyz(...) {}
 #[proc_macro_attribute]
 pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as GaugeArgs);
@@ -55,13 +58,19 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
         #input
 
         #[no_mangle]
-        pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: i32, _: *mut u8) -> bool {
-            let rusty: ::msfs::msfs::GaugeCallback = #rusty_name;
-            let ctx = ::msfs::msfs::FsContext::from(ctx);
-            let service_id = unsafe { std::mem::transmute(service_id) };
-            match rusty(&ctx, service_id) {
-                Ok(()) => true,
-                Err(()) => false,
+        pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: u32, _: *mut u8) -> bool {
+            fn remap(
+                gauge: ::msfs::msfs::Gauge,
+            ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), Box<dyn std::error::Error>>> + 'static>> {
+                Box::pin(#rusty_name(gauge))
+            }
+            static mut executor: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
+                handle: remap,
+                tx: None,
+                future: None,
+            };
+            unsafe {
+                executor.handle(ctx, service_id)
             }
         }
     };

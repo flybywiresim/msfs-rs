@@ -8,6 +8,7 @@ license-file = "LICENSE"
 
 [dependencies]
 msfs_derive = { path = "../msfs_derive" }
+futures = "0.3"
 
 [build-dependencies]
 bindgen = "0.53"
