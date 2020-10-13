@@ -151,6 +151,21 @@ impl SimConnect {
         }
     }
 
+    /// Set the priority for a notification group.
+    pub fn set_notification_group_priority(
+        &self,
+        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
+        priority: sys::DWORD,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_SetNotificationGroupPriority(
+                self.handle,
+                group_id,
+                priority,
+            ))
+        }
+    }
+
     /// Remove a client defined event from a notification group.
     pub fn remove_client_event(
         &self,

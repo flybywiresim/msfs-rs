@@ -226,6 +226,21 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -376,6 +391,21 @@
                 <span class="ident">up_event_id</span>,
                 <span class="ident">up_value</span>,
                 <span class="ident">maskable</span> <span class="kw">as</span> <span class="ident">i32</span>,
+            ))
+        }
+    }
+
+    <span class="doccomment">/// Set the priority for a notification group.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_notification_group_priority</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">group_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_NOTIFICATION_GROUP_ID</span>,
+        <span class="ident">priority</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetNotificationGroupPriority</span>(
+                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="ident">group_id</span>,
+                <span class="ident">priority</span>,
             ))
         }
     }
