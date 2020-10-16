@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::sys;
+use std::ptr::NonNull;
 
 pub use sys::SIMCONNECT_OBJECT_ID_USER;
 
@@ -37,7 +38,7 @@ pub type SimConnectRecvCallback = dyn Fn(&SimConnect, SimConnectRecv);
 
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect {
-    handle: sys::HANDLE,
+    handle: NonNull<std::ffi::c_void>,
     callback: Box<SimConnectRecvCallback>,
 }
 
@@ -84,9 +85,10 @@ impl SimConnect {
                 0,
                 0,
             ))?;
-            debug_assert!(ptr != 0);
+            let ptr = ptr as *mut std::ffi::c_void;
+            debug_assert!(!ptr.is_null());
             let mut sim = SimConnect {
-                handle: ptr,
+                handle: NonNull::new_unchecked(ptr),
                 callback: Box::new(callback),
             };
             sim.call_dispatch()?;
@@ -97,7 +99,7 @@ impl SimConnect {
     fn call_dispatch(&mut self) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_CallDispatch(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 Some(dispatch_cb),
                 self as *mut SimConnect as *mut std::ffi::c_void,
             ))
@@ -113,7 +115,7 @@ impl SimConnect {
     ) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_AddClientEventToNotificationGroup(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 group_id,
                 event_id,
                 maskable as i32,
@@ -130,7 +132,7 @@ impl SimConnect {
         unsafe {
             let name = std::ffi::CString::new(name).unwrap();
             map_err(sys::SimConnect_MapClientEventToSimEvent(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 id,
                 name.as_ptr(),
             ))
@@ -151,7 +153,7 @@ impl SimConnect {
         unsafe {
             let input_definition = std::ffi::CString::new(input_definition).unwrap();
             map_err(sys::SimConnect_MapInputEventToClientEvent(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 group_id,
                 input_definition.as_ptr(),
                 down_event_id,
@@ -171,7 +173,7 @@ impl SimConnect {
     ) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_SetNotificationGroupPriority(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 group_id,
                 priority,
             ))
@@ -186,7 +188,7 @@ impl SimConnect {
     ) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_RemoveClientEvent(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 group_id,
                 event_id,
             ))
@@ -203,7 +205,7 @@ impl SimConnect {
             let units_type = std::ffi::CString::new(*units_type).unwrap();
             unsafe {
                 map_err(sys::SimConnect_AddToDataDefinition(
-                    self.handle,
+                    self.handle.as_ptr() as sys::HANDLE,
                     define_id,
                     datum_name.as_ptr(),
                     units_type.as_ptr(),
@@ -225,7 +227,7 @@ impl SimConnect {
     ) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_SetDataOnSimObject(
-                self.handle,
+                self.handle.as_ptr() as sys::HANDLE,
                 define_id,
                 object_id,
                 0,
@@ -249,6 +251,6 @@ pub enum SimConnectRecv<'a> {
 
 impl Drop for SimConnect {
     fn drop(&mut self) {
-        assert!(unsafe { sys::SimConnect_Close(self.handle) } >= 0);
+        assert!(unsafe { sys::SimConnect_Close(self.handle.as_ptr() as sys::HANDLE) } >= 0);
     }
 }

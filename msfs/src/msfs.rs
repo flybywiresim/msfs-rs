@@ -58,15 +58,15 @@ use crate::sim_connect::SimConnectRecv;
 pub use msfs_derive::gauge;
 
 #[derive(Debug)]
-pub enum MSFSEvent {
+pub enum MSFSEvent<'a> {
     PanelServiceID(PanelServiceID),
-    SimConnect(crate::sim_connect::SimConnectRecv<'static>),
+    SimConnect(crate::sim_connect::SimConnectRecv<'a>),
 }
 
 /// Gauge
 pub struct Gauge {
     executor: *mut GaugeExecutor,
-    rx: mpsc::Receiver<MSFSEvent>,
+    rx: mpsc::Receiver<MSFSEvent<'static>>,
 }
 
 impl Gauge {
@@ -85,9 +85,9 @@ impl Gauge {
     }
 
     /// Consume the next event from MSFS.
-    pub fn next_event(&mut self) -> impl Future<Output = Option<MSFSEvent>> + '_ {
+    pub fn next_event(&mut self) -> impl Future<Output = Option<MSFSEvent<'_>>> + '_ {
         use futures::stream::StreamExt;
-        self.rx.next()
+        async move { self.rx.next().await }
     }
 }
 
@@ -97,7 +97,7 @@ type GaugeExecutorFuture =
 pub struct GaugeExecutor {
     pub handle: fn(Gauge) -> GaugeExecutorFuture,
     pub future: Option<GaugeExecutorFuture>,
-    pub tx: Option<mpsc::Sender<MSFSEvent>>,
+    pub tx: Option<mpsc::Sender<MSFSEvent<'static>>>,
 }
 
 #[doc(hidden)]
@@ -118,7 +118,7 @@ impl GaugeExecutor {
         }
     }
 
-    fn send(&mut self, data: Option<MSFSEvent>) -> bool {
+    fn send(&mut self, data: Option<MSFSEvent<'static>>) -> bool {
         if let Some(data) = data {
             self.tx.as_mut().unwrap().try_send(data).unwrap();
         } else {

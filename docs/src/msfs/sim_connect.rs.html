@@ -253,10 +253,13 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">NonNull</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID_USER</span>;
 
@@ -293,7 +296,7 @@
 
 <span class="doccomment">/// A SimConnect session. This provides access to data within the MSFS sim.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimConnect</span> {
-    <span class="ident">handle</span>: <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
+    <span class="ident">handle</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span><span class="op">&gt;</span>,
     <span class="ident">callback</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SimConnectRecvCallback</span><span class="op">&gt;</span>,
 }
 
@@ -340,9 +343,10 @@
                 <span class="number">0</span>,
                 <span class="number">0</span>,
             ))<span class="question-mark">?</span>;
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">ptr</span> <span class="op">!=</span> <span class="number">0</span>);
+            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>;
+            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">ptr</span>.<span class="ident">is_null</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">SimConnect</span> {
-                <span class="ident">handle</span>: <span class="ident">ptr</span>,
+                <span class="ident">handle</span>: <span class="ident">NonNull</span>::<span class="ident">new_unchecked</span>(<span class="ident">ptr</span>),
                 <span class="ident">callback</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">callback</span>),
             };
             <span class="ident">sim</span>.<span class="ident">call_dispatch</span>()<span class="question-mark">?</span>;
@@ -353,7 +357,7 @@
     <span class="kw">fn</span> <span class="ident">call_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_CallDispatch</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">dispatch_cb</span>),
                 <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
             ))
@@ -369,7 +373,7 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddClientEventToNotificationGroup</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">group_id</span>,
                 <span class="ident">event_id</span>,
                 <span class="ident">maskable</span> <span class="kw">as</span> <span class="ident">i32</span>,
@@ -386,7 +390,7 @@
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_MapClientEventToSimEvent</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">id</span>,
                 <span class="ident">name</span>.<span class="ident">as_ptr</span>(),
             ))
@@ -407,7 +411,7 @@
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">input_definition</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">input_definition</span>).<span class="ident">unwrap</span>();
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_MapInputEventToClientEvent</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">group_id</span>,
                 <span class="ident">input_definition</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">down_event_id</span>,
@@ -427,7 +431,7 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetNotificationGroupPriority</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">group_id</span>,
                 <span class="ident">priority</span>,
             ))
@@ -442,7 +446,7 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_RemoveClientEvent</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">group_id</span>,
                 <span class="ident">event_id</span>,
             ))
@@ -459,7 +463,7 @@
             <span class="kw">let</span> <span class="ident">units_type</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">units_type</span>).<span class="ident">unwrap</span>();
             <span class="kw">unsafe</span> {
                 <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddToDataDefinition</span>(
-                    <span class="self">self</span>.<span class="ident">handle</span>,
+                    <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                     <span class="ident">define_id</span>,
                     <span class="ident">datum_name</span>.<span class="ident">as_ptr</span>(),
                     <span class="ident">units_type</span>.<span class="ident">as_ptr</span>(),
@@ -481,7 +485,7 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetDataOnSimObject</span>(
-                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
                 <span class="ident">define_id</span>,
                 <span class="ident">object_id</span>,
                 <span class="number">0</span>,
@@ -505,7 +509,7 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SimConnect</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>) } <span class="op">&gt;=</span> <span class="number">0</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">HANDLE</span>) } <span class="op">&gt;=</span> <span class="number">0</span>);
     }
 }
 </pre></div>
