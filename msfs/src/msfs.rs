@@ -52,6 +52,25 @@ pub mod legacy {
             sys::get_units_enum(name.as_ptr())
         }
     }
+
+    /// execute_calculator_code for f64
+    pub fn execute_calculator_code_f64(code: &str) -> Option<f64> {
+        unsafe {
+            let code = std::ffi::CString::new(code).unwrap();
+            let mut n = 0.0;
+            if sys::execute_calculator_code(
+                code.as_ptr(),
+                &mut n,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            ) == 1
+            {
+                Some(n)
+            } else {
+                None
+            }
+        }
+    }
 }
 
 use crate::sim_connect::SimConnectRecv;
