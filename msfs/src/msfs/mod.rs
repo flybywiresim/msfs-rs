@@ -1,7 +1,10 @@
 use crate::sys;
+
 use futures::{channel::mpsc, Future};
 use std::pin::Pin;
 use std::task::Poll;
+
+pub mod legacy;
 
 /// `PanelServiceID` is used in `GaugeCallback`s and is generated from
 /// `sys::PANEL_SERVICE_*` constants.
@@ -28,51 +31,6 @@ pub enum PanelServiceID {
     PanelClose = sys::PANEL_SERVICE_PANEL_CLOSE,
 }
 
-/// Bindings to the Legacy/gauges.h API
-pub mod legacy {
-    use super::sys;
-
-    /// aircraft_varget
-    pub fn aircraft_varget(simvar: sys::ENUM, units: sys::ENUM, index: sys::SINT32) -> f64 {
-        unsafe { sys::aircraft_varget(simvar, units, index) }
-    }
-
-    /// get_aircraft_var_enum
-    pub fn get_aircraft_var_enum(name: &str) -> sys::ENUM {
-        unsafe {
-            let name = std::ffi::CString::new(name).unwrap();
-            sys::get_aircraft_var_enum(name.as_ptr())
-        }
-    }
-
-    /// get_units_enum
-    pub fn get_units_enum(unitname: &str) -> sys::ENUM {
-        unsafe {
-            let name = std::ffi::CString::new(unitname).unwrap();
-            sys::get_units_enum(name.as_ptr())
-        }
-    }
-
-    /// execute_calculator_code for f64
-    pub fn execute_calculator_code_f64(code: &str) -> Option<f64> {
-        unsafe {
-            let code = std::ffi::CString::new(code).unwrap();
-            let mut n = 0.0;
-            if sys::execute_calculator_code(
-                code.as_ptr(),
-                &mut n,
-                std::ptr::null_mut(),
-                std::ptr::null_mut(),
-            ) == 1
-            {
-                Some(n)
-            } else {
-                None
-            }
-        }
-    }
-}
-
 use crate::sim_connect::SimConnectRecv;
 pub use msfs_derive::gauge;
 
@@ -97,7 +55,8 @@ impl Gauge {
         let executor = self.executor;
         let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
             let executor = unsafe { &mut *executor };
-            let recv: SimConnectRecv<'static> = unsafe { std::mem::transmute(recv) };
+            let recv =
+                unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
             executor.send(Some(MSFSEvent::SimConnect(recv)));
         })?;
         Ok(sim)
@@ -124,10 +83,14 @@ impl GaugeExecutor {
     pub fn handle(&mut self, _ctx: sys::FsContext, service_id: u32) -> bool {
         match service_id {
             sys::PANEL_SERVICE_PRE_INSTALL => {
-                let (tx, rx) = mpsc::channel(1);
-                self.tx = Some(tx);
-                let gauge = Gauge { executor: self, rx };
-                self.future = Some(Box::pin((self.handle)(gauge)));
+                if self.future.is_none() {
+                    let (tx, rx) = mpsc::channel(1);
+                    self.tx = Some(tx);
+                    let gauge = Gauge { executor: self, rx };
+                    self.future = Some(Box::pin((self.handle)(gauge)));
+                } else {
+                    eprintln!("MSFS-RS: (warn) Multiple PRE_INSTALL events detected");
+                }
                 true
             }
             sys::PANEL_SERVICE_POST_KILL => self.send(None),

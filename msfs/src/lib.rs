@@ -33,7 +33,7 @@
 //! to run the `msfs-fix` util on your output wasm files, like so:
 //! ```shell
 //! $ cargo build
-//! $ msfs-fix target/wasm32-wasi/release/foo.wasm > target/wasm32-wasi/release/foo.wasm
+//! $ msfs-fix target/wasm32-wasi/release/foo.wasm ./foo.wasm
 //! ```
 
 pub mod msfs;

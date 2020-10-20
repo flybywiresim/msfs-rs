@@ -1,5 +1,3 @@
-use std::io::Write;
-
 fn main() {
     let mut m = walrus::Module::from_file(
         std::env::args()
@@ -15,5 +13,11 @@ fn main() {
     fix("malloc");
     fix("free");
 
-    std::io::stdout().write_all(&m.emit_wasm()).unwrap();
+    std::fs::write(
+        std::env::args()
+            .nth(2)
+            .expect("must provide output dir as second argument"),
+        &m.emit_wasm(),
+    )
+    .unwrap();
 }

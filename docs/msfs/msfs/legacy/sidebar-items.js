@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["aircraft_varget","aircraft_varget"],["execute_calculator_code_f64","execute_calculator_code for f64"],["get_aircraft_var_enum","get_aircraft_var_enum"],["get_units_enum","get_units_enum"]]});
+initSidebarItems({"fn":[["aircraft_varget","aircraft_varget"],["execute_calculator_code","execute_calculator_code"],["get_aircraft_var_enum","get_aircraft_var_enum"],["get_units_enum","get_units_enum"]]});
