@@ -7,6 +7,7 @@ fn main() {
         .clang_arg(format!("-I{}", msfs_sdk))
         .clang_arg(format!("-I{}", "src/bindgen_support"))
         .clang_arg("-fms-extensions")
+        .clang_arg("-fvisibility=default")
         .clang_arg("-xc++")
         .header("src/bindgen_support/wrapper.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
