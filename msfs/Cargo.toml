@@ -11,4 +11,4 @@ msfs_derive = { path = "../msfs_derive" }
 futures = "0.3"
 
 [build-dependencies]
-bindgen = "0.53"
+bindgen = "0.55"
