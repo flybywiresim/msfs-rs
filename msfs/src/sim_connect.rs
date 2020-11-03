@@ -1,13 +1,16 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::sys;
+use std::collections::HashMap;
 
 pub use sys::SIMCONNECT_OBJECT_ID_USER;
 
 pub use msfs_derive::sim_connect_data_definition as data_definition;
 
+pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
+
 /// A trait implemented by the `data_definition` attribute.
-pub trait DataDefinition {
+pub trait DataDefinition: 'static {
     #[doc(hidden)]
     const DEFINITIONS: &'static [(&'static str, &'static str, sys::SIMCONNECT_DATATYPE)];
 }
@@ -39,6 +42,7 @@ pub type SimConnectRecvCallback = dyn Fn(&SimConnect, SimConnectRecv);
 pub struct SimConnect {
     handle: sys::HANDLE,
     callback: Box<SimConnectRecvCallback>,
+    definitions: HashMap<std::any::TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
 }
 
 extern "C" fn dispatch_cb(
@@ -88,6 +92,7 @@ impl SimConnect {
             let mut sim = SimConnect {
                 handle,
                 callback: Box::new(callback),
+                definitions: HashMap::new(),
             };
             sim.call_dispatch()?;
             Ok(sim)
@@ -194,10 +199,12 @@ impl SimConnect {
     }
 
     /// Associate a data definition with a client defined object definition.
-    pub fn add_data_definition<T: DataDefinition>(
-        &self,
-        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
-    ) -> Result<()> {
+    pub fn add_data_definition<T: DataDefinition>(&mut self) -> Result<()> {
+        let key = std::any::TypeId::of::<T>();
+        debug_assert!(!self.definitions.contains_key(&key));
+        let define_id = self.definitions.len() as sys::SIMCONNECT_DATA_DEFINITION_ID;
+        self.definitions.insert(key, define_id);
+
         for (datum_name, units_type, datatype) in T::DEFINITIONS {
             let datum_name = std::ffi::CString::new(*datum_name).unwrap();
             let units_type = std::ffi::CString::new(*units_type).unwrap();
@@ -219,10 +226,11 @@ impl SimConnect {
     /// Make changes to the data properties of an object.
     pub fn set_data_on_sim_object<T: DataDefinition>(
         &self,
-        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
         object_id: sys::SIMCONNECT_OBJECT_ID,
         data: &T,
     ) -> Result<()> {
+        let define_id = self.definitions[&std::any::TypeId::of::<T>()];
+
         unsafe {
             map_err(sys::SimConnect_SetDataOnSimObject(
                 self.handle,
@@ -237,20 +245,21 @@ impl SimConnect {
     }
 
     /// Request when the SimConnect client is to receive data values for a specific object
-    pub fn request_data_on_sim_object(
+    pub fn request_data_on_sim_object<T: DataDefinition>(
         &self,
         request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
-        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
         object_id: sys::SIMCONNECT_OBJECT_ID,
-        period: sys::SIMCONNECT_PERIOD,
+        period: Period,
     ) -> Result<()> {
+        let define_id = self.definitions[&std::any::TypeId::of::<T>()];
+
         unsafe {
             map_err(sys::SimConnect_RequestDataOnSimObject(
                 self.handle,
                 request_id,
                 define_id,
                 object_id,
-                period,
+                period as u32,
                 sys::SIMCONNECT_DATA_REQUEST_FLAG_CHANGED,
                 0,
                 0,
@@ -268,6 +277,37 @@ pub enum SimConnectRecv<'a> {
     Open(&'a sys::SIMCONNECT_RECV_OPEN),
     Quit(&'a sys::SIMCONNECT_RECV_QUIT),
     Event(&'a sys::SIMCONNECT_RECV_EVENT),
+    SimObjectData(&'a sys::SIMCONNECT_RECV_SIMOBJECT_DATA),
+}
+
+impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
+    pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
+        let define_id = sim.definitions[&std::any::TypeId::of::<T>()];
+        if define_id == self.dwDefineID {
+            Some(unsafe { &*(self.dwData as *const T) })
+        } else {
+            None
+        }
+    }
+}
+
+/// Specify how often data is to be sent to the client.
+#[derive(Debug)]
+#[repr(u32)]
+pub enum Period {
+    /// Specifies that the data is not to be sent
+    Never = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER,
+    /// Specifies that the data should be sent once only. Note that this is not
+    /// an efficient way of receiving data frequently, use one of the other
+    /// periods if there is a regular frequency to the data request.
+    Once = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE,
+    /// Specifies that the data should be sent every visual (rendered) frame.
+    VisualFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_VISUAL_FRAME,
+    /// Specifies that the data should be sent every simulated frame, whether that frame is
+    /// rendered or not.
+    SimFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME,
+    /// Specifies that the data should be sent once every second.
+    Second = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND,
 }
 
 impl Drop for SimConnect {

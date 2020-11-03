@@ -117,6 +117,7 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
                 "i64" => "INT64",
                 "f32" => "FLOAT32",
                 "f64" => "FLOAT64",
+                "DataXYZ" => "XYZ",
                 _ => panic!("Unsupported type {}", ty),
             }
             .to_string(),
