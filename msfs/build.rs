@@ -9,6 +9,7 @@ fn main() {
         .clang_arg("-fms-extensions")
         .clang_arg("-fvisibility=default")
         .clang_arg("-xc++")
+        .clang_arg("-v")
         .header("src/bindgen_support/wrapper.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .impl_debug(true)

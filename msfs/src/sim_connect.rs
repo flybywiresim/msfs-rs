@@ -235,6 +235,29 @@ impl SimConnect {
             ))
         }
     }
+
+    /// Request when the SimConnect client is to receive data values for a specific object
+    pub fn request_data_on_sim_object(
+        &self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        period: sys::SIMCONNECT_PERIOD,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_RequestDataOnSimObject(
+                self.handle,
+                request_id,
+                define_id,
+                object_id,
+                period,
+                sys::SIMCONNECT_DATA_REQUEST_FLAG_CHANGED,
+                0,
+                0,
+                0,
+            ))
+        }
+    }
 }
 
 /// Message received from `SimConnect::get_next_dispatch`.
