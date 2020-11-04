@@ -22,7 +22,7 @@ struct ControlSurfaces {
 /// [VCockpit0]
 /// size_mm=0,0
 /// pixel_size=0,0
-/// texture=$PDF
+/// texture=$PFD
 /// htmlgauge00=WasmInstrument/WasmInstrument.html?wasm_module=log.wasm&wasm_gauge=LOG, 0,0,0,0
 /// ```
 #[msfs::gauge(name=LOG)]
@@ -30,8 +30,6 @@ async fn log(mut gauge: msfs::Gauge) -> Result<(), Box<dyn std::error::Error>> {
     let mut sim = gauge.open_simconnect("LOG")?;
 
     while let Some(event) = gauge.next_event().await {
-        println!("RUST: EVENT {:?}", event);
-
         match event {
             MSFSEvent::PanelServiceID(service_id) => match service_id {
                 msfs::PanelServiceID::PostInstall => {
@@ -41,13 +39,14 @@ async fn log(mut gauge: msfs::Gauge) -> Result<(), Box<dyn std::error::Error>> {
                         SIMCONNECT_OBJECT_ID_USER,
                         Period::SimFrame,
                     )?;
+                    println!("RUST: LOG INSTALLED");
                 }
                 _ => {}
             },
             MSFSEvent::SimConnect(recv) => match recv {
                 SimConnectRecv::SimObjectData(event) => {
                     let data = event.into::<ControlSurfaces>(&sim).unwrap();
-                    println!("{:#?}", data);
+                    println!("RUST: SimObjectData {:?}", data);
                 }
                 _ => {}
             },

@@ -2,6 +2,7 @@
 
 use crate::sys;
 use std::collections::HashMap;
+use std::pin::Pin;
 
 pub use sys::SIMCONNECT_OBJECT_ID_USER;
 
@@ -45,35 +46,9 @@ pub struct SimConnect {
     definitions: HashMap<std::any::TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
 }
 
-extern "C" fn dispatch_cb(
-    recv: *mut sys::SIMCONNECT_RECV,
-    _cb_data: sys::DWORD,
-    p_context: *mut std::ffi::c_void,
-) {
-    let sim = unsafe { &*(p_context as *mut SimConnect) };
-    let recv = unsafe {
-        match (*recv).dwID as sys::SIMCONNECT_RECV_ID {
-            sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_NULL => Some(SimConnectRecv::Null),
-            sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_OPEN => Some(SimConnectRecv::Open(
-                &*(recv as *mut sys::SIMCONNECT_RECV_OPEN),
-            )),
-            sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_QUIT => Some(SimConnectRecv::Quit(
-                &*(recv as *mut sys::SIMCONNECT_RECV_QUIT),
-            )),
-            sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT => Some(SimConnectRecv::Event(
-                &*(recv as *mut sys::SIMCONNECT_RECV_EVENT),
-            )),
-            _ => None,
-        }
-    };
-    if let Some(recv) = recv {
-        (sim.callback)(sim, recv);
-    }
-}
-
 impl SimConnect {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
-    pub fn open<F>(name: &str, callback: F) -> Result<SimConnect>
+    pub fn open<F>(name: &str, callback: F) -> Result<Pin<Box<SimConnect>>>
     where
         F: Fn(&SimConnect, SimConnectRecv) + 'static,
     {
@@ -89,11 +64,11 @@ impl SimConnect {
                 0,
             ))?;
             debug_assert!(handle != 0);
-            let mut sim = SimConnect {
+            let mut sim = Box::pin(SimConnect {
                 handle,
                 callback: Box::new(callback),
                 definitions: HashMap::new(),
-            };
+            });
             sim.call_dispatch()?;
             Ok(sim)
         }
@@ -259,8 +234,8 @@ impl SimConnect {
                 request_id,
                 define_id,
                 object_id,
-                period as u32,
-                sys::SIMCONNECT_DATA_REQUEST_FLAG_CHANGED,
+                period as sys::SIMCONNECT_PERIOD,
+                sys::SIMCONNECT_DATA_REQUEST_FLAG_DEFAULT,
                 0,
                 0,
                 0,
@@ -269,18 +244,81 @@ impl SimConnect {
     }
 }
 
-/// Message received from `SimConnect::get_next_dispatch`.
-#[derive(Debug)]
-pub enum SimConnectRecv<'a> {
-    Null,
-    Exception(&'a sys::SIMCONNECT_RECV_EXCEPTION),
-    Open(&'a sys::SIMCONNECT_RECV_OPEN),
-    Quit(&'a sys::SIMCONNECT_RECV_QUIT),
-    Event(&'a sys::SIMCONNECT_RECV_EVENT),
-    SimObjectData(&'a sys::SIMCONNECT_RECV_SIMOBJECT_DATA),
+macro_rules! recv {
+    ($V:ident) => {
+        $V!(
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EXCEPTION,
+                SIMCONNECT_RECV_EXCEPTION,
+                Exception
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_OPEN,
+                SIMCONNECT_RECV_OPEN,
+                Open
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_QUIT,
+                SIMCONNECT_RECV_QUIT,
+                Quit
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT,
+                SIMCONNECT_RECV_EVENT,
+                Event
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA,
+                SIMCONNECT_RECV_SIMOBJECT_DATA,
+                SimObjectData
+            ),
+        );
+    };
 }
 
+extern "C" fn dispatch_cb(
+    recv: *mut sys::SIMCONNECT_RECV,
+    _cb_data: sys::DWORD,
+    p_context: *mut std::ffi::c_void,
+) {
+    let sim = unsafe { &*(p_context as *mut SimConnect) };
+
+    macro_rules! recv_cb {
+        ($( ($ID:ident, $T:ident, $E:ident), )*) => {
+            unsafe {
+                match (*recv).dwID as sys::SIMCONNECT_RECV_ID {
+                    sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_NULL => Some(SimConnectRecv::Null),
+                    $(
+                        sys::$ID => Some(SimConnectRecv::$E(&*(recv as *mut sys::$T))),
+                    )*
+                    _ => None,
+                }
+            }
+        }
+    }
+    let recv = recv!(recv_cb);
+
+    if let Some(recv) = recv {
+        (sim.callback)(sim, recv);
+    }
+}
+
+macro_rules! recv_enum {
+    ($( ($ID:ident, $T:ident, $E:ident), )*) => {
+        /// Message received from SimConnect.
+        #[derive(Debug)]
+        pub enum SimConnectRecv<'a> {
+            Null,
+            $(
+                $E(&'a sys::$T),
+            )*
+        }
+    }
+}
+recv!(recv_enum);
+
 impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
+    /// Convert a SimObjectData event into the data it contains.
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.definitions[&std::any::TypeId::of::<T>()];
         if define_id == self.dwDefineID {
@@ -293,21 +331,21 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
 
 /// Specify how often data is to be sent to the client.
 #[derive(Debug)]
-#[repr(u32)]
+#[repr(C)]
 pub enum Period {
     /// Specifies that the data is not to be sent
-    Never = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER,
+    Never = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER as isize,
     /// Specifies that the data should be sent once only. Note that this is not
     /// an efficient way of receiving data frequently, use one of the other
     /// periods if there is a regular frequency to the data request.
-    Once = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE,
+    Once = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE as isize,
     /// Specifies that the data should be sent every visual (rendered) frame.
-    VisualFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_VISUAL_FRAME,
+    VisualFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_VISUAL_FRAME as isize,
     /// Specifies that the data should be sent every simulated frame, whether that frame is
     /// rendered or not.
-    SimFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME,
+    SimFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME as isize,
     /// Specifies that the data should be sent once every second.
-    Second = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND,
+    Second = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND as isize,
 }
 
 impl Drop for SimConnect {

@@ -4,6 +4,7 @@ use futures::{channel::mpsc, Future};
 use std::pin::Pin;
 use std::task::Poll;
 
+#[cfg(target_os = "wasm32")]
 pub mod legacy;
 
 /// `PanelServiceID` is used in `GaugeCallback`s and is generated from
@@ -51,7 +52,8 @@ impl Gauge {
     pub fn open_simconnect(
         &self,
         name: &str,
-    ) -> Result<crate::sim_connect::SimConnect, Box<dyn std::error::Error>> {
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect>>, Box<dyn std::error::Error>>
+    {
         let executor = self.executor;
         let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
             let executor = unsafe { &mut *executor };

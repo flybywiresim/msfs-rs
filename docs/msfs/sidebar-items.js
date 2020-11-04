@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["msfs",""],["sim_connect",""],["sys",""]]});
