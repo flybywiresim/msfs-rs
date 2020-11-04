@@ -1,5 +1,5 @@
 #!/bin/bash
 
 rm -rf docs
-cargo doc --no-deps --target wasm32-wasi
+cargo doc --no-deps --workspace
 mv target/doc docs
