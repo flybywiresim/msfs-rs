@@ -123,7 +123,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">task</span>::<span class="ident">Poll</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">doc</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">legacy</span>;
 
 <span class="doccomment">/// `PanelServiceID` is used in `GaugeCallback`s and is generated from</span>
