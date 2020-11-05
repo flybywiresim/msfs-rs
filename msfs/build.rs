@@ -28,8 +28,15 @@ fn main() {
         .unwrap();
 
     if !wasm {
-        println!("cargo:rustc-link-search={}/SimConnect SDK/lib", msfs_sdk);
+        println!(
+            "cargo:rustc-link-search={}/SimConnect SDK/lib/static",
+            msfs_sdk
+        );
         println!("cargo:rustc-link-lib=SimConnect");
+        println!("cargo:rustc-link-lib=shlwapi");
+        println!("cargo:rustc-link-lib=user32");
+        println!("cargo:rustc-link-lib=ws2_32");
+        println!("cargo:rustc-link-lib=shell32");
     }
 }
 

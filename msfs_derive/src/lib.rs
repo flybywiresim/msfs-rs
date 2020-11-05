@@ -93,7 +93,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
 ///     rudder: f64,
 /// }
 ///
-/// sim.add_data_definition::<ControlSurfaces>(definition_id);
+/// sim.add_data_definition::<ControlSurfaces>();
 /// ```
 #[proc_macro_attribute]
 pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> TokenStream {
@@ -126,7 +126,7 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
         let mut attrs = Vec::new();
         for a in &field.attrs {
             let simish = if let Some(i) = a.path.get_ident() {
-                i == "name" || i == "unit"
+                i == "name" || i == "unit" || i == "epsilon"
             } else {
                 false
             };
@@ -135,8 +135,9 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
                     Meta::NameValue(mnv) => {
                         let name = mnv.path.get_ident().unwrap().to_string();
                         let value = match mnv.lit {
-                            Lit::Str(s) => s.value(),
-                            _ => panic!("argument must be a string"),
+                            Lit::Str(s) => format!("\"{}\"", s.value()),
+                            Lit::Float(f) => f.base10_digits().to_string(),
+                            _ => panic!("argument must be a string or float"),
                         };
                         (name, value)
                     }
@@ -157,10 +158,14 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
     for meta in data {
         let name = meta["name"].clone();
         let unit = meta["unit"].clone();
+
+        let fallback = "0.0".to_string();
+        let epsilon = meta.get("epsilon").unwrap_or(&fallback);
+
         let ty = meta["type"].clone();
         array += &format!(
-            "  ({:?}, {:?}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{}),\n",
-            name, unit, ty
+            "  ({}, {}, {}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{}),\n",
+            name, unit, epsilon, ty
         );
     }
     array += "]";
@@ -171,7 +176,7 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
         #input
 
         impl ::msfs::sim_connect::DataDefinition for #name {
-            const DEFINITIONS: &'static [(&'static str, &'static str, ::msfs::sys::SIMCONNECT_DATATYPE)] = #array;
+            const DEFINITIONS: &'static [(&'static str, &'static str, f32, ::msfs::sys::SIMCONNECT_DATATYPE)] = #array;
         }
     };
 

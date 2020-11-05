@@ -13,7 +13,7 @@ pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
 /// A trait implemented by the `data_definition` attribute.
 pub trait DataDefinition: 'static {
     #[doc(hidden)]
-    const DEFINITIONS: &'static [(&'static str, &'static str, sys::SIMCONNECT_DATATYPE)];
+    const DEFINITIONS: &'static [(&'static str, &'static str, f32, sys::SIMCONNECT_DATATYPE)];
 }
 
 /// Rusty HRESULT wrapper.
@@ -74,7 +74,8 @@ impl SimConnect {
         }
     }
 
-    fn call_dispatch(&mut self) -> Result<()> {
+    /// Used to process the next SimConnect message received. Only needed when not using the gauge API.
+    pub fn call_dispatch(&mut self) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_CallDispatch(
                 self.handle,
@@ -180,7 +181,7 @@ impl SimConnect {
         let define_id = self.definitions.len() as sys::SIMCONNECT_DATA_DEFINITION_ID;
         self.definitions.insert(key, define_id);
 
-        for (datum_name, units_type, datatype) in T::DEFINITIONS {
+        for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
             let datum_name = std::ffi::CString::new(*datum_name).unwrap();
             let units_type = std::ffi::CString::new(*units_type).unwrap();
             unsafe {
@@ -190,8 +191,8 @@ impl SimConnect {
                     datum_name.as_ptr(),
                     units_type.as_ptr(),
                     *datatype,
-                    0.0,
-                    0,
+                    *epsilon,
+                    sys::SIMCONNECT_UNUSED,
                 ))?;
             }
         }
@@ -235,7 +236,7 @@ impl SimConnect {
                 define_id,
                 object_id,
                 period as sys::SIMCONNECT_PERIOD,
-                sys::SIMCONNECT_DATA_REQUEST_FLAG_DEFAULT,
+                sys::SIMCONNECT_DATA_REQUEST_FLAG_CHANGED,
                 0,
                 0,
                 0,
@@ -322,7 +323,7 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.definitions[&std::any::TypeId::of::<T>()];
         if define_id == self.dwDefineID {
-            Some(unsafe { &*(self.dwData as *const T) })
+            Some(unsafe { &*(&self.dwData as *const sys::DWORD as *const T) })
         } else {
             None
         }

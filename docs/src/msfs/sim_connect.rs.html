@@ -354,6 +354,7 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
+<span id="356">356</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -370,7 +371,7 @@
 <span class="doccomment">/// A trait implemented by the `data_definition` attribute.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataDefinition</span>: <span class="lifetime">&#39;static</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATATYPE</span>)];
+    <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f32</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATATYPE</span>)];
 }
 
 <span class="doccomment">/// Rusty HRESULT wrapper.</span>
@@ -431,7 +432,8 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">call_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Used to process the next SimConnect message received. Only needed when not using the gauge API.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_CallDispatch</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
@@ -537,7 +539,7 @@
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">definitions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_DEFINITION_ID</span>;
         <span class="self">self</span>.<span class="ident">definitions</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">define_id</span>);
 
-        <span class="kw">for</span> (<span class="ident">datum_name</span>, <span class="ident">units_type</span>, <span class="ident">datatype</span>) <span class="kw">in</span> <span class="ident">T</span>::<span class="ident">DEFINITIONS</span> {
+        <span class="kw">for</span> (<span class="ident">datum_name</span>, <span class="ident">units_type</span>, <span class="ident">epsilon</span>, <span class="ident">datatype</span>) <span class="kw">in</span> <span class="ident">T</span>::<span class="ident">DEFINITIONS</span> {
             <span class="kw">let</span> <span class="ident">datum_name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">datum_name</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">units_type</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">units_type</span>).<span class="ident">unwrap</span>();
             <span class="kw">unsafe</span> {
@@ -547,8 +549,8 @@
                     <span class="ident">datum_name</span>.<span class="ident">as_ptr</span>(),
                     <span class="ident">units_type</span>.<span class="ident">as_ptr</span>(),
                     <span class="kw-2">*</span><span class="ident">datatype</span>,
-                    <span class="number">0.0</span>,
-                    <span class="number">0</span>,
+                    <span class="kw-2">*</span><span class="ident">epsilon</span>,
+                    <span class="ident">sys</span>::<span class="ident">SIMCONNECT_UNUSED</span>,
                 ))<span class="question-mark">?</span>;
             }
         }
@@ -592,7 +594,7 @@
                 <span class="ident">define_id</span>,
                 <span class="ident">object_id</span>,
                 <span class="ident">period</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD</span>,
-                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_FLAG_DEFAULT</span>,
+                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_FLAG_CHANGED</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
@@ -679,7 +681,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sim</span>: <span class="kw-2">&amp;</span><span class="ident">SimConnect</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="ident">sim</span>.<span class="ident">definitions</span>[<span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()];
         <span class="kw">if</span> <span class="ident">define_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">dwDefineID</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">dwData</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dwData</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
