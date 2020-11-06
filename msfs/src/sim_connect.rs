@@ -174,39 +174,46 @@ impl SimConnect {
         }
     }
 
-    /// Associate a data definition with a client defined object definition.
-    pub fn add_data_definition<T: DataDefinition>(&mut self) -> Result<()> {
+    fn get_define_id<T: DataDefinition>(&mut self) -> Result<sys::SIMCONNECT_DATA_DEFINITION_ID> {
         let key = std::any::TypeId::of::<T>();
-        debug_assert!(!self.definitions.contains_key(&key));
-        let define_id = self.definitions.len() as sys::SIMCONNECT_DATA_DEFINITION_ID;
-        self.definitions.insert(key, define_id);
-
-        for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
-            let datum_name = std::ffi::CString::new(*datum_name).unwrap();
-            let units_type = std::ffi::CString::new(*units_type).unwrap();
-            unsafe {
-                map_err(sys::SimConnect_AddToDataDefinition(
-                    self.handle,
-                    define_id,
-                    datum_name.as_ptr(),
-                    units_type.as_ptr(),
-                    *datatype,
-                    *epsilon,
-                    sys::SIMCONNECT_UNUSED,
-                ))?;
+        let maybe_define_id = self.definitions.len() as sys::SIMCONNECT_DATA_DEFINITION_ID;
+        match self.definitions.entry(key) {
+            std::collections::hash_map::Entry::Vacant(entry) => {
+                unsafe {
+                    map_err(sys::SimConnect_ClearDataDefinition(
+                        self.handle,
+                        maybe_define_id,
+                    ))?;
+                }
+                for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
+                    let datum_name = std::ffi::CString::new(*datum_name).unwrap();
+                    let units_type = std::ffi::CString::new(*units_type).unwrap();
+                    unsafe {
+                        map_err(sys::SimConnect_AddToDataDefinition(
+                            self.handle,
+                            maybe_define_id,
+                            datum_name.as_ptr(),
+                            units_type.as_ptr(),
+                            *datatype,
+                            *epsilon,
+                            sys::SIMCONNECT_UNUSED,
+                        ))?;
+                    }
+                }
+                entry.insert(maybe_define_id);
+                Ok(maybe_define_id)
             }
+            std::collections::hash_map::Entry::Occupied(entry) => Ok(*entry.get()),
         }
-        Ok(())
     }
 
     /// Make changes to the data properties of an object.
     pub fn set_data_on_sim_object<T: DataDefinition>(
-        &self,
+        &mut self,
         object_id: sys::SIMCONNECT_OBJECT_ID,
         data: &T,
     ) -> Result<()> {
-        let define_id = self.definitions[&std::any::TypeId::of::<T>()];
-
+        let define_id = self.get_define_id::<T>()?;
         unsafe {
             map_err(sys::SimConnect_SetDataOnSimObject(
                 self.handle,
@@ -222,12 +229,12 @@ impl SimConnect {
 
     /// Request when the SimConnect client is to receive data values for a specific object
     pub fn request_data_on_sim_object<T: DataDefinition>(
-        &self,
+        &mut self,
         request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
         object_id: sys::SIMCONNECT_OBJECT_ID,
         period: Period,
     ) -> Result<()> {
-        let define_id = self.definitions[&std::any::TypeId::of::<T>()];
+        let define_id = self.get_define_id::<T>()?;
 
         unsafe {
             map_err(sys::SimConnect_RequestDataOnSimObject(
@@ -332,7 +339,6 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
 
 /// Specify how often data is to be sent to the client.
 #[derive(Debug)]
-#[repr(C)]
 pub enum Period {
     /// Specifies that the data is not to be sent
     Never = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER as isize,

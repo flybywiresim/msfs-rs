@@ -33,7 +33,6 @@ async fn log(mut gauge: msfs::Gauge) -> Result<(), Box<dyn std::error::Error>> {
         match event {
             MSFSEvent::PanelServiceID(service_id) => match service_id {
                 msfs::PanelServiceID::PostInstall => {
-                    sim.add_data_definition::<ControlSurfaces>()?;
                     sim.request_data_on_sim_object::<ControlSurfaces>(
                         0,
                         SIMCONNECT_OBJECT_ID_USER,
