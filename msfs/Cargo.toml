@@ -12,3 +12,4 @@ futures = "0.3"
 
 [build-dependencies]
 bindgen = "0.55"
+msfs_sdk = { path = "../msfs_sdk" }

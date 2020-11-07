@@ -4,11 +4,9 @@ use msfs::sim_connect::{data_definition, Period, SimConnect, SimConnectRecv, SIM
 #[derive(Debug)]
 struct Data {
     #[name = "RADIO HEIGHT"]
-    #[unit = "feet"]
     #[epsilon = 0.01]
     height: f64,
     #[name = "AIRSPEED INDICATED"]
-    #[unit = "knots"]
     #[epsilon = 0.01]
     airspeed: f64,
 }
@@ -17,16 +15,12 @@ struct Data {
 #[derive(Debug)]
 struct Controls {
     #[name = "ELEVATOR POSITION"]
-    #[unit = "position"]
     elevator: f64,
     #[name = "AILERON POSITION"]
-    #[unit = "position"]
     ailerons: f64,
     #[name = "RUDDER POSITION"]
-    #[unit = "position"]
     rudder: f64,
     #[name = "ELEVATOR TRIM POSITION"]
-    #[unit = "position"]
     elevator_trim: f64,
 }
 
@@ -34,10 +28,8 @@ struct Controls {
 #[derive(Debug)]
 struct Throttle(
     #[name = "GENERAL ENG THROTTLE LEVER POSITION:1"]
-    #[unit = "percent over 100"]
     f64,
     #[name = "GENERAL ENG THROTTLE LEVER POSITION:2"]
-    #[unit = "percent over 100"]
     f64,
 );
 
