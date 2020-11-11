@@ -117,6 +117,7 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
         meta.insert(
             "type".to_string(),
             match ty.as_str() {
+                "bool" => "INT32",
                 "i32" => "INT32",
                 "i64" => "INT64",
                 "f32" => "FLOAT32",
