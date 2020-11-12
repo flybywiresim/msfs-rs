@@ -2,6 +2,7 @@ use ::msfs::{
     msfs,
     msfs::MSFSEvent,
     sim_connect::{data_definition, Period, SimConnectRecv, SIMCONNECT_OBJECT_ID_USER},
+    msfs::legacy,
 };
 
 #[data_definition]

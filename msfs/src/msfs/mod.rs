@@ -4,7 +4,7 @@ use futures::{channel::mpsc, Future};
 use std::pin::Pin;
 use std::task::Poll;
 
-#[cfg(any(target_os = "wasm32", doc))]
+#[cfg(any(target_arch = "wasm32", doc))]
 pub mod legacy;
 
 /// `PanelServiceID` is used in `GaugeCallback`s and is generated from

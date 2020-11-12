@@ -25,16 +25,15 @@ pub fn get_units_enum(unitname: &str) -> sys::ENUM {
 
 #[doc(hidden)]
 pub trait ExecuteCalculatorCodeImpl {
-    fn execute(code: &str) -> Option<Self>
+    fn execute(code: &std::ffi::CStr) -> Option<Self>
     where
         Self: Sized;
 }
 
 #[doc(hidden)]
 impl ExecuteCalculatorCodeImpl for f64 {
-    fn execute(code: &str) -> Option<Self> {
+    fn execute(code: &std::ffi::CStr) -> Option<Self> {
         unsafe {
-            let code = std::ffi::CString::new(code).unwrap();
             let mut n = 0.0;
             if sys::execute_calculator_code(
                 code.as_ptr(),
@@ -53,9 +52,8 @@ impl ExecuteCalculatorCodeImpl for f64 {
 
 #[doc(hidden)]
 impl ExecuteCalculatorCodeImpl for i32 {
-    fn execute(code: &str) -> Option<Self> {
+    fn execute(code: &std::ffi::CStr) -> Option<Self> {
         unsafe {
-            let code = std::ffi::CString::new(code).unwrap();
             let mut n = 0;
             if sys::execute_calculator_code(
                 code.as_ptr(),
@@ -74,9 +72,8 @@ impl ExecuteCalculatorCodeImpl for i32 {
 
 #[doc(hidden)]
 impl ExecuteCalculatorCodeImpl for String {
-    fn execute(code: &str) -> Option<Self> {
+    fn execute(code: &std::ffi::CStr) -> Option<Self> {
         unsafe {
-            let code = std::ffi::CString::new(code).unwrap();
             let mut s = std::ptr::null();
             if sys::execute_calculator_code(
                 code.as_ptr(),
@@ -95,9 +92,8 @@ impl ExecuteCalculatorCodeImpl for String {
 
 #[doc(hidden)]
 impl ExecuteCalculatorCodeImpl for () {
-    fn execute(code: &str) -> Option<Self> {
+    fn execute(code: &std::ffi::CStr) -> Option<Self> {
         unsafe {
-            let code = std::ffi::CString::new(code).unwrap();
             if sys::execute_calculator_code(
                 code.as_ptr(),
                 std::ptr::null_mut(),
@@ -114,9 +110,42 @@ impl ExecuteCalculatorCodeImpl for () {
 }
 
 /// execute_calculator_code
-pub fn execute_calculator_code<T>(code: &str) -> Option<T>
-where
-    T: ExecuteCalculatorCodeImpl,
-{
-    ExecuteCalculatorCodeImpl::execute(code)
+pub fn execute_calculator_code<T: ExecuteCalculatorCodeImpl>(code: &str) -> Option<T> {
+    let code = std::ffi::CString::new(code).unwrap();
+    ExecuteCalculatorCodeImpl::execute(code.as_c_str())
+}
+
+/// Holds compiled calculator code, wraps `gauge_calculator_code_precompile`.
+pub struct CompiledCalculatorCode {
+    p_compiled: sys::PCSTRINGZ,
+    _p_compiled_size: sys::UINT32,
+}
+
+impl CompiledCalculatorCode {
+    /// Create a new CompiledCalculatorCode instance.
+    pub fn new(code: &str) -> Option<Self> {
+        let mut p_compiled = std::mem::MaybeUninit::uninit();
+        let mut p_compiled_size = std::mem::MaybeUninit::uninit();
+        unsafe {
+            let code = std::ffi::CString::new(code).unwrap();
+            if sys::gauge_calculator_code_precompile(
+                p_compiled.as_mut_ptr(),
+                p_compiled_size.as_mut_ptr(),
+                code.as_ptr(),
+            ) != 0
+            {
+                Some(CompiledCalculatorCode {
+                    p_compiled: p_compiled.assume_init(),
+                    _p_compiled_size: p_compiled_size.assume_init(),
+                })
+            } else {
+                None
+            }
+        }
+    }
+
+    /// Execute this CompiledCalculatorCode instance.
+    pub fn execute<T: ExecuteCalculatorCodeImpl>(&self) -> Option<T> {
+        ExecuteCalculatorCodeImpl::execute(unsafe { std::ffi::CStr::from_ptr(self.p_compiled) })
+    }
 }
