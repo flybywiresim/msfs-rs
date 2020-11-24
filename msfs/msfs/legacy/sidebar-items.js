@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["aircraft_varget","aircraft_varget"],["execute_calculator_code","execute_calculator_code"],["get_aircraft_var_enum","get_aircraft_var_enum"],["get_units_enum","get_units_enum"]],"struct":[["CompiledCalculatorCode","Holds compiled calculator code, wraps `gauge_calculator_code_precompile`."]]});
