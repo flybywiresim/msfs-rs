@@ -7,37 +7,26 @@ use std::task::Poll;
 #[cfg(any(target_arch = "wasm32", doc))]
 pub mod legacy;
 
-/// `PanelServiceID` is used in `GaugeCallback`s and is generated from
-/// `sys::PANEL_SERVICE_*` constants.
-#[repr(u32)]
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum PanelServiceID {
-    PreQuery = sys::PANEL_SERVICE_PRE_QUERY,
-    PostQuery = sys::PANEL_SERVICE_POST_QUERY,
-    // PreInstall = sys::PANEL_SERVICE_PRE_INSTALL,
-    PostInstall = sys::PANEL_SERVICE_POST_INSTALL,
-    PreInitialize = sys::PANEL_SERVICE_PRE_INITIALIZE,
-    PostInitialize = sys::PANEL_SERVICE_POST_INITIALIZE,
-    PreUpdate = sys::PANEL_SERVICE_PRE_UPDATE,
-    PostUpdate = sys::PANEL_SERVICE_POST_UPDATE,
-    PreGenerate = sys::PANEL_SERVICE_PRE_GENERATE,
-    PostGenerate = sys::PANEL_SERVICE_POST_GENERATE,
-    PreDraw = sys::PANEL_SERVICE_PRE_DRAW,
-    PostDraw = sys::PANEL_SERVICE_POST_DRAW,
-    PreKill = sys::PANEL_SERVICE_PRE_KILL,
-    // PostKill = sys::PANEL_SERVICE_POST_KILL,
-    ConnectToWindow = sys::PANEL_SERVICE_CONNECT_TO_WINDOW,
-    Disconnect = sys::PANEL_SERVICE_DISCONNECT,
-    PanelOpen = sys::PANEL_SERVICE_PANEL_OPEN,
-    PanelClose = sys::PANEL_SERVICE_PANEL_CLOSE,
+/// `PanelServiceID` is used in `GaugeCallback`.
+#[derive(Debug)]
+pub enum PanelServiceID<'a> {
+    PostInstall,
+    PreInitialize,
+    PostInitialize,
+    PreUpdate,
+    PostUpdate,
+    PreDraw(&'a sys::sGaugeDrawData),
+    PostDraw(&'a sys::sGaugeDrawData),
+    PreKill,
 }
 
 use crate::sim_connect::SimConnectRecv;
-pub use msfs_derive::gauge;
+pub use msfs_derive::{gauge, standalone_module};
 
 #[derive(Debug)]
 pub enum MSFSEvent<'a> {
-    PanelServiceID(PanelServiceID),
+    PanelServiceID(PanelServiceID<'a>),
+    Mouse { x: f32, y: f32, flags: u32 },
     SimConnect(crate::sim_connect::SimConnectRecv<'a>),
 }
 
@@ -82,8 +71,13 @@ pub struct GaugeExecutor {
 
 #[doc(hidden)]
 impl GaugeExecutor {
-    pub fn handle(&mut self, _ctx: sys::FsContext, service_id: u32) -> bool {
-        match service_id {
+    pub fn handle_gauge(
+        &mut self,
+        _ctx: sys::FsContext,
+        service_id: std::os::raw::c_int,
+        p_data: *mut std::ffi::c_void,
+    ) -> bool {
+        match service_id as u32 {
             sys::PANEL_SERVICE_PRE_INSTALL => {
                 if self.future.is_none() {
                     let (tx, rx) = mpsc::channel(1);
@@ -96,10 +90,32 @@ impl GaugeExecutor {
                 true
             }
             sys::PANEL_SERVICE_POST_KILL => self.send(None),
-            _ => self.send(Some(MSFSEvent::PanelServiceID(unsafe {
-                std::mem::transmute(service_id)
-            }))),
+            service_id => {
+                if let Some(data) = match service_id {
+                    sys::PANEL_SERVICE_POST_INSTALL => Some(PanelServiceID::PostInstall),
+                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(PanelServiceID::PreInitialize),
+                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(PanelServiceID::PostInitialize),
+                    sys::PANEL_SERVICE_PRE_UPDATE => Some(PanelServiceID::PreUpdate),
+                    sys::PANEL_SERVICE_POST_UPDATE => Some(PanelServiceID::PostUpdate),
+                    sys::PANEL_SERVICE_PRE_DRAW => Some(PanelServiceID::PreDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_POST_DRAW => Some(PanelServiceID::PostDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_PRE_KILL => Some(PanelServiceID::PreKill),
+                    _ => None,
+                } {
+                    self.send(Some(MSFSEvent::PanelServiceID(data)))
+                } else {
+                    true
+                }
+            }
         }
+    }
+
+    pub fn handle_mouse(&mut self, x: f32, y: f32, flags: u32) {
+        self.send(Some(MSFSEvent::Mouse { x, y, flags }));
     }
 
     fn send(&mut self, data: Option<MSFSEvent<'static>>) -> bool {

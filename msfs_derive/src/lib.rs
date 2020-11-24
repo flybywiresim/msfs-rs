@@ -11,6 +11,56 @@ mod sys {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
+/// Declare a standalone module.
+/// ```rs
+/// #[standalone_module]
+/// struct MyModule {}
+/// impl Default for MyModule {
+///   fn default() -> Self {
+///     println!("module is initialized");
+///     MyModule {}
+///   }
+/// }
+/// impl Drop for MyModule {
+///   fn drop(&mut self) {
+///     println!("module is deinitialized");
+///   }
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as ItemStruct);
+    let name = input.ident.clone();
+
+    let output = quote! {
+        #input
+
+        struct ModuleWrapperDoNotUseOrYouWillBeFired {
+            inner: Option<#name>,
+        }
+
+        static mut MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ModuleWrapperDoNotUseOrYouWillBeFired = ModuleWrapperDoNotUseOrYouWillBeFired {
+            inner: None,
+        };
+
+        #[no_mangle]
+        extern "C" fn module_init() {
+            unsafe {
+                MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.inner = Some(::core::default::Default::default());
+            }
+        }
+
+        #[no_mangle]
+        extern "C" fn module_deinit() {
+            unsafe {
+                drop(MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.inner.take().unwrap());
+            }
+        }
+    };
+
+    TokenStream::from(output)
+}
+
 struct GaugeArgs {
     name: Option<String>,
 }
@@ -53,30 +103,46 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemFn);
 
     let rusty_name = format_ident!("{}", input.sig.ident);
-    let extern_name = format_ident!(
-        "{}_gauge_callback",
-        args.name.unwrap_or_else(|| input.sig.ident.to_string())
+    let executor_name = format_ident!(
+        "{}_executor_do_not_use_or_you_will_be_fired",
+        input.sig.ident
     );
+
+    let extern_name = args.name.unwrap_or_else(|| input.sig.ident.to_string());
+    let extern_gauge_name = format_ident!("{}_gauge_callback", extern_name);
+    let extern_mouse_name = format_ident!("{}_mouse_callback", extern_name);
 
     let output = quote! {
         #input
 
+        #[allow(non_upper_case_globals)]
+        static mut #executor_name: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
+            handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+            tx: None,
+            future: None,
+        };
+
         #[no_mangle]
-        pub extern "C" fn #extern_name(ctx: ::msfs::sys::FsContext, service_id: u32, _: *mut u8) -> bool {
-            fn remap(
-                gauge: ::msfs::msfs::Gauge,
-            ) -> std::pin::Pin<std::boxed::Box<dyn std::future::Future<Output = std::result::Result<(), std::boxed::Box<dyn std::error::Error>>> + 'static>> {
-                std::boxed::Box::pin(#rusty_name(gauge))
-            }
-            static mut executor: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
-                handle: remap,
-                tx: None,
-                future: None,
-            };
+        pub extern "C" fn #extern_gauge_name(
+            ctx: ::msfs::sys::FsContext,
+            service_id: std::os::raw::c_int,
+            p_data: *mut std::os::raw::c_void,
+        ) -> bool {
             unsafe {
-                executor.handle(ctx, service_id)
+                #executor_name.handle_gauge(ctx, service_id, p_data)
             }
         }
+
+        #[no_mangle]
+        pub extern "C" fn #extern_mouse_name(
+            fx: std::os::raw::c_float,
+            fy: std::os::raw::c_float,
+            i_flags: std::os::raw::c_uint,
+        ) {
+             unsafe {
+                #executor_name.handle_mouse(fx, fy, i_flags);
+             }
+         }
     };
 
     TokenStream::from(output)

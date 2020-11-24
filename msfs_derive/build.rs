@@ -15,7 +15,7 @@ fn main() {
         let source = std::fs::read_to_string(f.path()).unwrap();
         source
             .lines()
-            .filter(|l| l.len() > 0)
+            .filter(|l| !l.is_empty())
             .map(|l| {
                 let parts = l.split(',').collect::<Vec<&str>>();
                 println!("parts {:?}", parts);

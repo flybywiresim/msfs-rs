@@ -37,7 +37,7 @@ fn map_err(result: sys::HRESULT) -> Result<()> {
 }
 
 /// Callback provided to SimConnect session.
-pub type SimConnectRecvCallback = dyn Fn(&SimConnect, SimConnectRecv);
+pub type SimConnectRecvCallback = dyn Fn(&mut SimConnect, SimConnectRecv);
 
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect {
@@ -50,7 +50,7 @@ impl SimConnect {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
     pub fn open<F>(name: &str, callback: F) -> Result<Pin<Box<SimConnect>>>
     where
-        F: Fn(&SimConnect, SimConnectRecv) + 'static,
+        F: Fn(&mut SimConnect, SimConnectRecv) + 'static,
     {
         unsafe {
             let mut handle = 0;
@@ -289,8 +289,6 @@ extern "C" fn dispatch_cb(
     _cb_data: sys::DWORD,
     p_context: *mut std::ffi::c_void,
 ) {
-    let sim = unsafe { &*(p_context as *mut SimConnect) };
-
     macro_rules! recv_cb {
         ($( ($ID:ident, $T:ident, $E:ident), )*) => {
             unsafe {
@@ -307,7 +305,8 @@ extern "C" fn dispatch_cb(
     let recv = recv!(recv_cb);
 
     if let Some(recv) = recv {
-        (sim.callback)(sim, recv);
+        let sim = unsafe { &*(p_context as *mut SimConnect) };
+        (sim.callback)(unsafe { &mut *(p_context as *mut SimConnect) }, recv);
     }
 }
 
