@@ -44,6 +44,7 @@ pub struct SimConnect {
     handle: sys::HANDLE,
     callback: Box<SimConnectRecvCallback>,
     definitions: HashMap<std::any::TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
+    event_id_counter: sys::DWORD,
 }
 
 impl SimConnect {
@@ -68,6 +69,7 @@ impl SimConnect {
                 handle,
                 callback: Box::new(callback),
                 definitions: HashMap::new(),
+                event_id_counter: 0,
             });
             sim.call_dispatch()?;
             Ok(sim)
@@ -76,104 +78,11 @@ impl SimConnect {
 
     /// Used to process the next SimConnect message received. Only needed when not using the gauge API.
     pub fn call_dispatch(&mut self) -> Result<()> {
-        println!(
-            "WASM: sent {:?}",
-            self as *mut SimConnect as *mut std::ffi::c_void
-        );
         unsafe {
             map_err(sys::SimConnect_CallDispatch(
                 self.handle,
                 Some(dispatch_cb),
                 self as *mut SimConnect as *mut std::ffi::c_void,
-            ))
-        }
-    }
-
-    /// Add an individual client defined event to a notification group.
-    pub fn add_client_event_to_notification_group(
-        &self,
-        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
-        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        maskable: bool,
-    ) -> Result<()> {
-        unsafe {
-            map_err(sys::SimConnect_AddClientEventToNotificationGroup(
-                self.handle,
-                group_id,
-                event_id,
-                maskable as i32,
-            ))
-        }
-    }
-
-    /// Associate a client defined event ID with a Prepar3D event name.
-    pub fn map_client_event_to_sim_event(
-        &self,
-        id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        name: &str,
-    ) -> Result<()> {
-        unsafe {
-            let name = std::ffi::CString::new(name).unwrap();
-            map_err(sys::SimConnect_MapClientEventToSimEvent(
-                self.handle,
-                id,
-                name.as_ptr(),
-            ))
-        }
-    }
-
-    /// Connect an input event (such as a keystroke, joystick or mouse movement) with the sending of an appropriate event notification.
-    pub fn map_input_event_to_client_event(
-        &self,
-        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
-        input_definition: &str,
-        down_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        down_value: sys::DWORD,
-        up_event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        up_value: sys::DWORD,
-        maskable: bool,
-    ) -> Result<()> {
-        unsafe {
-            let input_definition = std::ffi::CString::new(input_definition).unwrap();
-            map_err(sys::SimConnect_MapInputEventToClientEvent(
-                self.handle,
-                group_id,
-                input_definition.as_ptr(),
-                down_event_id,
-                down_value,
-                up_event_id,
-                up_value,
-                maskable as i32,
-            ))
-        }
-    }
-
-    /// Set the priority for a notification group.
-    pub fn set_notification_group_priority(
-        &self,
-        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
-        priority: sys::DWORD,
-    ) -> Result<()> {
-        unsafe {
-            map_err(sys::SimConnect_SetNotificationGroupPriority(
-                self.handle,
-                group_id,
-                priority,
-            ))
-        }
-    }
-
-    /// Remove a client defined event from a notification group.
-    pub fn remove_client_event(
-        &self,
-        group_id: sys::SIMCONNECT_NOTIFICATION_GROUP_ID,
-        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-    ) -> Result<()> {
-        unsafe {
-            map_err(sys::SimConnect_RemoveClientEvent(
-                self.handle,
-                group_id,
-                event_id,
             ))
         }
     }
@@ -254,6 +163,45 @@ impl SimConnect {
             ))
         }
     }
+
+    /// Map a Prepar3D event to a specific ID. If `mask` is true, the sim itself
+    /// will ignore the event, and only this SimConnect instance will receive it.
+    pub fn map_client_event_to_sim_event(
+        &mut self,
+        event_name: &str,
+        mask: bool,
+    ) -> Result<sys::DWORD> {
+        let event_id = self.event_id_counter;
+        self.event_id_counter += 1;
+        unsafe {
+            let event_name = std::ffi::CString::new(event_name).unwrap();
+            map_err(sys::SimConnect_MapClientEventToSimEvent(
+                self.handle,
+                event_id,
+                event_name.as_ptr(),
+            ))?;
+
+            map_err(sys::SimConnect_AddClientEventToNotificationGroup(
+                self.handle,
+                0,
+                event_id,
+                if mask { 1 } else { 0 },
+            ))?;
+
+            map_err(sys::SimConnect_SetNotificationGroupPriority(
+                self.handle,
+                0,
+                sys::SIMCONNECT_GROUP_PRIORITY_HIGHEST_MASKABLE,
+            ))?;
+        }
+        Ok(event_id)
+    }
+}
+
+impl Drop for SimConnect {
+    fn drop(&mut self) {
+        assert!(unsafe { sys::SimConnect_Close(self.handle) } >= 0);
+    }
 }
 
 macro_rules! recv {
@@ -309,8 +257,7 @@ extern "C" fn dispatch_cb(
     let recv = recv!(recv_cb);
 
     if let Some(recv) = recv {
-        println!("WASM: got {:?}", p_context);
-        let sim = unsafe { &*(p_context as *mut SimConnect) };
+        let sim = unsafe { &*(p_context as *const SimConnect) };
         (sim.callback)(unsafe { &mut *(p_context as *mut SimConnect) }, recv);
     }
 }
@@ -328,6 +275,18 @@ macro_rules! recv_enum {
     }
 }
 recv!(recv_enum);
+
+impl sys::SIMCONNECT_RECV_EVENT {
+    /// The ID for this event.
+    pub fn id(&self) -> sys::DWORD {
+        self.uEventID
+    }
+
+    /// The data for this event.
+    pub fn data(&self) -> sys::DWORD {
+        self.dwData
+    }
+}
 
 impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
     /// Convert a SimObjectData event into the data it contains.
@@ -357,10 +316,4 @@ pub enum Period {
     SimFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME as isize,
     /// Specifies that the data should be sent once every second.
     Second = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND as isize,
-}
-
-impl Drop for SimConnect {
-    fn drop(&mut self) {
-        assert!(unsafe { sys::SimConnect_Close(self.handle) } >= 0);
-    }
 }

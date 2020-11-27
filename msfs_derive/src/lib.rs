@@ -14,16 +14,9 @@ mod sys {
 /// Declare a standalone module.
 /// ```rs
 /// #[standalone_module]
-/// struct MyModule {}
-/// impl Default for MyModule {
-///   fn default() -> Self {
-///     println!("module is initialized");
-///     MyModule {}
-///   }
-/// }
-/// impl Drop for MyModule {
-///   fn drop(&mut self) {
-///     println!("module is deinitialized");
+/// async fn module(mut module: msfs::StandaloneModule) -> Result<(), Box<dyn std::error::Error>> {
+///   while let Some(event) = module.next_event().await {
+///     // ...
 ///   }
 /// }
 /// ```
