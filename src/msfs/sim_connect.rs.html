@@ -362,6 +362,11 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -441,6 +446,10 @@
 
     <span class="doccomment">/// Used to process the next SimConnect message received. Only needed when not using the gauge API.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">println</span><span class="macro">!</span>(
+            <span class="string">&quot;WASM: sent {:?}&quot;</span>,
+            <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>
+        );
         <span class="kw">unsafe</span> {
             <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_CallDispatch</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
@@ -670,6 +679,7 @@
     <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span> <span class="macro">recv</span><span class="macro">!</span>(<span class="ident">recv_cb</span>);
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">recv</span>) <span class="op">=</span> <span class="ident">recv</span> {
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;WASM: got {:?}&quot;</span>, <span class="ident">p_context</span>);
         <span class="kw">let</span> <span class="ident">sim</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">p_context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span>) };
         (<span class="ident">sim</span>.<span class="ident">callback</span>)(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">p_context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span>) }, <span class="ident">recv</span>);
     }

@@ -262,6 +262,14 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
@@ -294,31 +302,37 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">standalone_module</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemStruct</span>);
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
+
+    <span class="kw">let</span> <span class="ident">rusty_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">executor_name</span> <span class="op">=</span> <span class="macro">format_ident</span><span class="macro">!</span>(
+        <span class="string">&quot;{}_executor_do_not_use_or_you_will_be_fired&quot;</span>,
+        <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>
+    );
 
     <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
         #<span class="ident">input</span>
 
-        <span class="kw">struct</span> <span class="ident">ModuleWrapperDoNotUseOrYouWillBeFired</span> {
-            <span class="ident">inner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">name</span><span class="op">&gt;</span>,
-        }
-
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED</span>: <span class="ident">ModuleWrapperDoNotUseOrYouWillBeFired</span> <span class="op">=</span> <span class="ident">ModuleWrapperDoNotUseOrYouWillBeFired</span> {
-            <span class="ident">inner</span>: <span class="prelude-val">None</span>,
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
+        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> {
+            <span class="ident">executor</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">executor</span>::<span class="ident">Executor</span> {
+                <span class="ident">handle</span>: <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">m</span>)),
+                <span class="ident">future</span>: <span class="prelude-val">None</span>,
+                <span class="ident">tx</span>: <span class="prelude-val">None</span>,
+            },
         };
 
         <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_init</span>() {
+        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_init</span>() {
             <span class="kw">unsafe</span> {
-                <span class="ident">MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(::<span class="ident">core</span>::<span class="ident">default</span>::<span class="ident">Default</span>::<span class="ident">default</span>());
+                #<span class="ident">executor_name</span>.<span class="ident">handle_init</span>();
             }
         }
 
         <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_deinit</span>() {
+        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_deinit</span>() {
             <span class="kw">unsafe</span> {
-                <span class="ident">drop</span>(<span class="ident">MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED</span>.<span class="ident">inner</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
+                #<span class="ident">executor_name</span>.<span class="ident">handle_deinit</span>();
             }
         }
     };
@@ -367,7 +381,7 @@
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">GaugeArgs</span>);
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
 
-    <span class="kw">let</span> <span class="ident">rusty_name</span> <span class="op">=</span> <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>);
+    <span class="kw">let</span> <span class="ident">rusty_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">executor_name</span> <span class="op">=</span> <span class="macro">format_ident</span><span class="macro">!</span>(
         <span class="string">&quot;{}_executor_do_not_use_or_you_will_be_fired&quot;</span>,
         <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>
@@ -382,9 +396,11 @@
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
         <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> {
-            <span class="ident">handle</span>: <span class="op">|</span><span class="ident">gauge</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">gauge</span>)),
-            <span class="ident">tx</span>: <span class="prelude-val">None</span>,
-            <span class="ident">future</span>: <span class="prelude-val">None</span>,
+            <span class="ident">executor</span>: {
+                <span class="ident">handle</span>: <span class="op">|</span><span class="ident">gauge</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">gauge</span>)),
+                <span class="ident">tx</span>: <span class="prelude-val">None</span>,
+                <span class="ident">future</span>: <span class="prelude-val">None</span>,
+            },
         };
 
         <span class="attribute">#[<span class="ident">no_mangle</span>]</span>

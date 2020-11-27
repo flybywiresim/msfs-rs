@@ -134,15 +134,37 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel</span>::<span class="ident">mpsc</span>, <span class="ident">Future</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">task</span>::<span class="ident">Poll</span>;
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">doc</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">legacy</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">executor</span>;
 
 <span class="doccomment">/// `PanelServiceID` is used in `GaugeCallback`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -164,13 +186,13 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">PanelServiceID</span>(<span class="ident">PanelServiceID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="ident">Mouse</span> { <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>, <span class="ident">flags</span>: <span class="ident">u32</span> },
-    <span class="ident">SimConnect</span>(<span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+    <span class="ident">SimConnect</span>(<span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
 }
 
 <span class="doccomment">/// Gauge</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gauge</span> {
     <span class="ident">executor</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">GaugeExecutor</span>,
-    <span class="ident">rx</span>: <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">rx</span>: <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Gauge</span> {
@@ -185,25 +207,21 @@
             <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">executor</span> };
             <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span>
                 <span class="kw">unsafe</span> { <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">recv</span>) };
-            <span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">SimConnect</span>(<span class="ident">recv</span>)));
+            <span class="ident">executor</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">SimConnect</span>(<span class="ident">recv</span>)));
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
     }
 
     <span class="doccomment">/// Consume the next event from MSFS.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">futures</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
         <span class="ident">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="ident">await</span> }
     }
 }
 
-<span class="kw">type</span> <span class="ident">GaugeExecutorFuture</span> <span class="op">=</span>
-    <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaugeExecutor</span> {
-    <span class="kw">pub</span> <span class="ident">handle</span>: <span class="kw">fn</span>(<span class="ident">Gauge</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GaugeExecutorFuture</span>,
-    <span class="kw">pub</span> <span class="ident">future</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GaugeExecutorFuture</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">Gauge</span>, <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
@@ -216,17 +234,11 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">service_id</span> <span class="kw">as</span> <span class="ident">u32</span> {
             <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">future</span>.<span class="ident">is_none</span>() {
-                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">1</span>);
-                    <span class="self">self</span>.<span class="ident">tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
-                    <span class="kw">let</span> <span class="ident">gauge</span> <span class="op">=</span> <span class="ident">Gauge</span> { <span class="ident">executor</span>: <span class="self">self</span>, <span class="ident">rx</span> };
-                    <span class="self">self</span>.<span class="ident">future</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">pin</span>((<span class="self">self</span>.<span class="ident">handle</span>)(<span class="ident">gauge</span>)));
-                } <span class="kw">else</span> {
-                    <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;MSFS-RS: (warn) Multiple PRE_INSTALL events detected&quot;</span>);
-                }
-                <span class="bool-val">true</span>
+                <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">GaugeExecutor</span>;
+                <span class="self">self</span>.<span class="ident">executor</span>
+                    .<span class="ident">start</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">rx</span><span class="op">|</span> <span class="ident">Gauge</span> { <span class="ident">executor</span>, <span class="ident">rx</span> }))
             }
-            <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>),
+            <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>),
             <span class="ident">service_id</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">service_id</span> {
                     <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PostInstall</span>),
@@ -243,7 +255,7 @@
                     <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PreKill</span>),
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
                 } {
-                    <span class="self">self</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PanelServiceID</span>(<span class="ident">data</span>)))
+                    <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PanelServiceID</span>(<span class="ident">data</span>)))
                 } <span class="kw">else</span> {
                     <span class="bool-val">true</span>
                 }
@@ -252,20 +264,54 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mouse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>, <span class="ident">flags</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">Mouse</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">flags</span> }));
+        <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">Mouse</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">flags</span> }));
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StandaloneModule</span> {
+    <span class="ident">executor</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">StandaloneModuleExecutor</span>,
+    <span class="ident">rx</span>: <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">StandaloneModule</span> {
+    <span class="doccomment">/// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_simconnect</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnect</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    {
+        <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">executor</span>;
+        <span class="kw">let</span> <span class="ident">sim</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnect</span>::<span class="ident">open</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_sim</span>, <span class="ident">recv</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">executor</span> };
+            <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">recv</span>) };
+            <span class="ident">executor</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">recv</span>));
+        })<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">data</span> {
-            <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">try_send</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>();
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">take</span>();
-        }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">task</span>::<span class="ident">Context</span>::<span class="ident">from_waker</span>(<span class="ident">futures</span>::<span class="ident">task</span>::<span class="ident">noop_waker_ref</span>());
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">future</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>) {
-            <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_ok</span>(),
-        }
+    <span class="doccomment">/// Consume the next event from MSFS.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">futures</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
+        <span class="ident">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="ident">await</span> }
+    }
+}
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StandaloneModuleExecutor</span> {
+    <span class="kw">pub</span> <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">StandaloneModule</span>, <span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">impl</span> <span class="ident">StandaloneModuleExecutor</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">StandaloneModuleExecutor</span>;
+        <span class="self">self</span>.<span class="ident">executor</span>
+            .<span class="ident">start</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">rx</span><span class="op">|</span> <span class="ident">StandaloneModule</span> { <span class="ident">executor</span>, <span class="ident">rx</span> }));
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_deinit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>);
     }
 }
 </pre></div>
