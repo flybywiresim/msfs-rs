@@ -263,13 +263,6 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
@@ -287,16 +280,9 @@
 <span class="doccomment">/// Declare a standalone module.</span>
 <span class="doccomment">/// ```rs</span>
 <span class="doccomment">/// #[standalone_module]</span>
-<span class="doccomment">/// struct MyModule {}</span>
-<span class="doccomment">/// impl Default for MyModule {</span>
-<span class="doccomment">///   fn default() -&gt; Self {</span>
-<span class="doccomment">///     println!(&quot;module is initialized&quot;);</span>
-<span class="doccomment">///     MyModule {}</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// impl Drop for MyModule {</span>
-<span class="doccomment">///   fn drop(&amp;mut self) {</span>
-<span class="doccomment">///     println!(&quot;module is deinitialized&quot;);</span>
+<span class="doccomment">/// async fn module(mut module: msfs::StandaloneModule) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+<span class="doccomment">///   while let Some(event) = module.next_event().await {</span>
+<span class="doccomment">///     // ...</span>
 <span class="doccomment">///   }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
