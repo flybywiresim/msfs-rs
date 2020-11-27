@@ -1,7 +1,5 @@
 use ::msfs::{
     msfs,
-    msfs::legacy,
-    msfs::MSFSEvent,
     sim_connect::{data_definition, Period, SimConnectRecv, SIMCONNECT_OBJECT_ID_USER},
 };
 
@@ -19,37 +17,24 @@ struct ControlSurfaces {
     rudder: f64,
 }
 
-/// ```cfg
-/// [VCockpit0]
-/// size_mm=0,0
-/// pixel_size=0,0
-/// texture=$PFD
-/// htmlgauge00=WasmInstrument/WasmInstrument.html?wasm_module=log.wasm&wasm_gauge=LOG, 0,0,0,0
-/// ```
-#[msfs::gauge(name=LOG)]
-async fn log(mut gauge: msfs::Gauge) -> Result<(), Box<dyn std::error::Error>> {
-    let mut sim = gauge.open_simconnect("LOG")?;
+#[msfs::standalone_module]
+async fn module(mut module: msfs::StandaloneModule) -> Result<(), Box<dyn std::error::Error>> {
+    let mut sim = module.open_simconnect("LOG")?;
 
-    while let Some(event) = gauge.next_event().await {
+    sim.request_data_on_sim_object::<ControlSurfaces>(
+        0,
+        SIMCONNECT_OBJECT_ID_USER,
+        Period::SimFrame,
+    )?;
+
+    println!("WASM: LOG INSTALLED");
+
+    while let Some(event) = module.next_event().await {
         match event {
-            MSFSEvent::PanelServiceID(service_id) => match service_id {
-                msfs::PanelServiceID::PostInstall => {
-                    sim.request_data_on_sim_object::<ControlSurfaces>(
-                        0,
-                        SIMCONNECT_OBJECT_ID_USER,
-                        Period::SimFrame,
-                    )?;
-                    println!("RUST: LOG INSTALLED");
-                }
-                _ => {}
-            },
-            MSFSEvent::SimConnect(recv) => match recv {
-                SimConnectRecv::SimObjectData(event) => {
-                    let data = event.into::<ControlSurfaces>(&sim).unwrap();
-                    println!("RUST: SimObjectData {:?}", data);
-                }
-                _ => {}
-            },
+            SimConnectRecv::SimObjectData(event) => {
+                let data = event.into::<ControlSurfaces>(&sim).unwrap();
+                println!("WASM: SimObjectData {:?}", data);
+            }
             _ => {}
         }
     }

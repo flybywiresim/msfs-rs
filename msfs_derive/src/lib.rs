@@ -29,31 +29,37 @@ mod sys {
 /// ```
 #[proc_macro_attribute]
 pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(item as ItemStruct);
-    let name = input.ident.clone();
+    let input = parse_macro_input!(item as ItemFn);
+
+    let rusty_name = input.sig.ident.clone();
+    let executor_name = format_ident!(
+        "{}_executor_do_not_use_or_you_will_be_fired",
+        input.sig.ident
+    );
 
     let output = quote! {
         #input
 
-        struct ModuleWrapperDoNotUseOrYouWillBeFired {
-            inner: Option<#name>,
-        }
-
-        static mut MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ModuleWrapperDoNotUseOrYouWillBeFired = ModuleWrapperDoNotUseOrYouWillBeFired {
-            inner: None,
+        #[allow(non_upper_case_globals)]
+        static mut #executor_name: ::msfs::msfs::StandaloneModuleExecutor = ::msfs::msfs::StandaloneModuleExecutor {
+            executor: ::msfs::msfs::executor::Executor {
+                handle: |m| std::boxed::Box::pin(#rusty_name(m)),
+                future: None,
+                tx: None,
+            },
         };
 
         #[no_mangle]
-        extern "C" fn module_init() {
+        pub extern "C" fn module_init() {
             unsafe {
-                MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.inner = Some(::core::default::Default::default());
+                #executor_name.handle_init();
             }
         }
 
         #[no_mangle]
-        extern "C" fn module_deinit() {
+        pub extern "C" fn module_deinit() {
             unsafe {
-                drop(MODULE_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.inner.take().unwrap());
+                #executor_name.handle_deinit();
             }
         }
     };
@@ -102,7 +108,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as GaugeArgs);
     let input = parse_macro_input!(item as ItemFn);
 
-    let rusty_name = format_ident!("{}", input.sig.ident);
+    let rusty_name = input.sig.ident.clone();
     let executor_name = format_ident!(
         "{}_executor_do_not_use_or_you_will_be_fired",
         input.sig.ident
@@ -117,9 +123,11 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
 
         #[allow(non_upper_case_globals)]
         static mut #executor_name: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
-            handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
-            tx: None,
-            future: None,
+            executor: {
+                handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+                tx: None,
+                future: None,
+            },
         };
 
         #[no_mangle]

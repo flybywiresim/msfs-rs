@@ -76,6 +76,10 @@ impl SimConnect {
 
     /// Used to process the next SimConnect message received. Only needed when not using the gauge API.
     pub fn call_dispatch(&mut self) -> Result<()> {
+        println!(
+            "WASM: sent {:?}",
+            self as *mut SimConnect as *mut std::ffi::c_void
+        );
         unsafe {
             map_err(sys::SimConnect_CallDispatch(
                 self.handle,
@@ -305,6 +309,7 @@ extern "C" fn dispatch_cb(
     let recv = recv!(recv_cb);
 
     if let Some(recv) = recv {
+        println!("WASM: got {:?}", p_context);
         let sim = unsafe { &*(p_context as *mut SimConnect) };
         (sim.callback)(unsafe { &mut *(p_context as *mut SimConnect) }, recv);
     }
