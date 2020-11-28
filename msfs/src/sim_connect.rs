@@ -296,6 +296,11 @@ impl sys::SIMCONNECT_RECV_EVENT {
 }
 
 impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
+    /// The ID for this data.
+    pub fn id(&self) -> sys::DWORD {
+        self.dwRequestID
+    }
+
     /// Convert a SimObjectData event into the data it contains.
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.definitions[&std::any::TypeId::of::<T>()];
