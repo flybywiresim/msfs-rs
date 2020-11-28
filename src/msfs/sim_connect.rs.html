@@ -320,6 +320,13 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -397,6 +404,11 @@
             <span class="ident">sim</span>.<span class="ident">call_dispatch</span>()<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
         }
+    }
+
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span> {
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Used to process the next SimConnect message received. Only needed when not using the gauge API.</span>
@@ -523,7 +535,9 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SimConnect</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>) } <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="kw">unsafe</span> {
+            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>)).<span class="ident">expect</span>(<span class="string">&quot;SimConnect_Close&quot;</span>);
+        }
     }
 }
 
