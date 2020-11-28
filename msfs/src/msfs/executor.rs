@@ -12,19 +12,31 @@ pub struct Executor<I, T> {
 }
 
 impl<I, T> Executor<I, T> {
-    pub(crate) fn start(&mut self, get_input: Box<dyn Fn(mpsc::Receiver<T>) -> I>) -> bool {
-        if self.future.is_none() {
-            let (tx, rx) = mpsc::channel(1);
-            self.tx = Some(tx);
-            let input = get_input(rx);
-            self.future = Some(Box::pin((self.handle)(input)));
-            true
-        } else {
-            false
+    pub(crate) fn start(
+        &mut self,
+        get_input: Box<dyn Fn(mpsc::Receiver<T>) -> I>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        debug_assert!(self.future.is_none());
+        let (tx, rx) = mpsc::channel(1);
+        self.tx = Some(tx);
+        let input = get_input(rx);
+
+        let mut f = (self.handle)(input);
+
+        let mut context = std::task::Context::from_waker(futures::task::noop_waker_ref());
+        match match f.as_mut().poll(&mut context) {
+            Poll::Pending => Ok(()),
+            Poll::Ready(v) => v,
+        } {
+            Ok(()) => {
+                self.future = Some(f);
+                Ok(())
+            }
+            e => e,
         }
     }
 
-    pub(crate) fn send(&mut self, data: Option<T>) -> bool {
+    pub(crate) fn send(&mut self, data: Option<T>) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(data) = data {
             self.tx.as_mut().unwrap().try_send(data).unwrap();
         } else {
@@ -32,8 +44,8 @@ impl<I, T> Executor<I, T> {
         }
         let mut context = std::task::Context::from_waker(futures::task::noop_waker_ref());
         match self.future.as_mut().unwrap().as_mut().poll(&mut context) {
-            Poll::Pending => true,
-            Poll::Ready(v) => v.is_ok(),
+            Poll::Pending => Ok(()),
+            Poll::Ready(v) => v,
         }
     }
 }

@@ -19,7 +19,7 @@ pub enum PanelServiceID<'a> {
     PreKill,
 }
 
-use crate::sim_connect::SimConnectRecv;
+use crate::sim_connect::{SimConnect, SimConnectRecv};
 pub use msfs_derive::{gauge, standalone_module};
 
 #[derive(Debug)]
@@ -47,7 +47,10 @@ impl Gauge {
             let executor = unsafe { &mut *executor };
             let recv =
                 unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
-            executor.executor.send(Some(MSFSEvent::SimConnect(recv)));
+            executor
+                .executor
+                .send(Some(MSFSEvent::SimConnect(recv)))
+                .unwrap();
         })?;
         Ok(sim)
     }
@@ -77,8 +80,9 @@ impl GaugeExecutor {
                 let executor = self as *mut GaugeExecutor;
                 self.executor
                     .start(Box::new(move |rx| Gauge { executor, rx }))
+                    .is_ok()
             }
-            sys::PANEL_SERVICE_POST_KILL => self.executor.send(None),
+            sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
             service_id => {
                 if let Some(data) = match service_id {
                     sys::PANEL_SERVICE_POST_INSTALL => Some(PanelServiceID::PostInstall),
@@ -95,7 +99,9 @@ impl GaugeExecutor {
                     sys::PANEL_SERVICE_PRE_KILL => Some(PanelServiceID::PreKill),
                     _ => None,
                 } {
-                    self.executor.send(Some(MSFSEvent::PanelServiceID(data)))
+                    self.executor
+                        .send(Some(MSFSEvent::PanelServiceID(data)))
+                        .is_ok()
                 } else {
                     true
                 }
@@ -104,7 +110,9 @@ impl GaugeExecutor {
     }
 
     pub fn handle_mouse(&mut self, x: f32, y: f32, flags: u32) {
-        self.executor.send(Some(MSFSEvent::Mouse { x, y, flags }));
+        self.executor
+            .send(Some(MSFSEvent::Mouse { x, y, flags }))
+            .unwrap();
     }
 }
 
@@ -116,17 +124,19 @@ pub struct StandaloneModule {
 impl StandaloneModule {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
     pub fn open_simconnect(
-        &self,
+        &mut self,
         name: &str,
-    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect>>, Box<dyn std::error::Error>>
-    {
+    ) -> Result<std::pin::Pin<Box<SimConnect>>, Box<dyn std::error::Error>> {
         let executor = self.executor;
-        let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
+        let mut sim = SimConnect::open(name, move |_sim, recv| {
             let executor = unsafe { &mut *executor };
             let recv =
                 unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
-            executor.executor.send(Some(recv));
+            executor.executor.send(Some(recv)).unwrap();
         })?;
+        if let Some(ref mut list) = unsafe { self.executor.as_mut() }.unwrap().simconnects {
+            list.push(sim.as_mut_ptr());
+        }
         Ok(sim)
     }
 
@@ -135,22 +145,70 @@ impl StandaloneModule {
         use futures::stream::StreamExt;
         async move { self.rx.next().await }
     }
+
+    pub fn simulate<Fut: 'static, F: Fn(StandaloneModule) -> Fut>(
+        _f: F,
+    ) -> Result<(), Box<dyn std::error::Error>>
+    where
+        Fut: futures::Future<Output = Result<(), Box<dyn std::error::Error>>>,
+    {
+        let mut e = StandaloneModuleExecutor {
+            executor: executor::Executor {
+                handle: |m| {
+                    assert!(std::mem::size_of::<F>() == 0);
+                    let f: F = unsafe { std::mem::MaybeUninit::zeroed().assume_init() };
+                    Box::pin(f(m))
+                },
+                future: None,
+                tx: None,
+            },
+            simconnects: Some(vec![]),
+        };
+
+        e.start()?;
+
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(10));
+            let simconnects = e.simconnects.as_ref().unwrap();
+            if simconnects.is_empty() {
+                break;
+            }
+            for s in simconnects {
+                unsafe {
+                    (&mut **s).call_dispatch()?;
+                }
+            }
+        }
+
+        e.end()?;
+
+        Ok(())
+    }
 }
 
 #[doc(hidden)]
 pub struct StandaloneModuleExecutor {
     pub executor: executor::Executor<StandaloneModule, SimConnectRecv<'static>>,
+    pub simconnects: Option<Vec<*mut SimConnect>>,
 }
 
 #[doc(hidden)]
 impl StandaloneModuleExecutor {
-    pub fn handle_init(&mut self) {
+    fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let executor = self as *mut StandaloneModuleExecutor;
         self.executor
-            .start(Box::new(move |rx| StandaloneModule { executor, rx }));
+            .start(Box::new(move |rx| StandaloneModule { executor, rx }))
+    }
+
+    pub fn handle_init(&mut self) {
+        self.start().unwrap();
+    }
+
+    fn end(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        self.executor.send(None)
     }
 
     pub fn handle_deinit(&mut self) {
-        self.executor.send(None);
+        self.end().unwrap();
     }
 }

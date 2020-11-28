@@ -76,6 +76,11 @@ impl SimConnect {
         }
     }
 
+    #[doc(hidden)]
+    pub(crate) fn as_mut_ptr(&mut self) -> *mut SimConnect {
+        self
+    }
+
     /// Used to process the next SimConnect message received. Only needed when not using the gauge API.
     pub fn call_dispatch(&mut self) -> Result<()> {
         unsafe {
@@ -200,7 +205,9 @@ impl SimConnect {
 
 impl Drop for SimConnect {
     fn drop(&mut self) {
-        assert!(unsafe { sys::SimConnect_Close(self.handle) } >= 0);
+        unsafe {
+            map_err(sys::SimConnect_Close(self.handle)).expect("SimConnect_Close");
+        }
     }
 }
 
