@@ -26,6 +26,9 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # msfs-rs</span>
 <span class="doccomment">//!</span>
@@ -41,12 +44,15 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Known Issues and Work-Arounds</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### Symbol visibility bug in Rust</span>
-<span class="doccomment">//! Until https://github.com/rust-lang/rfcs/issues/2771 is fixed, you will have</span>
-<span class="doccomment">//! to run the `msfs-fix` util on your output wasm files, like so:</span>
-<span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! $ cargo build</span>
-<span class="doccomment">//! $ msfs-fix target/wasm32-wasi/release/foo.wasm ./foo.wasm</span>
+<span class="doccomment">//! ### Missing various exports</span>
+<span class="doccomment">//! Add a .cargo/config.toml file with the following settings:</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [target.wasm32-wasi]</span>
+<span class="doccomment">//! rustflags = [</span>
+<span class="doccomment">//!   &quot;-Clink-arg=--export-table&quot;,</span>
+<span class="doccomment">//!   &quot;-Clink-arg=--export=malloc&quot;,</span>
+<span class="doccomment">//!   &quot;-Clink-arg=--export=free&quot;,</span>
+<span class="doccomment">//! ]</span>
 <span class="doccomment">//! ```</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">msfs</span>;
