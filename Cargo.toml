@@ -3,6 +3,5 @@ members = [
   "msfs",
   "msfs_sdk",
   "msfs_derive",
-  "msfs_fix",
 ]
 exclude = ["examples"]
