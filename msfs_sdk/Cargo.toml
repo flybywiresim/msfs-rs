@@ -1,7 +1,9 @@
 [package]
 name = "msfs_sdk"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
 authors = ["snek"]
 edition = "2018"
+description = "Crate to find MSFS SDK"
+license-file = "../LICENSE"
 
 [dependencies]
