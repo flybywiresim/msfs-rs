@@ -1,5 +1,5 @@
 [package]
-authors = ["Gus Caplan <me@gus.host>"]
+authors = ["snek"]
 edition = "2018"
 name = "log"
 version = "0.1.0"

@@ -1,11 +1,13 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::sys;
+use std::any::TypeId;
 use std::collections::HashMap;
 use std::pin::Pin;
 
 pub use sys::SIMCONNECT_OBJECT_ID_USER;
 
+pub use msfs_derive::sim_connect_client_data_definition as client_data_definition;
 pub use msfs_derive::sim_connect_data_definition as data_definition;
 
 pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
@@ -14,6 +16,12 @@ pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
 pub trait DataDefinition: 'static {
     #[doc(hidden)]
     const DEFINITIONS: &'static [(&'static str, &'static str, f32, sys::SIMCONNECT_DATATYPE)];
+}
+
+/// A trait implemented by the `client_data_definition` attribute.
+pub trait ClientDataDefinition: 'static {
+    #[doc(hidden)]
+    fn get_definitions() -> Vec<(usize, usize, f32)>;
 }
 
 /// Rusty HRESULT wrapper.
@@ -43,8 +51,10 @@ pub type SimConnectRecvCallback = dyn Fn(&mut SimConnect, SimConnectRecv);
 pub struct SimConnect {
     handle: sys::HANDLE,
     callback: Box<SimConnectRecvCallback>,
-    definitions: HashMap<std::any::TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
+    data_definitions: HashMap<TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
+    client_data_definitions: HashMap<TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID>,
     event_id_counter: sys::DWORD,
+    client_data_id_counter: sys::DWORD,
 }
 
 impl SimConnect {
@@ -68,14 +78,17 @@ impl SimConnect {
             let mut sim = Box::pin(SimConnect {
                 handle,
                 callback: Box::new(callback),
-                definitions: HashMap::new(),
+                data_definitions: HashMap::new(),
+                client_data_definitions: HashMap::new(),
                 event_id_counter: 0,
+                client_data_id_counter: 0,
             });
             sim.call_dispatch()?;
             Ok(sim)
         }
     }
 
+    // SimConnect is only exposed as a Pin<Box<SimConnect>>>, so get ptr with this method:
     #[doc(hidden)]
     pub(crate) fn as_mut_ptr(&mut self) -> *mut SimConnect {
         self
@@ -93,23 +106,22 @@ impl SimConnect {
     }
 
     fn get_define_id<T: DataDefinition>(&mut self) -> Result<sys::SIMCONNECT_DATA_DEFINITION_ID> {
-        let key = std::any::TypeId::of::<T>();
-        let maybe_define_id = self.definitions.len() as sys::SIMCONNECT_DATA_DEFINITION_ID;
-        match self.definitions.entry(key) {
-            std::collections::hash_map::Entry::Vacant(entry) => {
+        let handle = self.handle;
+        SimConnect::get_id::<T, _, _>(
+            &mut self.data_definitions,
+            |define_id: sys::SIMCONNECT_DATA_DEFINITION_ID| {
+                /*
                 unsafe {
-                    map_err(sys::SimConnect_ClearDataDefinition(
-                        self.handle,
-                        maybe_define_id,
-                    ))?;
+                    map_err(sys::SimConnect_ClearDataDefinition(handle, define_id))?;
                 }
+                */
                 for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
                     let datum_name = std::ffi::CString::new(*datum_name).unwrap();
                     let units_type = std::ffi::CString::new(*units_type).unwrap();
                     unsafe {
                         map_err(sys::SimConnect_AddToDataDefinition(
-                            self.handle,
-                            maybe_define_id,
+                            handle,
+                            define_id,
                             datum_name.as_ptr(),
                             units_type.as_ptr(),
                             *datatype,
@@ -118,8 +130,66 @@ impl SimConnect {
                         ))?;
                     }
                 }
-                entry.insert(maybe_define_id);
-                Ok(maybe_define_id)
+                Ok(())
+            },
+        )
+    }
+
+    fn get_client_data_define_id<T: ClientDataDefinition>(
+        &mut self,
+    ) -> Result<sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID> {
+        let handle = self.handle;
+        SimConnect::get_id::<T, _, _>(&mut self.client_data_definitions, |define_id| {
+            /*
+            unsafe {
+                map_err(sys::SimConnect_ClearClientDataDefinition(handle, define_id))?;
+            }
+            */
+
+            // Rust may reorder fields, so find padding has to be calculated as min of
+            // all fields instead of the last field.
+            let mut padding = std::usize::MAX;
+            for (offset, size, epsilon) in T::get_definitions() {
+                padding = padding.min(std::mem::size_of::<T>() - (offset + size));
+                unsafe {
+                    map_err(sys::SimConnect_AddToClientDataDefinition(
+                        handle,
+                        define_id,
+                        offset as sys::DWORD,
+                        size as sys::DWORD,
+                        epsilon,
+                        sys::SIMCONNECT_UNUSED,
+                    ))?;
+                }
+            }
+            debug_assert!(padding >= 0);
+            if padding > 0 {
+                unsafe {
+                    map_err(sys::SimConnect_AddToClientDataDefinition(
+                        handle,
+                        define_id,
+                        (std::mem::size_of::<T>() - padding) as sys::DWORD,
+                        padding as sys::DWORD,
+                        0.0,
+                        sys::SIMCONNECT_UNUSED,
+                    ))?;
+                }
+            }
+            Ok(())
+        })
+    }
+
+    fn get_id<T: 'static, U: std::convert::TryFrom<usize> + Copy, F: Fn(U) -> Result<()>>(
+        map: &mut HashMap<TypeId, U>,
+        insert_fn: F,
+    ) -> Result<U> {
+        let key = TypeId::of::<T>();
+        let maybe_id = U::try_from(map.len()).unwrap_or_else(|_| unreachable!());
+        match map.entry(key) {
+            std::collections::hash_map::Entry::Vacant(entry) => {
+                insert_fn(maybe_id)?;
+                entry.insert(maybe_id);
+                Ok(maybe_id)
             }
             std::collections::hash_map::Entry::Occupied(entry) => Ok(*entry.get()),
         }
@@ -201,6 +271,92 @@ impl SimConnect {
         }
         Ok(event_id)
     }
+
+    /// Allocate a region of memory in the sim with the given `name`. Other
+    /// SimConnect modules can use the `name` to read data from this memory
+    /// using `request_client_data`. This memory cannot be deallocated.
+    pub fn create_client_data<T: ClientDataDefinition>(
+        &mut self,
+        name: &str,
+    ) -> Result<ClientDataArea<T>> {
+        let client_id = self.client_data_id_counter;
+        self.client_data_id_counter += 1;
+        unsafe {
+            let name = std::ffi::CString::new(name).unwrap();
+            map_err(sys::SimConnect_MapClientDataNameToID(
+                self.handle,
+                name.as_ptr(),
+                client_id,
+            ))?;
+        }
+        unsafe {
+            map_err(sys::SimConnect_CreateClientData(
+                self.handle,
+                client_id,
+                std::mem::size_of::<T>() as sys::DWORD,
+                0,
+            ))?;
+        }
+        Ok(ClientDataArea {
+            client_id,
+            phantom: std::marker::PhantomData,
+        })
+    }
+
+    /// Request a pre-allocated region of memory from the sim with the given
+    /// `name`. A module must have already used `create_client_data` to
+    /// allocate this memory.
+    pub fn request_client_data<T: ClientDataDefinition>(
+        &mut self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+        name: &str,
+    ) -> Result<()> {
+        let define_id = self.get_client_data_define_id::<T>()?;
+        let client_id = self.client_data_id_counter;
+        self.client_data_id_counter += 1;
+        unsafe {
+            let name = std::ffi::CString::new(name).unwrap();
+            map_err(sys::SimConnect_MapClientDataNameToID(
+                self.handle,
+                name.as_ptr(),
+                client_id,
+            ))?;
+        }
+        unsafe {
+            map_err(sys::SimConnect_RequestClientData(
+                self.handle,
+                client_id,
+                request_id,
+                define_id,
+                sys::SIMCONNECT_CLIENT_DATA_PERIOD_SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET,
+                sys::SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED,
+                0,
+                0,
+                0,
+            ))?;
+        }
+        Ok(())
+    }
+
+    /// Set the data of an area allocated with `create_client_data`.
+    pub fn set_client_data<T: ClientDataDefinition>(
+        &mut self,
+        area: &ClientDataArea<T>,
+        data: &T,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_SetClientData(
+                self.handle,
+                area.client_id,
+                self.get_client_data_define_id::<T>()?,
+                0,
+                0,
+                std::mem::size_of::<T>() as sys::DWORD,
+                data as *const _ as *mut std::ffi::c_void,
+            ))?;
+        }
+        Ok(())
+    }
 }
 
 impl Drop for SimConnect {
@@ -238,6 +394,11 @@ macro_rules! recv {
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA,
                 SIMCONNECT_RECV_SIMOBJECT_DATA,
                 SimObjectData
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_CLIENT_DATA,
+                SIMCONNECT_RECV_CLIENT_DATA,
+                ClientData
             ),
         );
     };
@@ -303,9 +464,26 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
 
     /// Convert a SimObjectData event into the data it contains.
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
-        let define_id = sim.definitions[&std::any::TypeId::of::<T>()];
+        let define_id = sim.data_definitions[&TypeId::of::<T>()];
         if define_id == self.dwDefineID {
             Some(unsafe { &*(&self.dwData as *const sys::DWORD as *const T) })
+        } else {
+            None
+        }
+    }
+}
+
+impl sys::SIMCONNECT_RECV_CLIENT_DATA {
+    /// The ID for this data.
+    pub fn id(&self) -> sys::DWORD {
+        self._base.dwRequestID
+    }
+
+    /// Convert a ClientData event into the data it contains.
+    pub fn into<T: ClientDataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
+        let define_id = sim.client_data_definitions[&TypeId::of::<T>()];
+        if define_id == self._base.dwDefineID {
+            Some(unsafe { &*(&self._base.dwData as *const sys::DWORD as *const T) })
         } else {
             None
         }
@@ -328,4 +506,11 @@ pub enum Period {
     SimFrame = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME as isize,
     /// Specifies that the data should be sent once every second.
     Second = sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND as isize,
+}
+
+/// An allocated client data memory region. Dropping this struct will not
+/// deallocate the memory which has been allocated in the sim.
+pub struct ClientDataArea<T: ClientDataDefinition> {
+    client_id: sys::SIMCONNECT_CLIENT_DATA_ID,
+    phantom: std::marker::PhantomData<T>,
 }
