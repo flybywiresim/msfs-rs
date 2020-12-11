@@ -162,7 +162,6 @@ impl SimConnect {
                     ))?;
                 }
             }
-            debug_assert!(padding >= 0);
             if padding > 0 {
                 unsafe {
                     map_err(sys::SimConnect_AddToClientDataDefinition(

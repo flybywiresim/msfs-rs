@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo clippy --all-targets --all-features -- -D warnings
+          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo fmt -- --check
           docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo doc --no-deps --workspace
           sudo chown -R $(whoami) target/doc
           touch target/doc/.nojekyll
