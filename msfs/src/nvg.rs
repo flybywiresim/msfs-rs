@@ -3,7 +3,6 @@
 //! instruments in MSFS. See `Gauge::create_nanovg`.
 
 use crate::sys;
-use uom::si::{angle::radian, f32::Angle};
 
 type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
@@ -176,17 +175,10 @@ impl Path {
 
     /// Creates a new circle arc shaped sub-path. The arc center is at (`cx`,`cy`), the arc radius
     /// is `r`, and the arc is drawn from angle `a0` to `a1`, and swept in direction `dir`.
-    pub fn arc(&self, cx: f32, cy: f32, r: f32, a0: Angle, a1: Angle, dir: Direction) {
+    /// Angles are in radians.
+    pub fn arc(&self, cx: f32, cy: f32, r: f32, a0: f32, a1: f32, dir: Direction) {
         unsafe {
-            sys::nvgArc(
-                self.ctx,
-                cx,
-                cy,
-                r,
-                a0.get::<radian>(),
-                a1.get::<radian>(),
-                dir as i32,
-            );
+            sys::nvgArc(self.ctx, cx, cy, r, a0, a1, dir as i32);
         }
     }
 
@@ -199,21 +191,12 @@ impl Path {
         cy: f32,
         rx: f32,
         ry: f32,
-        a0: Angle,
-        a1: Angle,
+        a0: f32,
+        a1: f32,
         dir: Direction,
     ) {
         unsafe {
-            sys::nvgEllipticalArc(
-                self.ctx,
-                cx,
-                cy,
-                rx,
-                ry,
-                a0.get::<radian>(),
-                a1.get::<radian>(),
-                dir as i32,
-            );
+            sys::nvgEllipticalArc(self.ctx, cx, cy, rx, ry, a0, a1, dir as i32);
         }
     }
 
