@@ -9,9 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo clippy --all-targets --all-features -- -D warnings
-          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo fmt -- --check
-          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest cargo doc --no-deps --workspace
+          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest scripts/ci.sh
           sudo chown -R $(whoami) target/doc
           touch target/doc/.nojekyll
       - uses: JamesIves/github-pages-deploy-action@3.7.1

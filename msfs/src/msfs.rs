@@ -1,4 +1,4 @@
-use crate::{executor, nvg, sys};
+use crate::{executor, sys};
 
 /// `PanelServiceID` is used in `GaugeCallback`.
 #[derive(Debug)]
@@ -51,8 +51,8 @@ impl Gauge {
 
     /// Create a NanoVG rendering context. See `Context` for more details.
     #[cfg(any(target_arch = "wasm32", doc))]
-    pub fn create_nanovg(&self) -> Option<nvg::Context> {
-        nvg::Context::create(unsafe { (*self.executor).fs_ctx })
+    pub fn create_nanovg(&self) -> Option<crate::nvg::Context> {
+        crate::nvg::Context::create(unsafe { (*self.executor).fs_ctx })
     }
 
     /// Consume the next event from MSFS.
