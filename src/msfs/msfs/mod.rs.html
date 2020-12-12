@@ -218,6 +218,14 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
 
@@ -279,6 +287,12 @@
         <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
     }
 
+    <span class="doccomment">/// Create a NanoVG rendering context. See `Context` for more details.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">doc</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_nanovg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">nvg</span>::<span class="ident">Context</span><span class="op">&gt;</span> {
+        <span class="ident">nvg</span>::<span class="ident">Context</span>::<span class="ident">create</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">executor</span>).<span class="ident">fs_ctx</span> })
+    }
+
     <span class="doccomment">/// Consume the next event from MSFS.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">futures</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
@@ -288,6 +302,7 @@
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaugeExecutor</span> {
+    <span class="ident">fs_ctx</span>: <span class="ident">sys</span>::<span class="ident">FsContext</span>,
     <span class="kw">pub</span> <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">Gauge</span>, <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -295,13 +310,14 @@
 <span class="kw">impl</span> <span class="ident">GaugeExecutor</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_gauge</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">sys</span>::<span class="ident">FsContext</span>,
+        <span class="ident">ctx</span>: <span class="ident">sys</span>::<span class="ident">FsContext</span>,
         <span class="ident">service_id</span>: <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_int</span>,
         <span class="ident">p_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">service_id</span> <span class="kw">as</span> <span class="ident">u32</span> {
             <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">GaugeExecutor</span>;
+                <span class="self">self</span>.<span class="ident">fs_ctx</span> <span class="op">=</span> <span class="ident">ctx</span>;
                 <span class="self">self</span>.<span class="ident">executor</span>
                     .<span class="ident">start</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">rx</span><span class="op">|</span> <span class="ident">Gauge</span> { <span class="ident">executor</span>, <span class="ident">rx</span> }))
                     .<span class="ident">is_ok</span>()
