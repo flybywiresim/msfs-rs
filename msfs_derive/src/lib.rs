@@ -34,8 +34,8 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
         #input
 
         #[allow(non_upper_case_globals)]
-        static mut #executor_name: ::msfs::msfs::StandaloneModuleExecutor = ::msfs::msfs::StandaloneModuleExecutor {
-            executor: ::msfs::msfs::executor::Executor {
+        static mut #executor_name: ::msfs::StandaloneModuleExecutor = ::msfs::StandaloneModuleExecutor {
+            executor: ::msfs::executor::Executor {
                 handle: |m| std::boxed::Box::pin(#rusty_name(m)),
                 future: None,
                 tx: None,
@@ -116,7 +116,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
         #input
 
         #[allow(non_upper_case_globals)]
-        static mut #executor_name: ::msfs::msfs::GaugeExecutor = ::msfs::msfs::GaugeExecutor {
+        static mut #executor_name: ::msfs::GaugeExecutor = ::msfs::GaugeExecutor {
             executor: {
                 handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
                 tx: None,

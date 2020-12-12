@@ -1,5 +1,5 @@
-use ::msfs::{
-    msfs,
+use msfs::{
+    self,
     sim_connect::{data_definition, Period, SimConnectRecv, SIMCONNECT_OBJECT_ID_USER},
 };
 

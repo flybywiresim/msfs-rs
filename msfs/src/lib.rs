@@ -23,6 +23,17 @@
 //! ]
 //! ```
 
-pub mod msfs;
+mod msfs;
 pub mod sim_connect;
 pub mod sys;
+
+pub use msfs::*;
+
+#[cfg(any(target_arch = "wasm32", doc))]
+pub mod legacy;
+
+#[cfg(any(target_arch = "wasm32", doc))]
+pub mod nvg;
+
+#[doc(hidden)]
+pub mod executor;

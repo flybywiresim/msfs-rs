@@ -1,13 +1,4 @@
-use crate::sys;
-
-#[cfg(any(target_arch = "wasm32", doc))]
-pub mod legacy;
-
-#[cfg(any(target_arch = "wasm32", doc))]
-pub mod nvg;
-
-#[doc(hidden)]
-pub mod executor;
+use crate::{executor, nvg, sys};
 
 /// `PanelServiceID` is used in `GaugeCallback`.
 #[derive(Debug)]
