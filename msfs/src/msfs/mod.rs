@@ -58,6 +58,12 @@ impl Gauge {
         Ok(sim)
     }
 
+    /// Create a NanoVG rendering context. See `Context` for more details.
+    #[cfg(any(target_arch = "wasm32", doc))]
+    pub fn create_nanovg(&self) -> Option<nvg::Context> {
+        nvg::Context::create(unsafe { (*self.executor).fs_ctx })
+    }
+
     /// Consume the next event from MSFS.
     pub fn next_event(&mut self) -> impl futures::Future<Output = Option<MSFSEvent<'_>>> + '_ {
         use futures::stream::StreamExt;
@@ -67,6 +73,7 @@ impl Gauge {
 
 #[doc(hidden)]
 pub struct GaugeExecutor {
+    fs_ctx: sys::FsContext,
     pub executor: executor::Executor<Gauge, MSFSEvent<'static>>,
 }
 
@@ -74,13 +81,14 @@ pub struct GaugeExecutor {
 impl GaugeExecutor {
     pub fn handle_gauge(
         &mut self,
-        _ctx: sys::FsContext,
+        ctx: sys::FsContext,
         service_id: std::os::raw::c_int,
         p_data: *mut std::ffi::c_void,
     ) -> bool {
         match service_id as u32 {
             sys::PANEL_SERVICE_PRE_INSTALL => {
                 let executor = self as *mut GaugeExecutor;
+                self.fs_ctx = ctx;
                 self.executor
                     .start(Box::new(move |rx| Gauge { executor, rx }))
                     .is_ok()

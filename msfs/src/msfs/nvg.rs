@@ -1,3 +1,7 @@
+//! NanoVG is small antialiased vector graphics rendering library with a lean
+//! API modeled after the HTML5 Canvas API. It can be used to draw gauge
+//! instruments in MSFS. See `Gauge::create_nanovg`.
+
 use crate::sys;
 use uom::si::{angle::radian, f32::Angle};
 
@@ -84,7 +88,10 @@ impl Context {
 
     /// NanoVG allows you to load jpg, png, psd, tga, pic and gif files to be used for rendering.
     /// In addition you can upload your own image. The image loading is provided by stb_image.
-    pub fn create_image(&self, filename: &str) -> std::result::Result<Image, Box<dyn std::error::Error>> {
+    pub fn create_image(
+        &self,
+        filename: &str,
+    ) -> std::result::Result<Image, Box<dyn std::error::Error>> {
         let filename = std::ffi::CString::new(filename).unwrap();
         let handle = unsafe { sys::nvgCreateImage(self.ctx, filename.as_ptr(), 0) };
         match handle {
@@ -92,7 +99,10 @@ impl Context {
                 std::io::ErrorKind::Other,
                 "unable to load image",
             ))),
-            _ => Ok(Image { ctx: self.ctx, handle }),
+            _ => Ok(Image {
+                ctx: self.ctx,
+                handle,
+            }),
         }
     }
 }
@@ -284,46 +294,34 @@ pub struct Color(sys::NVGcolor);
 impl Color {
     /// Returns a color value from red, green, blue values. Alpha will be set to 255 (1.0).
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Self {
-        Self(unsafe {
-            sys::nvgRGB(r, g, b)
-        })
+        Self(unsafe { sys::nvgRGB(r, g, b) })
     }
 
     /// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
     pub fn from_rgbf(r: f32, g: f32, b: f32) -> Self {
-        Self(unsafe {
-            sys::nvgRGBf(r, g, b)
-        })
+        Self(unsafe { sys::nvgRGBf(r, g, b) })
     }
 
     /// Returns a color value from red, green, blue and alpha values.
     pub fn from_rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
-        Self(unsafe {
-            sys::nvgRGBA(r, g, b, a)
-        })
+        Self(unsafe { sys::nvgRGBA(r, g, b, a) })
     }
 
     /// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
     pub fn from_rgbaf(r: f32, g: f32, b: f32, a: f32) -> Self {
-        Self(unsafe {
-            sys::nvgRGBAf(r, g, b, a)
-        })
+        Self(unsafe { sys::nvgRGBAf(r, g, b, a) })
     }
 
     /// Returns color value specified by hue, saturation and lightness.
     /// HSL values are all in range [0..1], alpha will be set to 255.
     pub fn from_hsv(h: f32, s: f32, l: f32) -> Self {
-        Self(unsafe {
-            sys::nvgHSL(h, s, l)
-        })
+        Self(unsafe { sys::nvgHSL(h, s, l) })
     }
 
     /// Returns color value specified by hue, saturation and lightness.
     /// HSL values are all in range [0..1], alpha will be set to 255.
     pub fn from_hsva(h: f32, s: f32, l: f32, a: u8) -> Self {
-        Self(unsafe {
-            sys::nvgHSLA(h, s, l, a)
-        })
+        Self(unsafe { sys::nvgHSLA(h, s, l, a) })
     }
 }
 
