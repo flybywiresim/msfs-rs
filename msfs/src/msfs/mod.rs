@@ -3,6 +3,9 @@ use crate::sys;
 #[cfg(any(target_arch = "wasm32", doc))]
 pub mod legacy;
 
+#[cfg(any(target_arch = "wasm32", doc))]
+pub mod nvg;
+
 #[doc(hidden)]
 pub mod executor;
 
