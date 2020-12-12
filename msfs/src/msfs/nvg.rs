@@ -74,8 +74,25 @@ impl Context {
         let filename = std::ffi::CString::new(filename).unwrap();
         let handle = unsafe { sys::nvgCreateFont(self.ctx, name.as_ptr(), filename.as_ptr()) };
         match handle {
-            -1 => panic!(),
+            -1 => Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "unable to load font",
+            ))),
             _ => Ok(Font { handle }),
+        }
+    }
+
+    /// NanoVG allows you to load jpg, png, psd, tga, pic and gif files to be used for rendering.
+    /// In addition you can upload your own image. The image loading is provided by stb_image.
+    pub fn create_image(&self, filename: &str) -> std::result::Result<Image, Box<dyn std::error::Error>> {
+        let filename = std::ffi::CString::new(filename).unwrap();
+        let handle = unsafe { sys::nvgCreateImage(self.ctx, filename.as_ptr(), 0) };
+        match handle {
+            -1 => Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "unable to load image",
+            ))),
+            _ => Ok(Image { ctx: self.ctx, handle }),
         }
     }
 }
@@ -86,6 +103,7 @@ pub struct Frame {
 }
 
 impl Frame {
+    /// Draw a path.
     pub fn draw_path<F: Fn(&Path) -> Result>(&self, f: F) -> Result {
         unsafe {
             sys::nvgBeginPath(self.ctx);
@@ -260,7 +278,86 @@ pub enum Direction {
     CounterClockwise = sys::NVGwinding_NVG_CCW,
 }
 
-/// A font handle
+/// Colors in NanoVG are stored as unsigned ints in ABGR format.
+pub struct Color(sys::NVGcolor);
+
+impl Color {
+    /// Returns a color value from red, green, blue values. Alpha will be set to 255 (1.0).
+    pub fn from_rgb(r: u8, g: u8, b: u8) -> Self {
+        Self(unsafe {
+            sys::nvgRGB(r, g, b)
+        })
+    }
+
+    /// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
+    pub fn from_rgbf(r: f32, g: f32, b: f32) -> Self {
+        Self(unsafe {
+            sys::nvgRGBf(r, g, b)
+        })
+    }
+
+    /// Returns a color value from red, green, blue and alpha values.
+    pub fn from_rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
+        Self(unsafe {
+            sys::nvgRGBA(r, g, b, a)
+        })
+    }
+
+    /// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
+    pub fn from_rgbaf(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self(unsafe {
+            sys::nvgRGBAf(r, g, b, a)
+        })
+    }
+
+    /// Returns color value specified by hue, saturation and lightness.
+    /// HSL values are all in range [0..1], alpha will be set to 255.
+    pub fn from_hsv(h: f32, s: f32, l: f32) -> Self {
+        Self(unsafe {
+            sys::nvgHSL(h, s, l)
+        })
+    }
+
+    /// Returns color value specified by hue, saturation and lightness.
+    /// HSL values are all in range [0..1], alpha will be set to 255.
+    pub fn from_hsva(h: f32, s: f32, l: f32, a: u8) -> Self {
+        Self(unsafe {
+            sys::nvgHSLA(h, s, l, a)
+        })
+    }
+}
+
+/// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.
+/// These can be used as paints for strokes and fills.
+pub struct Paint(sys::NVGpaint);
+
+/// A font handle.
 pub struct Font {
     handle: std::os::raw::c_int,
+}
+
+/// An image handle.
+pub struct Image {
+    ctx: *mut sys::NVGcontext,
+    handle: std::os::raw::c_int,
+}
+
+impl Image {
+    /// Returns the dimensions of a created image.
+    pub fn size(&self) -> (usize, usize) {
+        let mut w = 0;
+        let mut h = 0;
+        unsafe {
+            sys::nvgImageSize(self.ctx, self.handle, &mut w, &mut h);
+        }
+        (w as usize, h as usize)
+    }
+}
+
+impl Drop for Image {
+    fn drop(&mut self) {
+        unsafe {
+            sys::nvgDeleteImage(self.ctx, self.handle);
+        }
+    }
 }
