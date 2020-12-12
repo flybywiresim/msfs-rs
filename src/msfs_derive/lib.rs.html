@@ -374,8 +374,8 @@
         #<span class="ident">input</span>
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
-        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> {
-            <span class="ident">executor</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">executor</span>::<span class="ident">Executor</span> {
+        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">StandaloneModuleExecutor</span> {
+            <span class="ident">executor</span>: ::<span class="ident">msfs</span>::<span class="ident">executor</span>::<span class="ident">Executor</span> {
                 <span class="ident">handle</span>: <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">m</span>)),
                 <span class="ident">future</span>: <span class="prelude-val">None</span>,
                 <span class="ident">tx</span>: <span class="prelude-val">None</span>,
@@ -456,7 +456,7 @@
         #<span class="ident">input</span>
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
-        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> {
+        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> {
             <span class="ident">executor</span>: {
                 <span class="ident">handle</span>: <span class="op">|</span><span class="ident">gauge</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">gauge</span>)),
                 <span class="ident">tx</span>: <span class="prelude-val">None</span>,
