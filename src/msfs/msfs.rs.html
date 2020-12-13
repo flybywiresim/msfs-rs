@@ -217,12 +217,32 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">executor</span>, <span class="ident">sys</span>};
 
-<span class="doccomment">/// `PanelServiceID` is used in `GaugeCallback`.</span>
+<span class="kw">impl</span> <span class="ident">sys</span>::<span class="ident">sGaugeDrawData</span> {
+    <span class="doccomment">/// Get the width of the target instrument texture.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">winWidth</span> <span class="kw">as</span> <span class="ident">usize</span>
+    }
+
+    <span class="doccomment">/// Get the height of the target instrunent texture.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">height</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">winHeight</span> <span class="kw">as</span> <span class="ident">usize</span>
+    }
+}
+
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sim_connect</span>::{<span class="ident">SimConnect</span>, <span class="ident">SimConnectRecv</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive</span>::{<span class="ident">gauge</span>, <span class="ident">standalone_module</span>};
+
+<span class="doccomment">/// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PanelServiceID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">PostInstall</span>,
     <span class="ident">PreInitialize</span>,
     <span class="ident">PostInitialize</span>,
@@ -231,14 +251,6 @@
     <span class="ident">PreDraw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">sys</span>::<span class="ident">sGaugeDrawData</span>),
     <span class="ident">PostDraw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">sys</span>::<span class="ident">sGaugeDrawData</span>),
     <span class="ident">PreKill</span>,
-}
-
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sim_connect</span>::{<span class="ident">SimConnect</span>, <span class="ident">SimConnectRecv</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive</span>::{<span class="ident">gauge</span>, <span class="ident">standalone_module</span>};
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">PanelServiceID</span>(<span class="ident">PanelServiceID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="ident">Mouse</span> { <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>, <span class="ident">flags</span>: <span class="ident">u32</span> },
     <span class="ident">SimConnect</span>(<span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
 }
@@ -272,7 +284,7 @@
     <span class="doccomment">/// Create a NanoVG rendering context. See `Context` for more details.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">doc</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_nanovg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">nvg</span>::<span class="ident">Context</span><span class="op">&gt;</span> {
-        <span class="kw">crate</span>::<span class="ident">nvg</span>::<span class="ident">Context</span>::<span class="ident">create</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">executor</span>).<span class="ident">fs_ctx</span> })
+        <span class="kw">crate</span>::<span class="ident">nvg</span>::<span class="ident">Context</span>::<span class="ident">create</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">executor</span>).<span class="ident">fs_ctx</span>.<span class="ident">unwrap</span>() })
     }
 
     <span class="doccomment">/// Consume the next event from MSFS.</span>
@@ -284,7 +296,7 @@
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaugeExecutor</span> {
-    <span class="ident">fs_ctx</span>: <span class="ident">sys</span>::<span class="ident">FsContext</span>,
+    <span class="kw">pub</span> <span class="ident">fs_ctx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">FsContext</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">Gauge</span>, <span class="ident">MSFSEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -299,7 +311,7 @@
         <span class="kw">match</span> <span class="ident">service_id</span> <span class="kw">as</span> <span class="ident">u32</span> {
             <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">GaugeExecutor</span>;
-                <span class="self">self</span>.<span class="ident">fs_ctx</span> <span class="op">=</span> <span class="ident">ctx</span>;
+                <span class="self">self</span>.<span class="ident">fs_ctx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>);
                 <span class="self">self</span>.<span class="ident">executor</span>
                     .<span class="ident">start</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">rx</span><span class="op">|</span> <span class="ident">Gauge</span> { <span class="ident">executor</span>, <span class="ident">rx</span> }))
                     .<span class="ident">is_ok</span>()
@@ -307,23 +319,21 @@
             <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>).<span class="ident">is_ok</span>(),
             <span class="ident">service_id</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">service_id</span> {
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PostInstall</span>),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_INITIALIZE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PreInitialize</span>),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_INITIALIZE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PostInitialize</span>),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PreUpdate</span>),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PostUpdate</span>),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_DRAW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PreDraw</span>(<span class="kw">unsafe</span> {
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_INSTALL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PostInstall</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_INITIALIZE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PreInitialize</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_INITIALIZE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PostInitialize</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PreUpdate</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PostUpdate</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_DRAW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PreDraw</span>(<span class="kw">unsafe</span> {
                         <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">p_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">sys</span>::<span class="ident">sGaugeDrawData</span>)
                     })),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_DRAW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PostDraw</span>(<span class="kw">unsafe</span> {
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_POST_DRAW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PostDraw</span>(<span class="kw">unsafe</span> {
                         <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">p_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">sys</span>::<span class="ident">sGaugeDrawData</span>)
                     })),
-                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">PanelServiceID</span>::<span class="ident">PreKill</span>),
+                    <span class="ident">sys</span>::<span class="ident">PANEL_SERVICE_PRE_KILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PreKill</span>),
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
                 } {
-                    <span class="self">self</span>.<span class="ident">executor</span>
-                        .<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">MSFSEvent</span>::<span class="ident">PanelServiceID</span>(<span class="ident">data</span>)))
-                        .<span class="ident">is_ok</span>()
+                    <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">data</span>)).<span class="ident">is_ok</span>()
                 } <span class="kw">else</span> {
                     <span class="bool-val">true</span>
                 }

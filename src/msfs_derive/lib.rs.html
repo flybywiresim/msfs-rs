@@ -337,6 +337,7 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
+<span id="337">337</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
@@ -457,7 +458,8 @@
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
         <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: ::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> <span class="op">=</span> ::<span class="ident">msfs</span>::<span class="ident">GaugeExecutor</span> {
-            <span class="ident">executor</span>: {
+            <span class="ident">fs_ctx</span>: <span class="prelude-val">None</span>,
+            <span class="ident">executor</span>: ::<span class="ident">msfs</span>::<span class="ident">executor</span>::<span class="ident">Executor</span> {
                 <span class="ident">handle</span>: <span class="op">|</span><span class="ident">gauge</span><span class="op">|</span> <span class="ident">std</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>::<span class="ident">pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">gauge</span>)),
                 <span class="ident">tx</span>: <span class="prelude-val">None</span>,
                 <span class="ident">future</span>: <span class="prelude-val">None</span>,
