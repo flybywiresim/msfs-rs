@@ -124,20 +124,20 @@ impl Frame {
             match stroke {
                 PaintOrColor::Paint(p) => unsafe {
                     sys::nvgStrokePaint(self.ctx, p.0);
-                }
+                },
                 PaintOrColor::Color(c) => unsafe {
                     sys::nvgStrokeColor(self.ctx, c.0);
-                }
+                },
             }
         }
         if let Some(fill) = &style.fill {
             match fill {
                 PaintOrColor::Paint(p) => unsafe {
                     sys::nvgFillPaint(self.ctx, p.0);
-                }
+                },
                 PaintOrColor::Color(c) => unsafe {
                     sys::nvgFillColor(self.ctx, c.0);
-                }
+                },
             }
         }
 
@@ -403,10 +403,16 @@ impl Paint {
     /// Creates and returns an image pattern. Parameters (`x`, `y`) specify the left-top location of the image pattern,
     /// (`w`, `h`) is the size of the image, `angle` is the rotation around the top-left corner, and `image` is the image
     /// to render.
-    pub fn from_image(image: &Image, x: f32, y: f32, w: f32, h: f32, angle: f32, alpha: f32) -> Paint {
-        Paint(unsafe {
-            sys::nvgImagePattern(image.ctx, x, y, w, h, angle, image.handle, alpha)
-        })
+    pub fn from_image(
+        image: &Image,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        angle: f32,
+        alpha: f32,
+    ) -> Paint {
+        Paint(unsafe { sys::nvgImagePattern(image.ctx, x, y, w, h, angle, image.handle, alpha) })
     }
 }
 

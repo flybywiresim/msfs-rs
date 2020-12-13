@@ -108,9 +108,7 @@ impl GaugeExecutor {
                     sys::PANEL_SERVICE_PRE_KILL => Some(MSFSEvent::PreKill),
                     _ => None,
                 } {
-                    self.executor
-                        .send(Some(data))
-                        .is_ok()
+                    self.executor.send(Some(data)).is_ok()
                 } else {
                     true
                 }
