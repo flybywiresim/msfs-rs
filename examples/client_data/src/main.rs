@@ -4,8 +4,8 @@ use msfs::sim_connect::{client_data_definition, SimConnect, SimConnectRecv};
 #[derive(Debug)]
 struct Data {
     foo: u32,
-    bar: bool,
-    baz: i8,
+    bar: i8,
+    baz: bool,
     qux: i16,
 }
 
@@ -17,15 +17,15 @@ fn writer() -> Result<(), Box<dyn std::error::Error>> {
     let area = sim.create_client_data::<Data>("data")?;
     let mut data = Data {
         foo: 0,
-        bar: false,
-        baz: 42,
+        bar: 42,
+        baz: false,
         qux: 13,
     };
 
     loop {
         sim.call_dispatch()?;
         data.foo += 1;
-        data.bar = !data.bar;
+        data.baz = !data.baz;
         sim.set_client_data(&area, &data)?;
         std::thread::sleep(std::time::Duration::from_millis(10));
     }

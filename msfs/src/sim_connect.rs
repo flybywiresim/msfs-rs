@@ -146,7 +146,7 @@ impl SimConnect {
             }
             */
 
-            // Rust may reorder fields, so find padding has to be calculated as min of
+            // Rust may reorder fields, so padding has to be calculated as min of
             // all fields instead of the last field.
             let mut padding = std::usize::MAX;
             for (offset, size, epsilon) in T::get_definitions() {
@@ -162,7 +162,7 @@ impl SimConnect {
                     ))?;
                 }
             }
-            if padding > 0 {
+            if padding > 0 && padding != std::usize::MAX {
                 unsafe {
                     map_err(sys::SimConnect_AddToClientDataDefinition(
                         handle,
@@ -271,13 +271,7 @@ impl SimConnect {
         Ok(event_id)
     }
 
-    /// Allocate a region of memory in the sim with the given `name`. Other
-    /// SimConnect modules can use the `name` to read data from this memory
-    /// using `request_client_data`. This memory cannot be deallocated.
-    pub fn create_client_data<T: ClientDataDefinition>(
-        &mut self,
-        name: &str,
-    ) -> Result<ClientDataArea<T>> {
+    fn get_client_data_id(&mut self, name: &str) -> Result<sys::SIMCONNECT_CLIENT_DATA_ID> {
         let client_id = self.client_data_id_counter;
         self.client_data_id_counter += 1;
         unsafe {
@@ -288,6 +282,17 @@ impl SimConnect {
                 client_id,
             ))?;
         }
+        Ok(client_id)
+    }
+
+    /// Allocate a region of memory in the sim with the given `name`. Other
+    /// SimConnect modules can use the `name` to read data from this memory
+    /// using `request_client_data`. This memory cannot be deallocated.
+    pub fn create_client_data<T: ClientDataDefinition>(
+        &mut self,
+        name: &str,
+    ) -> Result<ClientDataArea<T>> {
+        let client_id = self.get_client_data_id(name)?;
         unsafe {
             map_err(sys::SimConnect_CreateClientData(
                 self.handle,
@@ -296,6 +301,19 @@ impl SimConnect {
                 0,
             ))?;
         }
+        Ok(ClientDataArea {
+            client_id,
+            phantom: std::marker::PhantomData,
+        })
+    }
+
+    /// Create a handle to a region of memory allocated by another module with
+    /// the given `name`.
+    pub fn get_client_area<T: ClientDataDefinition>(
+        &mut self,
+        name: &str,
+    ) -> Result<ClientDataArea<T>> {
+        let client_id = self.get_client_data_id(name)?;
         Ok(ClientDataArea {
             client_id,
             phantom: std::marker::PhantomData,
@@ -311,16 +329,7 @@ impl SimConnect {
         name: &str,
     ) -> Result<()> {
         let define_id = self.get_client_data_define_id::<T>()?;
-        let client_id = self.client_data_id_counter;
-        self.client_data_id_counter += 1;
-        unsafe {
-            let name = std::ffi::CString::new(name).unwrap();
-            map_err(sys::SimConnect_MapClientDataNameToID(
-                self.handle,
-                name.as_ptr(),
-                client_id,
-            ))?;
-        }
+        let client_id = self.get_client_data_id(name)?;
         unsafe {
             map_err(sys::SimConnect_RequestClientData(
                 self.handle,
@@ -337,7 +346,8 @@ impl SimConnect {
         Ok(())
     }
 
-    /// Set the data of an area allocated with `create_client_data`.
+    /// Set the data of an area acquired by `create_client_data` or
+    /// `get_client_data`.
     pub fn set_client_data<T: ClientDataDefinition>(
         &mut self,
         area: &ClientDataArea<T>,
