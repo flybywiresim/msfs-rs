@@ -1,8 +1,23 @@
 use crate::{executor, sys};
 
-/// `PanelServiceID` is used in `GaugeCallback`.
+impl sys::sGaugeDrawData {
+    /// Get the width of the target instrument texture.
+    pub fn width(&self) -> usize {
+        self.winWidth as usize
+    }
+
+    /// Get the height of the target instrunent texture.
+    pub fn height(&self) -> usize {
+        self.winHeight as usize
+    }
+}
+
+use crate::sim_connect::{SimConnect, SimConnectRecv};
+pub use msfs_derive::{gauge, standalone_module};
+
+/// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.
 #[derive(Debug)]
-pub enum PanelServiceID<'a> {
+pub enum MSFSEvent<'a> {
     PostInstall,
     PreInitialize,
     PostInitialize,
@@ -11,14 +26,6 @@ pub enum PanelServiceID<'a> {
     PreDraw(&'a sys::sGaugeDrawData),
     PostDraw(&'a sys::sGaugeDrawData),
     PreKill,
-}
-
-use crate::sim_connect::{SimConnect, SimConnectRecv};
-pub use msfs_derive::{gauge, standalone_module};
-
-#[derive(Debug)]
-pub enum MSFSEvent<'a> {
-    PanelServiceID(PanelServiceID<'a>),
     Mouse { x: f32, y: f32, flags: u32 },
     SimConnect(SimConnectRecv<'a>),
 }
@@ -52,7 +59,7 @@ impl Gauge {
     /// Create a NanoVG rendering context. See `Context` for more details.
     #[cfg(any(target_arch = "wasm32", doc))]
     pub fn create_nanovg(&self) -> Option<crate::nvg::Context> {
-        crate::nvg::Context::create(unsafe { (*self.executor).fs_ctx })
+        crate::nvg::Context::create(unsafe { (*self.executor).fs_ctx.unwrap() })
     }
 
     /// Consume the next event from MSFS.
@@ -64,7 +71,7 @@ impl Gauge {
 
 #[doc(hidden)]
 pub struct GaugeExecutor {
-    fs_ctx: sys::FsContext,
+    pub fs_ctx: Option<sys::FsContext>,
     pub executor: executor::Executor<Gauge, MSFSEvent<'static>>,
 }
 
@@ -79,7 +86,7 @@ impl GaugeExecutor {
         match service_id as u32 {
             sys::PANEL_SERVICE_PRE_INSTALL => {
                 let executor = self as *mut GaugeExecutor;
-                self.fs_ctx = ctx;
+                self.fs_ctx = Some(ctx);
                 self.executor
                     .start(Box::new(move |rx| Gauge { executor, rx }))
                     .is_ok()
@@ -87,22 +94,22 @@ impl GaugeExecutor {
             sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
             service_id => {
                 if let Some(data) = match service_id {
-                    sys::PANEL_SERVICE_POST_INSTALL => Some(PanelServiceID::PostInstall),
-                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(PanelServiceID::PreInitialize),
-                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(PanelServiceID::PostInitialize),
-                    sys::PANEL_SERVICE_PRE_UPDATE => Some(PanelServiceID::PreUpdate),
-                    sys::PANEL_SERVICE_POST_UPDATE => Some(PanelServiceID::PostUpdate),
-                    sys::PANEL_SERVICE_PRE_DRAW => Some(PanelServiceID::PreDraw(unsafe {
+                    sys::PANEL_SERVICE_POST_INSTALL => Some(MSFSEvent::PostInstall),
+                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(MSFSEvent::PreInitialize),
+                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(MSFSEvent::PostInitialize),
+                    sys::PANEL_SERVICE_PRE_UPDATE => Some(MSFSEvent::PreUpdate),
+                    sys::PANEL_SERVICE_POST_UPDATE => Some(MSFSEvent::PostUpdate),
+                    sys::PANEL_SERVICE_PRE_DRAW => Some(MSFSEvent::PreDraw(unsafe {
                         &*(p_data as *const sys::sGaugeDrawData)
                     })),
-                    sys::PANEL_SERVICE_POST_DRAW => Some(PanelServiceID::PostDraw(unsafe {
+                    sys::PANEL_SERVICE_POST_DRAW => Some(MSFSEvent::PostDraw(unsafe {
                         &*(p_data as *const sys::sGaugeDrawData)
                     })),
-                    sys::PANEL_SERVICE_PRE_KILL => Some(PanelServiceID::PreKill),
+                    sys::PANEL_SERVICE_PRE_KILL => Some(MSFSEvent::PreKill),
                     _ => None,
                 } {
                     self.executor
-                        .send(Some(MSFSEvent::PanelServiceID(data)))
+                        .send(Some(data))
                         .is_ok()
                 } else {
                     true

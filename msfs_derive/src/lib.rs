@@ -117,7 +117,8 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
 
         #[allow(non_upper_case_globals)]
         static mut #executor_name: ::msfs::GaugeExecutor = ::msfs::GaugeExecutor {
-            executor: {
+            fs_ctx: None,
+            executor: ::msfs::executor::Executor {
                 handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
                 tx: None,
                 future: None,

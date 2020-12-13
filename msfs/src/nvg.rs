@@ -28,9 +28,9 @@ impl Context {
     }
 
     /// Draw a frame.
-    pub fn draw_frame<F: Fn(&Frame) -> Result>(&self, width: usize, height: usize, dpr: f32, f: F) {
+    pub fn draw_frame<F: Fn(&Frame) -> Result>(&self, width: usize, height: usize, f: F) {
         unsafe {
-            sys::nvgBeginFrame(self.ctx, width as f32, height as f32, dpr);
+            sys::nvgBeginFrame(self.ctx, width as f32, height as f32, 1.0);
         }
 
         let frame = Frame { ctx: self.ctx };
@@ -113,14 +113,55 @@ pub struct Frame {
 
 impl Frame {
     /// Draw a path.
-    pub fn draw_path<F: Fn(&Path) -> Result>(&self, f: F) -> Result {
+    pub fn draw_path<F: Fn(&Path) -> Result>(&self, style: Style, f: F) -> Result {
         unsafe {
+            // sys::nvgSave(self.ctx);
+            // sys::nvgReset(self.ctx);
             sys::nvgBeginPath(self.ctx);
         }
 
-        let path = Path { ctx: self.ctx };
+        if let Some(stroke) = &style.stroke {
+            match stroke {
+                PaintOrColor::Paint(p) => unsafe {
+                    sys::nvgStrokePaint(self.ctx, p.0);
+                }
+                PaintOrColor::Color(c) => unsafe {
+                    sys::nvgStrokeColor(self.ctx, c.0);
+                }
+            }
+        }
+        if let Some(fill) = &style.fill {
+            match fill {
+                PaintOrColor::Paint(p) => unsafe {
+                    sys::nvgFillPaint(self.ctx, p.0);
+                }
+                PaintOrColor::Color(c) => unsafe {
+                    sys::nvgFillColor(self.ctx, c.0);
+                }
+            }
+        }
 
-        f(&path)
+        let path = Path { ctx: self.ctx };
+        let r = f(&path);
+
+        if style.stroke.is_some() {
+            unsafe {
+                sys::nvgStroke(self.ctx);
+            }
+        }
+        if style.fill.is_some() {
+            unsafe {
+                sys::nvgFill(self.ctx);
+            }
+        }
+
+        /*
+        unsafe {
+            sys::nvgRestore(self.ctx);
+        }
+        */
+
+        r
     }
 }
 
@@ -271,6 +312,52 @@ pub enum Direction {
     CounterClockwise = sys::NVGwinding_NVG_CCW,
 }
 
+#[doc(hidden)]
+pub enum PaintOrColor {
+    Paint(Paint),
+    Color(Color),
+}
+
+impl From<Paint> for PaintOrColor {
+    fn from(p: Paint) -> PaintOrColor {
+        PaintOrColor::Paint(p)
+    }
+}
+
+impl From<Color> for PaintOrColor {
+    fn from(c: Color) -> PaintOrColor {
+        PaintOrColor::Color(c)
+    }
+}
+
+/// The stroke and/or fill which will be applied to a path.
+pub struct Style {
+    stroke: Option<PaintOrColor>,
+    fill: Option<PaintOrColor>,
+}
+
+impl Style {
+    /// Create a new style.
+    pub fn new() -> Self {
+        Self {
+            stroke: None,
+            fill: None,
+        }
+    }
+
+    /// Set the stroke of this style.
+    pub fn stroke<T: Into<PaintOrColor>>(mut self, stroke: T) -> Self {
+        self.stroke = Some(stroke.into());
+        self
+    }
+
+    /// Set the fill of this style.
+    pub fn fill<T: Into<PaintOrColor>>(mut self, fill: T) -> Self {
+        self.fill = Some(fill.into());
+        self
+    }
+}
+
 /// Colors in NanoVG are stored as unsigned ints in ABGR format.
 pub struct Color(sys::NVGcolor);
 
@@ -311,6 +398,17 @@ impl Color {
 /// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.
 /// These can be used as paints for strokes and fills.
 pub struct Paint(sys::NVGpaint);
+
+impl Paint {
+    /// Creates and returns an image pattern. Parameters (`x`, `y`) specify the left-top location of the image pattern,
+    /// (`w`, `h`) is the size of the image, `angle` is the rotation around the top-left corner, and `image` is the image
+    /// to render.
+    pub fn from_image(image: &Image, x: f32, y: f32, w: f32, h: f32, angle: f32, alpha: f32) -> Paint {
+        Paint(unsafe {
+            sys::nvgImagePattern(image.ctx, x, y, w, h, angle, image.handle, alpha)
+        })
+    }
+}
 
 /// A font handle.
 pub struct Font {
