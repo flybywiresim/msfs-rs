@@ -27,6 +27,10 @@ fn main() {
             .clang_arg("-xc++")
             .clang_arg("-v")
             .header("src/bindgen_support/wrapper.h")
+            .blacklist_function("nvgFillColor")
+            .blacklist_function("nvgFillPaint")
+            .blacklist_function("nvgStrokeColor")
+            .blacklist_function("nvgStrokePaint")
             .parse_callbacks(Box::new(bindgen::CargoCallbacks))
             .rustified_enum("SIMCONNECT_EXCEPTION")
             .impl_debug(true);

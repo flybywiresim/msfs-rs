@@ -113,7 +113,7 @@ pub struct Frame {
 
 impl Frame {
     /// Draw a path.
-    pub fn draw_path<F: Fn(&Path) -> Result>(&self, style: Style, f: F) -> Result {
+    pub fn draw_path<F: Fn(&Path) -> Result>(&self, style: &Style, f: F) -> Result {
         unsafe {
             // sys::nvgSave(self.ctx);
             // sys::nvgReset(self.ctx);
@@ -123,20 +123,20 @@ impl Frame {
         if let Some(stroke) = &style.stroke {
             match stroke {
                 PaintOrColor::Paint(p) => unsafe {
-                    sys::nvgStrokePaint(self.ctx, p.0);
+                    sys::nvgStrokePaint(self.ctx, &p.0);
                 },
                 PaintOrColor::Color(c) => unsafe {
-                    sys::nvgStrokeColor(self.ctx, c.0);
+                    sys::nvgStrokeColor(self.ctx, &c.0);
                 },
             }
         }
         if let Some(fill) = &style.fill {
             match fill {
                 PaintOrColor::Paint(p) => unsafe {
-                    sys::nvgFillPaint(self.ctx, p.0);
+                    sys::nvgFillPaint(self.ctx, &p.0);
                 },
                 PaintOrColor::Color(c) => unsafe {
-                    sys::nvgFillColor(self.ctx, c.0);
+                    sys::nvgFillColor(self.ctx, &c.0);
                 },
             }
         }
@@ -312,6 +312,7 @@ pub enum Direction {
     CounterClockwise = sys::NVGwinding_NVG_CCW,
 }
 
+#[derive(Debug)]
 #[doc(hidden)]
 pub enum PaintOrColor {
     Paint(Paint),
@@ -331,20 +332,13 @@ impl From<Color> for PaintOrColor {
 }
 
 /// The stroke and/or fill which will be applied to a path.
+#[derive(Debug, Default)]
 pub struct Style {
     stroke: Option<PaintOrColor>,
     fill: Option<PaintOrColor>,
 }
 
 impl Style {
-    /// Create a new style.
-    pub fn new() -> Self {
-        Self {
-            stroke: None,
-            fill: None,
-        }
-    }
-
     /// Set the stroke of this style.
     pub fn stroke<T: Into<PaintOrColor>>(mut self, stroke: T) -> Self {
         self.stroke = Some(stroke.into());
@@ -359,6 +353,7 @@ impl Style {
 }
 
 /// Colors in NanoVG are stored as unsigned ints in ABGR format.
+#[derive(Debug)]
 pub struct Color(sys::NVGcolor);
 
 impl Color {
@@ -397,6 +392,7 @@ impl Color {
 
 /// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.
 /// These can be used as paints for strokes and fills.
+#[derive(Debug)]
 pub struct Paint(sys::NVGpaint);
 
 impl Paint {
