@@ -3,23 +3,70 @@
 use crate::sys;
 
 /// aircraft_varget
-pub fn aircraft_varget(simvar: sys::ENUM, units: sys::ENUM, index: sys::SINT32) -> f64 {
-    unsafe { sys::aircraft_varget(simvar, units, index) }
-}
-
 /// get_aircraft_var_enum
-pub fn get_aircraft_var_enum(name: &str) -> sys::ENUM {
-    unsafe {
+pub struct AircraftVariable {
+    simvar: sys::ENUM,
+    units: sys::ENUM,
+    index: sys::SINT32,
+}
+impl AircraftVariable {
+    pub fn from(name: &str, units: &str, index: usize) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
-        sys::get_aircraft_var_enum(name.as_ptr())
+        let units = std::ffi::CString::new(units).unwrap();
+
+        let simvar = unsafe { sys::get_aircraft_var_enum(name.as_ptr()) };
+        if simvar == -1 {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "invalid name",
+            )));
+        }
+
+        let units = unsafe { sys::get_units_enum(units.as_ptr()) };
+        if units == -1 {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "invalid units",
+            )));
+        }
+        Ok(Self {
+            simvar,
+            units,
+            index: index as sys::SINT32,
+        })
+    }
+
+    pub fn get(&self) -> f64 {
+        unsafe { sys::aircraft_varget(self.simvar, self.units, self.index) }
     }
 }
 
-/// get_units_enum
-pub fn get_units_enum(unitname: &str) -> sys::ENUM {
+/// register_named_variable
+/// set_named_variable_typed_value
+/// get_named_variable_value
+/// set_named_variable_value
+pub struct NamedVariable(sys::ID);
+impl NamedVariable {
+    pub fn from(name: &str) -> Self {
+        Self(unsafe {
+            let name = std::ffi::CString::new(name).unwrap();
+            sys::register_named_variable(name.as_ptr())
+        })
+    }
+
+    pub fn get_value(&self) -> f64 {
+        unsafe { sys::get_named_variable_value(self.0) }
+    }
+
+    pub fn set_value(&self, value: f64) {
+        unsafe { sys::set_named_variable_value(self.0, value) }
+    }
+}
+
+/// trigger_key_event
+pub fn trigger_key_event(event_id: sys::ID32, value: sys::UINT32) {
     unsafe {
-        let name = std::ffi::CString::new(unitname).unwrap();
-        sys::get_units_enum(name.as_ptr())
+        sys::trigger_key_event(event_id, value);
     }
 }
 
