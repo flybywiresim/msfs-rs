@@ -10,6 +10,7 @@ fn main() {
             .compiler("clang")
             .flag(&format!("--sysroot={}/WASM/wasi-sysroot", msfs_sdk))
             .flag("-fms-extensions")
+            .flag("-D__INTELLISENSE__") // get rid of incorrect __attribute__'s from asobo
             .include(format!("{}/WASM/include", msfs_sdk))
             .file(format!("{}/WASM/src/MSFS/Render/nanovg.cpp", msfs_sdk))
             .compile("nanovg");

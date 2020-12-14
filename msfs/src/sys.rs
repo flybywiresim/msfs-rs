@@ -8,8 +8,8 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 // https://github.com/rustwasm/team/issues/291
 extern "C" {
-    pub fn nvgStrokeColor(ctx: *mut NVGcontext, color: *mut NVGcolor);
-    pub fn nvgStrokePaint(ctx: *mut NVGcontext, paint: *mut NVGpaint);
-    pub fn nvgFillColor(ctx: *mut NVGcontext, color: *mut NVGcolor);
-    pub fn nvgFillPaint(ctx: *mut NVGcontext, paint: *mut NVGpaint);
+    pub fn nvgStrokeColor(ctx: *mut NVGcontext, color: *const NVGcolor);
+    pub fn nvgStrokePaint(ctx: *mut NVGcontext, paint: *const NVGpaint);
+    pub fn nvgFillColor(ctx: *mut NVGcontext, color: *const NVGcolor);
+    pub fn nvgFillPaint(ctx: *mut NVGcontext, paint: *const NVGpaint);
 }

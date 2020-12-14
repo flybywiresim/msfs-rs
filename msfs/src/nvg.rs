@@ -106,6 +106,14 @@ impl Context {
     }
 }
 
+impl Drop for Context {
+    fn drop(&mut self) {
+        unsafe {
+            sys::nvgDeleteInternal(self.ctx);
+        }
+    }
+}
+
 /// Methods to draw on a frame. See `Context::draw_frame`.
 pub struct Frame {
     ctx: *mut sys::NVGcontext,
