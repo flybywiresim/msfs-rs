@@ -445,10 +445,6 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! NanoVG is small antialiased vector graphics rendering library with a lean</span>
 <span class="doccomment">//! API modeled after the HTML5 Canvas API. It can be used to draw gauge</span>
@@ -565,7 +561,7 @@
 
 <span class="kw">impl</span> <span class="ident">Frame</span> {
     <span class="doccomment">/// Draw a path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">draw_path</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="ident">Style</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">draw_path</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
         <span class="kw">unsafe</span> {
             <span class="comment">// sys::nvgSave(self.ctx);</span>
             <span class="comment">// sys::nvgReset(self.ctx);</span>
@@ -575,20 +571,20 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stroke</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">style</span>.<span class="ident">stroke</span> {
             <span class="kw">match</span> <span class="ident">stroke</span> {
                 <span class="ident">PaintOrColor</span>::<span class="ident">Paint</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys</span>::<span class="ident">nvgStrokePaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">p</span>.<span class="number">0</span>);
+                    <span class="ident">sys</span>::<span class="ident">nvgStrokePaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>);
                 },
                 <span class="ident">PaintOrColor</span>::<span class="ident">Color</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys</span>::<span class="ident">nvgStrokeColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">c</span>.<span class="number">0</span>);
+                    <span class="ident">sys</span>::<span class="ident">nvgStrokeColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="number">0</span>);
                 },
             }
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fill</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">style</span>.<span class="ident">fill</span> {
             <span class="kw">match</span> <span class="ident">fill</span> {
                 <span class="ident">PaintOrColor</span>::<span class="ident">Paint</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys</span>::<span class="ident">nvgFillPaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">p</span>.<span class="number">0</span>);
+                    <span class="ident">sys</span>::<span class="ident">nvgFillPaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>);
                 },
                 <span class="ident">PaintOrColor</span>::<span class="ident">Color</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys</span>::<span class="ident">nvgFillColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">c</span>.<span class="number">0</span>);
+                    <span class="ident">sys</span>::<span class="ident">nvgFillColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="number">0</span>);
                 },
             }
         }
@@ -764,6 +760,7 @@
     <span class="ident">CounterClockwise</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">NVGwinding_NVG_CCW</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PaintOrColor</span> {
     <span class="ident">Paint</span>(<span class="ident">Paint</span>),
@@ -783,20 +780,13 @@
 }
 
 <span class="doccomment">/// The stroke and/or fill which will be applied to a path.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Style</span> {
     <span class="ident">stroke</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span>,
     <span class="ident">fill</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Style</span> {
-    <span class="doccomment">/// Create a new style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">stroke</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fill</span>: <span class="prelude-val">None</span>,
-        }
-    }
-
     <span class="doccomment">/// Set the stroke of this style.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stroke</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stroke</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">stroke</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">stroke</span>.<span class="ident">into</span>());
@@ -811,6 +801,7 @@
 }
 
 <span class="doccomment">/// Colors in NanoVG are stored as unsigned ints in ABGR format.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Color</span>(<span class="ident">sys</span>::<span class="ident">NVGcolor</span>);
 
 <span class="kw">impl</span> <span class="ident">Color</span> {
@@ -849,6 +840,7 @@
 
 <span class="doccomment">/// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.</span>
 <span class="doccomment">/// These can be used as paints for strokes and fills.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Paint</span>(<span class="ident">sys</span>::<span class="ident">NVGpaint</span>);
 
 <span class="kw">impl</span> <span class="ident">Paint</span> {

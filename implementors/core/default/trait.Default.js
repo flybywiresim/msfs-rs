@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["msfs"] = [{"text":"impl&lt;Storage:&nbsp;Default, Align:&nbsp;Default&gt; Default for __BindgenBitfieldUnit&lt;Storage, Align&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Default&gt; Default for __IncompleteArrayField&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["msfs"] = [{"text":"impl&lt;Storage:&nbsp;Default, Align:&nbsp;Default&gt; Default for __BindgenBitfieldUnit&lt;Storage, Align&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Default&gt; Default for __IncompleteArrayField&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl Default for Style","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
