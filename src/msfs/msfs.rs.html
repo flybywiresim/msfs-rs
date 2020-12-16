@@ -222,6 +222,11 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">executor</span>, <span class="ident">sys</span>};
 
@@ -231,9 +236,14 @@
         <span class="self">self</span>.<span class="ident">winWidth</span> <span class="kw">as</span> <span class="ident">usize</span>
     }
 
-    <span class="doccomment">/// Get the height of the target instrunent texture.</span>
+    <span class="doccomment">/// Get the height of the target instrument texture.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">height</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">winHeight</span> <span class="kw">as</span> <span class="ident">usize</span>
+    }
+
+    <span class="doccomment">/// Get the elapsed time since the last frame.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delta_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span> {
+        <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_secs_f64</span>(<span class="self">self</span>.<span class="ident">dt</span>)
     }
 }
 
