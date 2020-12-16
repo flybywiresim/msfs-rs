@@ -44,7 +44,7 @@ fn main() {
             .generate()
             .unwrap()
             .write_to_file(
-                std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("bindings.rs"),
+                std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("msfs-sys.rs"),
             )
             .unwrap();
     }

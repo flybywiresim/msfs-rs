@@ -6,9 +6,14 @@ impl sys::sGaugeDrawData {
         self.winWidth as usize
     }
 
-    /// Get the height of the target instrunent texture.
+    /// Get the height of the target instrument texture.
     pub fn height(&self) -> usize {
         self.winHeight as usize
+    }
+
+    /// Get the elapsed time since the last frame.
+    pub fn delta_time(&self) -> std::time::Duration {
+        std::time::Duration::from_secs_f64(self.dt)
     }
 }
 
