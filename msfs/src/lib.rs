@@ -4,6 +4,7 @@
 //!
 //! - MSFS Gauge API
 //! - SimConnect API
+//! - NanoVG API
 //!
 //! ## Building
 //!

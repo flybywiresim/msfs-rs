@@ -1,3 +1,3 @@
 # msfs-rs
 
-See https://snek.dev/msfs-rs/msfs/
+See https://flybywiresim.github.io/msfs-rs/msfs/
