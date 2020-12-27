@@ -517,12 +517,6 @@
 <span id="514">514</span>
 <span id="515">515</span>
 <span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -609,12 +603,6 @@
             <span class="ident">sim</span>.<span class="ident">call_dispatch</span>()<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
         }
-    }
-
-    <span class="comment">// SimConnect is only exposed as a Pin&lt;Box&lt;SimConnect&gt;&gt;&gt;, so get ptr with this method:</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Used to process the next SimConnect message received. Only needed when not using the gauge API.</span>

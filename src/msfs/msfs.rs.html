@@ -184,49 +184,6 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">executor</span>, <span class="ident">sys</span>};
 
@@ -273,10 +230,10 @@
 
 <span class="kw">impl</span> <span class="ident">Gauge</span> {
     <span class="doccomment">/// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_simconnect</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_simconnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnect</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">executor</span>;
         <span class="kw">let</span> <span class="ident">sim</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">sim_connect</span>::<span class="ident">SimConnect</span>::<span class="ident">open</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_sim</span>, <span class="ident">recv</span><span class="op">|</span> {
@@ -365,20 +322,17 @@
 
 <span class="kw">impl</span> <span class="ident">StandaloneModule</span> {
     <span class="doccomment">/// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_simconnect</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_simconnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SimConnect</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">executor</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">SimConnect</span>::<span class="ident">open</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_sim</span>, <span class="ident">recv</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">SimConnect</span>::<span class="ident">open</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_sim</span>, <span class="ident">recv</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">executor</span> };
             <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span>
                 <span class="kw">unsafe</span> { <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">recv</span>) };
             <span class="ident">executor</span>.<span class="ident">executor</span>.<span class="ident">send</span>(<span class="prelude-val">Some</span>(<span class="ident">recv</span>)).<span class="ident">unwrap</span>();
         })<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">list</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">as_mut</span>() }.<span class="ident">unwrap</span>().<span class="ident">simconnects</span> {
-            <span class="ident">list</span>.<span class="ident">push</span>(<span class="ident">sim</span>.<span class="ident">as_mut_ptr</span>());
-        }
         <span class="prelude-val">Ok</span>(<span class="ident">sim</span>)
     }
 
@@ -387,51 +341,11 @@
         <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
         <span class="ident">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="ident">await</span> }
     }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simulate</span><span class="op">&lt;</span><span class="ident">Fut</span>: <span class="lifetime">&#39;static</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">StandaloneModule</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fut</span><span class="op">&gt;</span>(
-        <span class="ident">_f</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Fut</span>: <span class="ident">futures</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">StandaloneModuleExecutor</span> {
-            <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span> {
-                <span class="ident">handle</span>: <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
-                    <span class="kw">let</span> <span class="ident">f</span>: <span class="ident">F</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">zeroed</span>().<span class="ident">assume_init</span>() };
-                    <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">f</span>(<span class="ident">m</span>))
-                },
-                <span class="ident">future</span>: <span class="prelude-val">None</span>,
-                <span class="ident">tx</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">simconnects</span>: <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[]),
-        };
-
-        <span class="ident">e</span>.<span class="ident">start</span>()<span class="question-mark">?</span>;
-
-        <span class="kw">loop</span> {
-            <span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">sleep</span>(<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">10</span>));
-            <span class="kw">let</span> <span class="ident">simconnects</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">simconnects</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">simconnects</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">break</span>;
-            }
-            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">simconnects</span> {
-                <span class="kw">unsafe</span> {
-                    (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">call_dispatch</span>()<span class="question-mark">?</span>;
-                }
-            }
-        }
-
-        <span class="ident">e</span>.<span class="ident">end</span>()<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StandaloneModuleExecutor</span> {
     <span class="kw">pub</span> <span class="ident">executor</span>: <span class="ident">executor</span>::<span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">StandaloneModule</span>, <span class="ident">SimConnectRecv</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">simconnects</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
