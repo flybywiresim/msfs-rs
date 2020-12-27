@@ -40,7 +40,6 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
                 future: None,
                 tx: None,
             },
-            simconnects: None,
         };
 
         #[no_mangle]

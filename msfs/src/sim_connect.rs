@@ -85,12 +85,6 @@ impl<'a> SimConnect<'a> {
         }
     }
 
-    // SimConnect is only exposed as a Pin<Box<SimConnect>>>, so get ptr with this method:
-    #[doc(hidden)]
-    pub(crate) fn as_mut_ptr(&mut self) -> *mut SimConnect<'a> {
-        self
-    }
-
     /// Used to process the next SimConnect message received. Only needed when not using the gauge API.
     pub fn call_dispatch(&mut self) -> Result<()> {
         unsafe {

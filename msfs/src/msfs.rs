@@ -43,10 +43,10 @@ pub struct Gauge {
 
 impl Gauge {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
-    pub fn open_simconnect(
+    pub fn open_simconnect<'a>(
         &self,
         name: &str,
-    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect>>, Box<dyn std::error::Error>>
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
     {
         let executor = self.executor;
         let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
@@ -135,20 +135,17 @@ pub struct StandaloneModule {
 
 impl StandaloneModule {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
-    pub fn open_simconnect(
-        &mut self,
+    pub fn open_simconnect<'a>(
+        &self,
         name: &str,
-    ) -> Result<std::pin::Pin<Box<SimConnect>>, Box<dyn std::error::Error>> {
+    ) -> Result<std::pin::Pin<Box<SimConnect<'a>>>, Box<dyn std::error::Error>> {
         let executor = self.executor;
-        let mut sim = SimConnect::open(name, move |_sim, recv| {
+        let sim = SimConnect::open(name, move |_sim, recv| {
             let executor = unsafe { &mut *executor };
             let recv =
                 unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
             executor.executor.send(Some(recv)).unwrap();
         })?;
-        if let Some(ref mut list) = unsafe { self.executor.as_mut() }.unwrap().simconnects {
-            list.push(sim.as_mut_ptr());
-        }
         Ok(sim)
     }
 
@@ -157,51 +154,11 @@ impl StandaloneModule {
         use futures::stream::StreamExt;
         async move { self.rx.next().await }
     }
-
-    pub fn simulate<Fut: 'static, F: Fn(StandaloneModule) -> Fut>(
-        _f: F,
-    ) -> Result<(), Box<dyn std::error::Error>>
-    where
-        Fut: futures::Future<Output = Result<(), Box<dyn std::error::Error>>>,
-    {
-        let mut e = StandaloneModuleExecutor {
-            executor: executor::Executor {
-                handle: |m| {
-                    assert!(std::mem::size_of::<F>() == 0);
-                    let f: F = unsafe { std::mem::MaybeUninit::zeroed().assume_init() };
-                    Box::pin(f(m))
-                },
-                future: None,
-                tx: None,
-            },
-            simconnects: Some(vec![]),
-        };
-
-        e.start()?;
-
-        loop {
-            std::thread::sleep(std::time::Duration::from_millis(10));
-            let simconnects = e.simconnects.as_ref().unwrap();
-            if simconnects.is_empty() {
-                break;
-            }
-            for s in simconnects {
-                unsafe {
-                    (&mut **s).call_dispatch()?;
-                }
-            }
-        }
-
-        e.end()?;
-
-        Ok(())
-    }
 }
 
 #[doc(hidden)]
 pub struct StandaloneModuleExecutor {
     pub executor: executor::Executor<StandaloneModule, SimConnectRecv<'static>>,
-    pub simconnects: Option<Vec<*mut SimConnect<'static>>>,
 }
 
 #[doc(hidden)]
