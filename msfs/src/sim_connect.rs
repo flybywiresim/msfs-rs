@@ -44,24 +44,21 @@ fn map_err(result: sys::HRESULT) -> Result<()> {
     }
 }
 
-/// Callback provided to SimConnect session.
-pub type SimConnectRecvCallback = dyn Fn(&mut SimConnect, SimConnectRecv);
-
 /// A SimConnect session. This provides access to data within the MSFS sim.
-pub struct SimConnect {
+pub struct SimConnect<'a> {
     handle: sys::HANDLE,
-    callback: Box<SimConnectRecvCallback>,
+    callback: Box<dyn FnMut(&mut SimConnect, SimConnectRecv) + 'a>,
     data_definitions: HashMap<TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
     client_data_definitions: HashMap<TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID>,
     event_id_counter: sys::DWORD,
     client_data_id_counter: sys::DWORD,
 }
 
-impl SimConnect {
+impl<'a> SimConnect<'a> {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
-    pub fn open<F>(name: &str, callback: F) -> Result<Pin<Box<SimConnect>>>
+    pub fn open<F>(name: &str, callback: F) -> Result<Pin<Box<SimConnect<'a>>>>
     where
-        F: Fn(&mut SimConnect, SimConnectRecv) + 'static,
+        F: FnMut(&mut SimConnect, SimConnectRecv) + 'a,
     {
         unsafe {
             let mut handle = 0;
@@ -90,7 +87,7 @@ impl SimConnect {
 
     // SimConnect is only exposed as a Pin<Box<SimConnect>>>, so get ptr with this method:
     #[doc(hidden)]
-    pub(crate) fn as_mut_ptr(&mut self) -> *mut SimConnect {
+    pub(crate) fn as_mut_ptr(&mut self) -> *mut SimConnect<'a> {
         self
     }
 
@@ -368,7 +365,7 @@ impl SimConnect {
     }
 }
 
-impl Drop for SimConnect {
+impl<'a> Drop for SimConnect<'a> {
     fn drop(&mut self) {
         unsafe {
             map_err(sys::SimConnect_Close(self.handle)).expect("SimConnect_Close");
@@ -434,7 +431,7 @@ extern "C" fn dispatch_cb(
     let recv = recv!(recv_cb);
 
     if let Some(recv) = recv {
-        let sim = unsafe { &*(p_context as *const SimConnect) };
+        let sim = unsafe { &mut *(p_context as *mut SimConnect) };
         (sim.callback)(unsafe { &mut *(p_context as *mut SimConnect) }, recv);
     }
 }

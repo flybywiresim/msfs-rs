@@ -201,7 +201,7 @@ impl StandaloneModule {
 #[doc(hidden)]
 pub struct StandaloneModuleExecutor {
     pub executor: executor::Executor<StandaloneModule, SimConnectRecv<'static>>,
-    pub simconnects: Option<Vec<*mut SimConnect>>,
+    pub simconnects: Option<Vec<*mut SimConnect<'static>>>,
 }
 
 #[doc(hidden)]
