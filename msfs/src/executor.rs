@@ -16,7 +16,12 @@ impl<I, T> Executor<I, T> {
         &mut self,
         get_input: Box<dyn Fn(mpsc::Receiver<T>) -> I>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        debug_assert!(self.future.is_none());
+        if self.future.is_some() {
+            eprintln!("MSFS-RS: RESTARTING EXECUTOR");
+            self.future.take();
+            self.tx.take();
+        }
+
         let (tx, rx) = mpsc::channel(1);
         self.tx = Some(tx);
         let input = get_input(rx);
