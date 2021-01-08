@@ -52,6 +52,11 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel</span>::<span class="ident">mpsc</span>, <span class="ident">Future</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
@@ -71,7 +76,12 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">get_input</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">future</span>.<span class="ident">is_none</span>());
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">future</span>.<span class="ident">is_some</span>() {
+            <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;MSFS-RS: RESTARTING EXECUTOR&quot;</span>);
+            <span class="self">self</span>.<span class="ident">future</span>.<span class="ident">take</span>();
+            <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">take</span>();
+        }
+
         <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">1</span>);
         <span class="self">self</span>.<span class="ident">tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">get_input</span>(<span class="ident">rx</span>);
