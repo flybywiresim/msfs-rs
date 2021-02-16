@@ -4,6 +4,7 @@ use crate::sys;
 
 /// aircraft_varget
 /// get_aircraft_var_enum
+#[derive(Debug)]
 pub struct AircraftVariable {
     simvar: sys::ENUM,
     units: sys::ENUM,
@@ -45,6 +46,7 @@ impl AircraftVariable {
 /// set_named_variable_typed_value
 /// get_named_variable_value
 /// set_named_variable_value
+#[derive(Debug)]
 pub struct NamedVariable(sys::ID);
 impl NamedVariable {
     pub fn from(name: &str) -> Self {
@@ -163,6 +165,7 @@ pub fn execute_calculator_code<T: ExecuteCalculatorCodeImpl>(code: &str) -> Opti
 }
 
 /// Holds compiled calculator code, wraps `gauge_calculator_code_precompile`.
+#[derive(Debug)]
 pub struct CompiledCalculatorCode {
     p_compiled: sys::PCSTRINGZ,
     _p_compiled_size: sys::UINT32,

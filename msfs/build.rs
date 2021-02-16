@@ -9,8 +9,10 @@ fn main() {
         cc::Build::new()
             .compiler("clang")
             .flag(&format!("--sysroot={}/WASM/wasi-sysroot", msfs_sdk))
-            .flag("-fms-extensions")
+            .flag("-fms-extensions") // intended to be used with msvc
             .flag("-D__INTELLISENSE__") // get rid of incorrect __attribute__'s from asobo
+            .flag("-Wno-unused-parameter") // warning in nanovg
+            .flag("-Wno-sign-compare") // warning in nanovg
             .include(format!("{}/WASM/include", msfs_sdk))
             .file(format!("{}/WASM/src/MSFS/Render/nanovg.cpp", msfs_sdk))
             .compile("nanovg");

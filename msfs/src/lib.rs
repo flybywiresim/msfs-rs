@@ -107,7 +107,7 @@ unsafe extern "C" fn __wasilibc_find_relpath(
         }
     }
 
-    return -1;
+    -1
 }
 
 #[doc(hidden)]
