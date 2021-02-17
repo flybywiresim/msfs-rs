@@ -2,6 +2,46 @@
 
 use crate::sys;
 
+#[doc(hidden)]
+pub trait SimVarF64 {
+    fn to(&self) -> f64;
+    fn from(v: f64) -> Self;
+}
+
+impl SimVarF64 for f64 {
+    fn to(&self) -> f64 {
+        *self
+    }
+
+    fn from(v: f64) -> Self {
+        v
+    }
+}
+
+impl SimVarF64 for bool {
+    fn to(&self) -> f64 {
+        if *self {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn from(v: f64) -> Self {
+        v != 0.0
+    }
+}
+
+impl SimVarF64 for u8 {
+    fn to(&self) -> f64 {
+        *self as f64
+    }
+
+    fn from(v: f64) -> Self {
+        v as Self
+    }
+}
+
 /// aircraft_varget
 /// get_aircraft_var_enum
 #[derive(Debug)]
@@ -37,8 +77,9 @@ impl AircraftVariable {
         })
     }
 
-    pub fn get(&self) -> f64 {
-        unsafe { sys::aircraft_varget(self.simvar, self.units, self.index) }
+    pub fn get<T: SimVarF64>(&self) -> T {
+        let v = unsafe { sys::aircraft_varget(self.simvar, self.units, self.index) };
+        T::from(v)
     }
 }
 
@@ -56,12 +97,14 @@ impl NamedVariable {
         })
     }
 
-    pub fn get_value(&self) -> f64 {
-        unsafe { sys::get_named_variable_value(self.0) }
+    pub fn get_value<T: SimVarF64>(&self) -> T {
+        let v = unsafe { sys::get_named_variable_value(self.0) };
+        T::from(v)
     }
 
-    pub fn set_value(&self, value: f64) {
-        unsafe { sys::set_named_variable_value(self.0, value) }
+    pub fn set_value(&self, v: impl SimVarF64) {
+        let v = v.to();
+        unsafe { sys::set_named_variable_value(self.0, v) }
     }
 }
 
