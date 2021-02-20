@@ -4,13 +4,13 @@ use crate::sys;
 
 #[doc(hidden)]
 pub trait SimVarF64 {
-    fn to(&self) -> f64;
+    fn to(self) -> f64;
     fn from(v: f64) -> Self;
 }
 
 impl SimVarF64 for f64 {
-    fn to(&self) -> f64 {
-        *self
+    fn to(self) -> f64 {
+        self
     }
 
     fn from(v: f64) -> Self {
@@ -19,8 +19,8 @@ impl SimVarF64 for f64 {
 }
 
 impl SimVarF64 for bool {
-    fn to(&self) -> f64 {
-        if *self {
+    fn to(self) -> f64 {
+        if self {
             1.0
         } else {
             0.0
@@ -33,8 +33,8 @@ impl SimVarF64 for bool {
 }
 
 impl SimVarF64 for u8 {
-    fn to(&self) -> f64 {
-        *self as f64
+    fn to(self) -> f64 {
+        self as f64
     }
 
     fn from(v: f64) -> Self {

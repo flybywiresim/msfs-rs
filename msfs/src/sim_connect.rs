@@ -54,6 +54,12 @@ pub struct SimConnect<'a> {
     client_data_id_counter: sys::DWORD,
 }
 
+impl<'a> std::fmt::Debug for SimConnect<'a> {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.debug_struct("SimConnect").finish()
+    }
+}
+
 impl<'a> SimConnect<'a> {
     /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
     pub fn open<F>(name: &str, callback: F) -> Result<Pin<Box<SimConnect<'a>>>>
