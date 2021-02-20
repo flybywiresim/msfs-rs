@@ -517,6 +517,12 @@
 <span id="514">514</span>
 <span id="515">515</span>
 <span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -572,6 +578,12 @@
     <span class="ident">client_data_definitions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_DEFINITION_ID</span><span class="op">&gt;</span>,
     <span class="ident">event_id_counter</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
     <span class="ident">client_data_id_counter</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SimConnect&quot;</span>).<span class="ident">finish</span>()
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
