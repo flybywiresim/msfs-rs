@@ -211,6 +211,26 @@ impl<'a> SimConnect<'a> {
         }
     }
 
+    /// Retrieve information about simulation objects of a given type that are
+    /// within a specified radius of the user's aircraft.
+    pub fn request_data_on_sim_object_type<T: DataDefinition>(
+        &mut self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+        radius: sys::DWORD,
+        r#type: sys::SIMCONNECT_SIMOBJECT_TYPE,
+    ) -> Result<()> {
+        let define_id = self.get_define_id::<T>()?;
+        unsafe {
+            map_err(sys::SimConnect_RequestDataOnSimObjectType(
+                self.handle,
+                request_id,
+                define_id,
+                radius,
+                r#type,
+            ))
+        }
+    }
+
     /// Request when the SimConnect client is to receive data values for a specific object
     pub fn request_data_on_sim_object<T: DataDefinition>(
         &mut self,
@@ -423,6 +443,9 @@ extern "C" fn dispatch_cb(
                     $(
                         sys::$ID => Some(SimConnectRecv::$E(&*(recv as *mut sys::$T))),
                     )*
+                    sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA_BYTYPE => {
+                        Some(SimConnectRecv::SimObjectData(&*(recv as *mut sys::SIMCONNECT_RECV_SIMOBJECT_DATA)))
+                    }
                     _ => None,
                 }
             }
