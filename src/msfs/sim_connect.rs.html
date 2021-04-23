@@ -523,6 +523,29 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 
@@ -733,6 +756,26 @@
                 <span class="number">0</span>,
                 <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of_val</span>(<span class="ident">data</span>) <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
                 <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
+            ))
+        }
+    }
+
+    <span class="doccomment">/// Retrieve information about simulation objects of a given type that are</span>
+    <span class="doccomment">/// within a specified radius of the user&#39;s aircraft.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_data_on_sim_object_type</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">radius</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+        <span class="ident">r#type</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_SIMOBJECT_TYPE</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">unsafe</span> {
+            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_RequestDataOnSimObjectType</span>(
+                <span class="self">self</span>.<span class="ident">handle</span>,
+                <span class="ident">request_id</span>,
+                <span class="ident">define_id</span>,
+                <span class="ident">radius</span>,
+                <span class="ident">r#type</span>,
             ))
         }
     }
@@ -949,6 +992,9 @@
                     $(
                         <span class="ident">sys</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">E</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">recv</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>))),
                     )<span class="op">*</span>
+                    <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA_BYTYPE</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv</span>::<span class="ident">SimObjectData</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">recv</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_SIMOBJECT_DATA</span>)))
+                    }
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
                 }
             }
@@ -1047,4 +1093,5 @@
     <span class="ident">phantom</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "msfs";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["msfs"] = [{"text":"impl Error for HResult","synthetic":false,"types":[]}];
+implementors["msfs"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/std/error/trait.Error.html\" title=\"trait std::error::Error\">Error</a> for <a class=\"struct\" href=\"msfs/sim_connect/struct.HResult.html\" title=\"struct msfs::sim_connect::HResult\">HResult</a>","synthetic":false,"types":["msfs::sim_connect::HResult"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
