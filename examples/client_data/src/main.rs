@@ -49,10 +49,9 @@ fn reader() -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     let w = std::thread::spawn(|| writer().unwrap());
     let r = std::thread::spawn(|| reader().unwrap());
     w.join().unwrap();
     r.join().unwrap();
-    Ok(())
 }
