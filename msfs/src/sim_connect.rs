@@ -293,7 +293,7 @@ impl<'a> SimConnect<'a> {
         &mut self,
         object_id: sys::SIMCONNECT_OBJECT_ID,
         event_id: sys::DWORD,
-        data: sys::DWORD
+        data: sys::DWORD,
     ) -> Result<()> {
         unsafe {
             map_err(sys::SimConnect_TransmitClientEvent(
@@ -302,7 +302,7 @@ impl<'a> SimConnect<'a> {
                 event_id,
                 data,
                 0,
-                0
+                0,
             ))
         }
     }
