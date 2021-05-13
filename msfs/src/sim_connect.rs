@@ -288,6 +288,25 @@ impl<'a> SimConnect<'a> {
         Ok(event_id)
     }
 
+    /// Trigger an event, previously mapped with `map_client_event_to_sim_event`
+    pub fn transmit_client_event(
+        &mut self,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        event_id: sys::DWORD,
+        data: sys::DWORD
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_TransmitClientEvent(
+                self.handle,
+                object_id,
+                event_id,
+                data,
+                0,
+                0
+            ))
+        }
+    }
+
     fn get_client_data_id(&mut self, name: &str) -> Result<sys::SIMCONNECT_CLIENT_DATA_ID> {
         let client_id = self.client_data_id_counter;
         self.client_data_id_counter += 1;
