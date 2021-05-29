@@ -13,6 +13,8 @@ fn main() {
             .flag("-D__INTELLISENSE__") // get rid of incorrect __attribute__'s from asobo
             .flag("-Wno-unused-parameter") // warning in nanovg
             .flag("-Wno-sign-compare") // warning in nanovg
+            .flag("-mthread-model") // no thread support
+            .flag("single") // no thread support
             .include(format!("{}/WASM/include", msfs_sdk))
             .file(format!("{}/WASM/src/MSFS/Render/nanovg.cpp", msfs_sdk))
             .compile("nanovg");
