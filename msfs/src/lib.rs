@@ -45,7 +45,9 @@ pub mod nvg;
 #[no_mangle]
 unsafe extern "C" fn __wasilibc_find_relpath(
     path: *const std::os::raw::c_char,
+    abs_prefix: *mut *const std::os::raw::c_char,
     relative_path: *mut *const std::os::raw::c_char,
+    _relative_path_len: usize,
 ) -> std::os::raw::c_int {
     static mut PREOPENS: Vec<(wasi::Fd, String)> = vec![];
     static mut PREOPENS_AVAILABLE: bool = false;
@@ -85,31 +87,33 @@ unsafe extern "C" fn __wasilibc_find_relpath(
     }
 
     let rust_path = std::ffi::CStr::from_ptr(path).to_str().unwrap();
-    for (fd, prefix) in &PREOPENS {
-        if rust_path.starts_with(prefix) {
-            if rust_path.len() == prefix.len() {
-                *relative_path = EMPTY;
-            } else {
-                *relative_path = path.add(prefix.len());
-                loop {
-                    if **relative_path == '\\' as i8 {
-                        *relative_path = (*relative_path).add(1);
-                    } else if **relative_path == '.' as i8 && *(*relative_path.add(1)) == '\\' as i8
-                    {
-                        *relative_path = (*relative_path).add(2);
-                    } else {
-                        break;
-                    }
-                }
-                if **relative_path == 0 {
-                    *relative_path = EMPTY;
-                }
-            }
-            return *fd as std::os::raw::c_int;
+    let mut best_len = 0;
+    let mut fd: std::os::raw::c_int = -1;
+    for (maybe_fd, prefix) in PREOPENS.iter().rev() {
+        if (fd == -1 || prefix.len() > best_len) && rust_path.starts_with(prefix) {
+            fd = *maybe_fd as std::os::raw::c_int;
+            best_len = prefix.len();
+            *abs_prefix = prefix.as_ptr() as *const std::os::raw::c_char;
         }
     }
 
-    -1
+    if fd != -1 {
+        *relative_path = path.add(best_len);
+        loop {
+            if **relative_path == '\\' as i8 {
+                *relative_path = (*relative_path).add(1);
+            } else if **relative_path == '.' as i8 && *(*relative_path.add(1)) == '\\' as i8 {
+                *relative_path = (*relative_path).add(2);
+            } else {
+                break;
+            }
+        }
+        if **relative_path == 0 {
+            *relative_path = EMPTY;
+        }
+    }
+
+    fd
 }
 
 #[doc(hidden)]
