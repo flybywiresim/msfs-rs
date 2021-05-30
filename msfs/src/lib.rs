@@ -45,9 +45,7 @@ pub mod nvg;
 #[no_mangle]
 unsafe extern "C" fn __wasilibc_find_relpath(
     path: *const std::os::raw::c_char,
-    abs_prefix: *mut *const std::os::raw::c_char,
     relative_path: *mut *const std::os::raw::c_char,
-    _relative_path_len: usize,
 ) -> std::os::raw::c_int {
     static mut PREOPENS: Vec<(wasi::Fd, String)> = vec![];
     static mut PREOPENS_AVAILABLE: bool = false;
@@ -93,7 +91,6 @@ unsafe extern "C" fn __wasilibc_find_relpath(
         if (fd == -1 || prefix.len() > best_len) && rust_path.starts_with(prefix) {
             fd = *maybe_fd as std::os::raw::c_int;
             best_len = prefix.len();
-            *abs_prefix = prefix.as_ptr() as *const std::os::raw::c_char;
         }
     }
 
