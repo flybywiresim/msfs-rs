@@ -27,8 +27,6 @@
 //! ]
 //! ```
 
-#![allow(clippy::upper_case_acronyms)]
-
 mod msfs;
 pub mod sim_connect;
 pub mod sys;
