@@ -1,1 +1,0 @@
-window.ALL_CRATES = ["msfs","msfs_derive","msfs_sdk"];
