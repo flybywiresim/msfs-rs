@@ -11,6 +11,7 @@ pub use msfs_derive::sim_connect_client_data_definition as client_data_definitio
 pub use msfs_derive::sim_connect_data_definition as data_definition;
 
 pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
+pub type InitPosition = sys::SIMCONNECT_DATA_INITPOSITION;
 
 /// A trait implemented by the `data_definition` attribute.
 pub trait DataDefinition: 'static {
@@ -402,6 +403,66 @@ impl<'a> SimConnect<'a> {
         }
         Ok(())
     }
+
+    pub fn ai_create_non_atc_aircraft(
+        &mut self,
+        container_title: &str,
+        tail_number: &str,
+        init_position: sys::SIMCONNECT_DATA_INITPOSITION,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<()> {
+        let container_title = std::ffi::CString::new(container_title).unwrap();
+        let tail_number = std::ffi::CString::new(tail_number).unwrap();
+
+        unsafe {
+            map_err(sys::SimConnect_AICreateNonATCAircraft(
+                self.handle,
+                container_title.as_ptr(),
+                tail_number.as_ptr(),
+                init_position,
+                request_id,
+            ))?;
+        }
+        Ok(())
+    }
+
+    pub fn ai_create_parked_atc_aircraft(
+        &mut self,
+        container_title: &str,
+        tail_number: &str,
+        icao: &str,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<()> {
+        let container_title = std::ffi::CString::new(container_title).unwrap();
+        let tail_number = std::ffi::CString::new(tail_number).unwrap();
+        let icao = std::ffi::CString::new(icao).unwrap();
+
+        unsafe {
+            map_err(sys::SimConnect_AICreateParkedATCAircraft(
+                self.handle,
+                container_title.as_ptr(),
+                tail_number.as_ptr(),
+                icao.as_ptr(),
+                request_id,
+            ))?;
+        }
+        Ok(())
+    }
+
+    pub fn ai_remove_object(
+        &mut self,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_AIRemoveObject(
+                self.handle,
+                object_id,
+                request_id,
+            ))?;
+        }
+        Ok(())
+    }
 }
 
 impl<'a> Drop for SimConnect<'a> {
@@ -444,6 +505,11 @@ macro_rules! recv {
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_CLIENT_DATA,
                 SIMCONNECT_RECV_CLIENT_DATA,
                 ClientData
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_ASSIGNED_OBJECT_ID,
+                SIMCONNECT_RECV_ASSIGNED_OBJECT_ID,
+                AssignedObjectId
             ),
         );
     };
@@ -501,6 +567,16 @@ impl sys::SIMCONNECT_RECV_EVENT {
     /// The data for this event.
     pub fn data(&self) -> sys::DWORD {
         self.dwData
+    }
+}
+
+impl sys::SIMCONNECT_RECV_ASSIGNED_OBJECT_ID {
+    pub fn id(&self) -> sys::DWORD {
+        self.dwRequestID
+    }
+
+    pub fn object_id(&self) -> sys::DWORD {
+        self.dwObjectID
     }
 }
 
