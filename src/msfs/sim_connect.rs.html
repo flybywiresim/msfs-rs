@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs/src/sim_connect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sim_connect.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../msfs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs&#x2F;src&#x2F;sim_connect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sim_connect.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../msfs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -641,26 +638,28 @@
 <span id="638">638</span>
 <span id="639">639</span>
 <span id="640">640</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
+<span id="641">641</span>
+<span id="642">642</span>
+</pre><pre class="rust">
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sys</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">TypeId</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::sys</span>;
+<span class="kw">use</span> <span class="ident">std::any::TypeId</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID_USER</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sys::SIMCONNECT_OBJECT_ID_USER</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive</span>::<span class="ident">sim_connect_client_data_definition</span> <span class="kw">as</span> <span class="ident">client_data_definition</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive</span>::<span class="ident">sim_connect_data_definition</span> <span class="kw">as</span> <span class="ident">data_definition</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive::sim_connect_client_data_definition</span> <span class="kw">as</span> <span class="ident">client_data_definition</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">msfs_derive::sim_connect_data_definition</span> <span class="kw">as</span> <span class="ident">data_definition</span>;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DataXYZ</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_XYZ</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InitPosition</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_INITPOSITION</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DataXYZ</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_DATA_XYZ</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InitPosition</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_DATA_INITPOSITION</span>;
 
 <span class="doccomment">/// A trait implemented by the `data_definition` attribute.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataDefinition</span>: <span class="lifetime">&#39;static</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f32</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATATYPE</span>)];
+    <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f32</span>, <span class="ident">sys::SIMCONNECT_DATATYPE</span>)];
 }
 
 <span class="doccomment">/// A trait implemented by the `client_data_definition` attribute.</span>
@@ -671,17 +670,17 @@
 
 <span class="doccomment">/// Rusty HRESULT wrapper.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HResult</span>(<span class="ident">sys</span>::<span class="ident">HRESULT</span>);
-<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">HResult</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>::<span class="ident">fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HResult</span>(<span class="ident">sys::HRESULT</span>);
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">HResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+        <span class="ident">std::fmt::Debug::fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
     }
 }
-<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">HResult</span> {}
+<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">HResult</span> {}
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HResult</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HResult</span><span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">map_err</span>(<span class="ident">result</span>: <span class="ident">sys</span>::<span class="ident">HRESULT</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">map_err</span>(<span class="ident">result</span>: <span class="ident">sys::HRESULT</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">result</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
@@ -691,16 +690,16 @@
 
 <span class="doccomment">/// A SimConnect session. This provides access to data within the MSFS sim.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">handle</span>: <span class="ident">sys</span>::<span class="ident">HANDLE</span>,
+    <span class="ident">handle</span>: <span class="ident">sys::HANDLE</span>,
     <span class="ident">callback</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span>, <span class="ident">SimConnectRecv</span>) <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">data_definitions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">&gt;</span>,
-    <span class="ident">client_data_definitions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_DEFINITION_ID</span><span class="op">&gt;</span>,
-    <span class="ident">event_id_counter</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-    <span class="ident">client_data_id_counter</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+    <span class="ident">data_definitions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">sys::SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">&gt;</span>,
+    <span class="ident">client_data_definitions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID</span><span class="op">&gt;</span>,
+    <span class="ident">event_id_counter</span>: <span class="ident">sys::DWORD</span>,
+    <span class="ident">client_data_id_counter</span>: <span class="ident">sys::DWORD</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SimConnect&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -713,21 +712,21 @@
     {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_Open</span>(
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_Open</span>(
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handle</span>,
                 <span class="ident">name</span>.<span class="ident">as_ptr</span>(),
-                <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                <span class="ident">std::ptr::null_mut</span>(),
                 <span class="number">0</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
             ))<span class="question-mark">?</span>;
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">handle</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">SimConnect</span> {
+            <span class="macro">debug_assert!</span>(<span class="ident">handle</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sim</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">SimConnect</span> {
                 <span class="ident">handle</span>,
-                <span class="ident">callback</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">callback</span>),
-                <span class="ident">data_definitions</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-                <span class="ident">client_data_definitions</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+                <span class="ident">callback</span>: <span class="ident">Box::new</span>(<span class="ident">callback</span>),
+                <span class="ident">data_definitions</span>: <span class="ident">HashMap::new</span>(),
+                <span class="ident">client_data_definitions</span>: <span class="ident">HashMap::new</span>(),
                 <span class="ident">event_id_counter</span>: <span class="number">0</span>,
                 <span class="ident">client_data_id_counter</span>: <span class="number">0</span>,
             });
@@ -739,36 +738,36 @@
     <span class="doccomment">/// Used to process the next SimConnect message received. Only needed when not using the gauge API.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_CallDispatch</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_CallDispatch</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">dispatch_cb</span>),
-                <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
+                <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std::ffi::c_void</span>,
             ))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_define_id</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_define_id</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys::SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>;
-        <span class="ident">SimConnect</span>::<span class="ident">get_id</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+        <span class="ident">SimConnect::get_id</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data_definitions</span>,
-            <span class="op">|</span><span class="ident">define_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">|</span> {
+            <span class="op">|</span><span class="ident">define_id</span>: <span class="ident">sys::SIMCONNECT_DATA_DEFINITION_ID</span><span class="op">|</span> {
                 <span class="comment">/*
                 unsafe {
                     map_err(sys::SimConnect_ClearDataDefinition(handle, define_id))?;
                 }
                 */</span>
-                <span class="kw">for</span> (<span class="ident">datum_name</span>, <span class="ident">units_type</span>, <span class="ident">epsilon</span>, <span class="ident">datatype</span>) <span class="kw">in</span> <span class="ident">T</span>::<span class="ident">DEFINITIONS</span> {
-                    <span class="kw">let</span> <span class="ident">datum_name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">datum_name</span>).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">units_type</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="ident">units_type</span>).<span class="ident">unwrap</span>();
+                <span class="kw">for</span> (<span class="ident">datum_name</span>, <span class="ident">units_type</span>, <span class="ident">epsilon</span>, <span class="ident">datatype</span>) <span class="kw">in</span> <span class="ident">T::DEFINITIONS</span> {
+                    <span class="kw">let</span> <span class="ident">datum_name</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="kw-2">*</span><span class="ident">datum_name</span>).<span class="ident">unwrap</span>();
+                    <span class="kw">let</span> <span class="ident">units_type</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="kw-2">*</span><span class="ident">units_type</span>).<span class="ident">unwrap</span>();
                     <span class="kw">unsafe</span> {
-                        <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddToDataDefinition</span>(
+                        <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AddToDataDefinition</span>(
                             <span class="ident">handle</span>,
                             <span class="ident">define_id</span>,
                             <span class="ident">datum_name</span>.<span class="ident">as_ptr</span>(),
                             <span class="ident">units_type</span>.<span class="ident">as_ptr</span>(),
                             <span class="kw-2">*</span><span class="ident">datatype</span>,
                             <span class="kw-2">*</span><span class="ident">epsilon</span>,
-                            <span class="ident">sys</span>::<span class="ident">SIMCONNECT_UNUSED</span>,
+                            <span class="ident">sys::SIMCONNECT_UNUSED</span>,
                         ))<span class="question-mark">?</span>;
                     }
                 }
@@ -779,9 +778,9 @@
 
     <span class="kw">fn</span> <span class="ident">get_client_data_define_id</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ClientDataDefinition</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_DEFINITION_ID</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>;
-        <span class="ident">SimConnect</span>::<span class="ident">get_id</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">client_data_definitions</span>, <span class="op">|</span><span class="ident">define_id</span><span class="op">|</span> {
+        <span class="ident">SimConnect::get_id</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">client_data_definitions</span>, <span class="op">|</span><span class="ident">define_id</span><span class="op">|</span> {
             <span class="comment">/*
             unsafe {
                 map_err(sys::SimConnect_ClearClientDataDefinition(handle, define_id))?;
@@ -790,29 +789,29 @@
 
             <span class="comment">// Rust may reorder fields, so padding has to be calculated as min of</span>
             <span class="comment">// all fields instead of the last field.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">padding</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">usize</span>::<span class="ident">MAX</span>;
-            <span class="kw">for</span> (<span class="ident">offset</span>, <span class="ident">size</span>, <span class="ident">epsilon</span>) <span class="kw">in</span> <span class="ident">T</span>::<span class="ident">get_definitions</span>() {
-                <span class="ident">padding</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">min</span>(<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> (<span class="ident">offset</span> <span class="op">+</span> <span class="ident">size</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">padding</span> <span class="op">=</span> <span class="ident">std::usize::MAX</span>;
+            <span class="kw">for</span> (<span class="ident">offset</span>, <span class="ident">size</span>, <span class="ident">epsilon</span>) <span class="kw">in</span> <span class="ident">T::get_definitions</span>() {
+                <span class="ident">padding</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">min</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> (<span class="ident">offset</span> <span class="op">+</span> <span class="ident">size</span>));
                 <span class="kw">unsafe</span> {
-                    <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddToClientDataDefinition</span>(
+                    <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AddToClientDataDefinition</span>(
                         <span class="ident">handle</span>,
                         <span class="ident">define_id</span>,
-                        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-                        <span class="ident">size</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+                        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
+                        <span class="ident">size</span> <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
                         <span class="ident">epsilon</span>,
-                        <span class="ident">sys</span>::<span class="ident">SIMCONNECT_UNUSED</span>,
+                        <span class="ident">sys::SIMCONNECT_UNUSED</span>,
                     ))<span class="question-mark">?</span>;
                 }
             }
-            <span class="kw">if</span> <span class="ident">padding</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">padding</span> <span class="op">!</span><span class="op">=</span> <span class="ident">std</span>::<span class="ident">usize</span>::<span class="ident">MAX</span> {
+            <span class="kw">if</span> <span class="ident">padding</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">padding</span> <span class="op">!</span><span class="op">=</span> <span class="ident">std::usize::MAX</span> {
                 <span class="kw">unsafe</span> {
-                    <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddToClientDataDefinition</span>(
+                    <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AddToClientDataDefinition</span>(
                         <span class="ident">handle</span>,
                         <span class="ident">define_id</span>,
-                        (<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">padding</span>) <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-                        <span class="ident">padding</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+                        (<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">padding</span>) <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
+                        <span class="ident">padding</span> <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
                         <span class="number">0.0</span>,
-                        <span class="ident">sys</span>::<span class="ident">SIMCONNECT_UNUSED</span>,
+                        <span class="ident">sys::SIMCONNECT_UNUSED</span>,
                     ))<span class="question-mark">?</span>;
                 }
             }
@@ -820,38 +819,38 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">get_id</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span>, <span class="ident">U</span>: <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">fn</span> <span class="ident">get_id</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span>, <span class="ident">U</span>: <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">U</span><span class="op">&gt;</span>,
         <span class="ident">insert_fn</span>: <span class="ident">F</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">maybe_id</span> <span class="op">=</span> <span class="ident">U</span>::<span class="ident">try_from</span>(<span class="ident">map</span>.<span class="ident">len</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable</span><span class="macro">!</span>());
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">maybe_id</span> <span class="op">=</span> <span class="ident">U::try_from</span>(<span class="ident">map</span>.<span class="ident">len</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable!</span>());
         <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">key</span>) {
-            <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">Entry</span>::<span class="ident">Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">std::collections::hash_map::Entry::Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">insert_fn</span>(<span class="ident">maybe_id</span>)<span class="question-mark">?</span>;
                 <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">maybe_id</span>);
                 <span class="prelude-val">Ok</span>(<span class="ident">maybe_id</span>)
             }
-            <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">Entry</span>::<span class="ident">Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">get</span>()),
+            <span class="ident">std::collections::hash_map::Entry::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">get</span>()),
         }
     }
 
     <span class="doccomment">/// Make changes to the data properties of an object.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_data_on_sim_object</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">object_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID</span>,
+        <span class="ident">object_id</span>: <span class="ident">sys::SIMCONNECT_OBJECT_ID</span>,
         <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetDataOnSimObject</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_SetDataOnSimObject</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">define_id</span>,
                 <span class="ident">object_id</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
-                <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of_val</span>(<span class="ident">data</span>) <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-                <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
+                <span class="ident">std::mem::size_of_val</span>(<span class="ident">data</span>) <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
+                <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std::ffi::c_void</span>,
             ))
         }
     }
@@ -860,13 +859,13 @@
     <span class="doccomment">/// within a specified radius of the user&#39;s aircraft.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_data_on_sim_object_type</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
-        <span class="ident">radius</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-        <span class="ident">r#type</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_SIMOBJECT_TYPE</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">radius</span>: <span class="ident">sys::DWORD</span>,
+        <span class="ident">r#type</span>: <span class="ident">sys::SIMCONNECT_SIMOBJECT_TYPE</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_RequestDataOnSimObjectType</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_RequestDataOnSimObjectType</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">request_id</span>,
                 <span class="ident">define_id</span>,
@@ -879,20 +878,20 @@
     <span class="doccomment">/// Request when the SimConnect client is to receive data values for a specific object</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_data_on_sim_object</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
-        <span class="ident">object_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">object_id</span>: <span class="ident">sys::SIMCONNECT_OBJECT_ID</span>,
         <span class="ident">period</span>: <span class="ident">Period</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_RequestDataOnSimObject</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_RequestDataOnSimObject</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">request_id</span>,
                 <span class="ident">define_id</span>,
                 <span class="ident">object_id</span>,
-                <span class="ident">period</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD</span>,
-                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_FLAG_CHANGED</span>,
+                <span class="ident">period</span> <span class="kw">as</span> <span class="ident">sys::SIMCONNECT_PERIOD</span>,
+                <span class="ident">sys::SIMCONNECT_DATA_REQUEST_FLAG_CHANGED</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
@@ -906,28 +905,28 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">event_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">mask</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">DWORD</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys::DWORD</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_id_counter</span>;
         <span class="self">self</span>.<span class="ident">event_id_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">event_name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">event_name</span>).<span class="ident">unwrap</span>();
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_MapClientEventToSimEvent</span>(
+            <span class="kw">let</span> <span class="ident">event_name</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">event_name</span>).<span class="ident">unwrap</span>();
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_MapClientEventToSimEvent</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">event_id</span>,
                 <span class="ident">event_name</span>.<span class="ident">as_ptr</span>(),
             ))<span class="question-mark">?</span>;
 
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AddClientEventToNotificationGroup</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AddClientEventToNotificationGroup</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="number">0</span>,
                 <span class="ident">event_id</span>,
                 <span class="kw">if</span> <span class="ident">mask</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> },
             ))<span class="question-mark">?</span>;
 
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetNotificationGroupPriority</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_SetNotificationGroupPriority</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="number">0</span>,
-                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_GROUP_PRIORITY_HIGHEST_MASKABLE</span>,
+                <span class="ident">sys::SIMCONNECT_GROUP_PRIORITY_HIGHEST_MASKABLE</span>,
             ))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="ident">event_id</span>)
@@ -936,12 +935,12 @@
     <span class="doccomment">/// Trigger an event, previously mapped with `map_client_event_to_sim_event`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmit_client_event</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">object_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID</span>,
-        <span class="ident">event_id</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-        <span class="ident">data</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+        <span class="ident">object_id</span>: <span class="ident">sys::SIMCONNECT_OBJECT_ID</span>,
+        <span class="ident">event_id</span>: <span class="ident">sys::DWORD</span>,
+        <span class="ident">data</span>: <span class="ident">sys::DWORD</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_TransmitClientEvent</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_TransmitClientEvent</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">object_id</span>,
                 <span class="ident">event_id</span>,
@@ -952,12 +951,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_client_data_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_ID</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_client_data_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sys::SIMCONNECT_CLIENT_DATA_ID</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_data_id_counter</span>;
         <span class="self">self</span>.<span class="ident">client_data_id_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_MapClientDataNameToID</span>(
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_MapClientDataNameToID</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">name</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">client_id</span>,
@@ -975,16 +974,16 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientDataArea</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client_data_id</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_CreateClientData</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_CreateClientData</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">client_id</span>,
-                <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
+                <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
                 <span class="number">0</span>,
             ))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="ident">ClientDataArea</span> {
             <span class="ident">client_id</span>,
-            <span class="ident">phantom</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>,
+            <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span>,
         })
     }
 
@@ -997,7 +996,7 @@
         <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client_data_id</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">ClientDataArea</span> {
             <span class="ident">client_id</span>,
-            <span class="ident">phantom</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>,
+            <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span>,
         })
     }
 
@@ -1006,19 +1005,19 @@
     <span class="doccomment">/// allocate this memory.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_client_data</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ClientDataDefinition</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client_data_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client_data_id</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_RequestClientData</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_RequestClientData</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">client_id</span>,
                 <span class="ident">request_id</span>,
                 <span class="ident">define_id</span>,
-                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_PERIOD_SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET</span>,
-                <span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED</span>,
+                <span class="ident">sys::SIMCONNECT_CLIENT_DATA_PERIOD_SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET</span>,
+                <span class="ident">sys::SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
@@ -1035,14 +1034,14 @@
         <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_SetClientData</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_SetClientData</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">area</span>.<span class="ident">client_id</span>,
                 <span class="self">self</span>.<span class="ident">get_client_data_define_id</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
-                <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-                <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
+                <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">sys::DWORD</span>,
+                <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std::ffi::c_void</span>,
             ))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
@@ -1052,14 +1051,14 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">container_title</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">tail_number</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">init_position</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_INITPOSITION</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">init_position</span>: <span class="ident">sys::SIMCONNECT_DATA_INITPOSITION</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">container_title</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">container_title</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">tail_number</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">tail_number</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">container_title</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">container_title</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">tail_number</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">tail_number</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AICreateNonATCAircraft</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AICreateNonATCAircraft</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">container_title</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">tail_number</span>.<span class="ident">as_ptr</span>(),
@@ -1075,14 +1074,14 @@
         <span class="ident">container_title</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">tail_number</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">icao</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">container_title</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">container_title</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">tail_number</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">tail_number</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">icao</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">icao</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">container_title</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">container_title</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">tail_number</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">tail_number</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">icao</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">icao</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AICreateParkedATCAircraft</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AICreateParkedATCAircraft</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">container_title</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">tail_number</span>.<span class="ident">as_ptr</span>(),
@@ -1095,11 +1094,11 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ai_remove_object</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">object_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_OBJECT_ID</span>,
-        <span class="ident">request_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_DATA_REQUEST_ID</span>,
+        <span class="ident">object_id</span>: <span class="ident">sys::SIMCONNECT_OBJECT_ID</span>,
+        <span class="ident">request_id</span>: <span class="ident">sys::SIMCONNECT_DATA_REQUEST_ID</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_AIRemoveObject</span>(
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_AIRemoveObject</span>(
                 <span class="self">self</span>.<span class="ident">handle</span>,
                 <span class="ident">object_id</span>,
                 <span class="ident">request_id</span>,
@@ -1112,14 +1111,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SimConnect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">unsafe</span> {
-            <span class="ident">map_err</span>(<span class="ident">sys</span>::<span class="ident">SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>)).<span class="ident">expect</span>(<span class="string">&quot;SimConnect_Close&quot;</span>);
+            <span class="ident">map_err</span>(<span class="ident">sys::SimConnect_Close</span>(<span class="self">self</span>.<span class="ident">handle</span>)).<span class="ident">expect</span>(<span class="string">&quot;SimConnect_Close&quot;</span>);
         }
     }
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">recv</span> {
+<span class="macro">macro_rules!</span> <span class="ident">recv</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">V</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro-nonterminal">$</span><span class="macro">V</span><span class="macro">!</span>(
+        <span class="macro-nonterminal">$</span><span class="macro">V!</span>(
             (
                 <span class="macro-nonterminal">SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EXCEPTION</span>,
                 <span class="ident">SIMCONNECT_RECV_EXCEPTION</span>,
@@ -1160,27 +1159,27 @@
 }
 
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">dispatch_cb</span>(
-    <span class="ident">recv</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV</span>,
-    <span class="ident">_cb_data</span>: <span class="ident">sys</span>::<span class="ident">DWORD</span>,
-    <span class="ident">p_context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>,
+    <span class="ident">recv</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::SIMCONNECT_RECV</span>,
+    <span class="ident">_cb_data</span>: <span class="ident">sys::DWORD</span>,
+    <span class="ident">p_context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std::ffi::c_void</span>,
 ) {
-    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">recv_cb</span> {
+    <span class="macro">macro_rules!</span> <span class="ident">recv_cb</span> {
         ($( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ID</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">E</span>:<span class="ident">ident</span>), )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">unsafe</span> {
-                <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">recv</span>).<span class="ident">dwID</span> <span class="kw">as</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_ID</span> {
-                    <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv</span>::<span class="ident">Null</span>),
+                <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">recv</span>).<span class="ident">dwID</span> <span class="kw">as</span> <span class="ident">sys::SIMCONNECT_RECV_ID</span> {
+                    <span class="ident">sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv::Null</span>),
                     $(
                         <span class="ident">sys</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">E</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">recv</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>))),
                     )<span class="op">*</span>
-                    <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA_BYTYPE</span> <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv</span>::<span class="ident">SimObjectData</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">recv</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_SIMOBJECT_DATA</span>)))
+                    <span class="ident">sys::SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA_BYTYPE</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">SimConnectRecv::SimObjectData</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">recv</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::SIMCONNECT_RECV_SIMOBJECT_DATA</span>)))
                     }
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
                 }
             }
         }
     }
-    <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span> <span class="macro">recv</span><span class="macro">!</span>(<span class="ident">recv_cb</span>);
+    <span class="kw">let</span> <span class="ident">recv</span> <span class="op">=</span> <span class="macro">recv!</span>(<span class="ident">recv_cb</span>);
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">recv</span>) <span class="op">=</span> <span class="ident">recv</span> {
         <span class="kw">let</span> <span class="ident">sim</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">p_context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SimConnect</span>) };
@@ -1188,7 +1187,7 @@
     }
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">recv_enum</span> {
+<span class="macro">macro_rules!</span> <span class="ident">recv_enum</span> {
     ($( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ID</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">E</span>:<span class="ident">ident</span>), )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="doccomment">/// Message received from SimConnect.</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1200,58 +1199,60 @@
         }
     }
 }
-<span class="macro">recv</span><span class="macro">!</span>(<span class="ident">recv_enum</span>);
+<span class="macro">recv!</span>(<span class="ident">recv_enum</span>);
 
-<span class="kw">impl</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_EVENT</span> {
+<span class="kw">impl</span> <span class="ident">sys::SIMCONNECT_RECV_EVENT</span> {
     <span class="doccomment">/// The ID for this event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">uEventID</span>
     }
 
     <span class="doccomment">/// The data for this event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">dwData</span>
     }
 }
 
-<span class="kw">impl</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_ASSIGNED_OBJECT_ID</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+<span class="kw">impl</span> <span class="ident">sys::SIMCONNECT_RECV_ASSIGNED_OBJECT_ID</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">dwRequestID</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">dwObjectID</span>
     }
 }
 
-<span class="kw">impl</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_SIMOBJECT_DATA</span> {
+<span class="kw">impl</span> <span class="ident">sys::SIMCONNECT_RECV_SIMOBJECT_DATA</span> {
     <span class="doccomment">/// The ID for this data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">dwRequestID</span>
     }
 
     <span class="doccomment">/// Convert a SimObjectData event into the data it contains.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DataDefinition</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sim</span>: <span class="kw-2">&amp;</span><span class="ident">SimConnect</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="ident">sim</span>.<span class="ident">data_definitions</span>[<span class="kw-2">&amp;</span><span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()];
+        <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="ident">sim</span>.<span class="ident">data_definitions</span>[<span class="kw-2">&amp;</span><span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()];
         <span class="kw">if</span> <span class="ident">define_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">dwDefineID</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dwData</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
+            <span class="comment">// UB: creates unaligned reference</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="macro">std::ptr::addr_of!</span>(<span class="self">self</span>.<span class="ident">dwData</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_RECV_CLIENT_DATA</span> {
+<span class="kw">impl</span> <span class="ident">sys::SIMCONNECT_RECV_CLIENT_DATA</span> {
     <span class="doccomment">/// The ID for this data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::DWORD</span> {
         <span class="self">self</span>.<span class="ident">_base</span>.<span class="ident">dwRequestID</span>
     }
 
     <span class="doccomment">/// Convert a ClientData event into the data it contains.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ClientDataDefinition</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sim</span>: <span class="kw-2">&amp;</span><span class="ident">SimConnect</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="ident">sim</span>.<span class="ident">client_data_definitions</span>[<span class="kw-2">&amp;</span><span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()];
+        <span class="kw">let</span> <span class="ident">define_id</span> <span class="op">=</span> <span class="ident">sim</span>.<span class="ident">client_data_definitions</span>[<span class="kw-2">&amp;</span><span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()];
         <span class="kw">if</span> <span class="ident">define_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">_base</span>.<span class="ident">dwDefineID</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_base</span>.<span class="ident">dwData</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">sys</span>::<span class="ident">DWORD</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
+            <span class="comment">// UB: creates unaligned reference</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="macro">std::ptr::addr_of!</span>(<span class="self">self</span>.<span class="ident">_base</span>.<span class="ident">dwData</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1262,25 +1263,27 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Period</span> {
     <span class="doccomment">/// Specifies that the data is not to be sent</span>
-    <span class="ident">Never</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER</span> <span class="kw">as</span> <span class="ident">isize</span>,
+    <span class="ident">Never</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_NEVER</span> <span class="kw">as</span> <span class="ident">isize</span>,
     <span class="doccomment">/// Specifies that the data should be sent once only. Note that this is not</span>
     <span class="doccomment">/// an efficient way of receiving data frequently, use one of the other</span>
     <span class="doccomment">/// periods if there is a regular frequency to the data request.</span>
-    <span class="ident">Once</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE</span> <span class="kw">as</span> <span class="ident">isize</span>,
+    <span class="ident">Once</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE</span> <span class="kw">as</span> <span class="ident">isize</span>,
     <span class="doccomment">/// Specifies that the data should be sent every visual (rendered) frame.</span>
-    <span class="ident">VisualFrame</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_VISUAL_FRAME</span> <span class="kw">as</span> <span class="ident">isize</span>,
+    <span class="ident">VisualFrame</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_VISUAL_FRAME</span> <span class="kw">as</span> <span class="ident">isize</span>,
     <span class="doccomment">/// Specifies that the data should be sent every simulated frame, whether that frame is</span>
     <span class="doccomment">/// rendered or not.</span>
-    <span class="ident">SimFrame</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME</span> <span class="kw">as</span> <span class="ident">isize</span>,
+    <span class="ident">SimFrame</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SIM_FRAME</span> <span class="kw">as</span> <span class="ident">isize</span>,
     <span class="doccomment">/// Specifies that the data should be sent once every second.</span>
-    <span class="ident">Second</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND</span> <span class="kw">as</span> <span class="ident">isize</span>,
+    <span class="ident">Second</span> <span class="op">=</span> <span class="ident">sys::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_SECOND</span> <span class="kw">as</span> <span class="ident">isize</span>,
 }
 
 <span class="doccomment">/// An allocated client data memory region. Dropping this struct will not</span>
 <span class="doccomment">/// deallocate the memory which has been allocated in the sim.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientDataArea</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ClientDataDefinition</span><span class="op">&gt;</span> {
-    <span class="ident">client_id</span>: <span class="ident">sys</span>::<span class="ident">SIMCONNECT_CLIENT_DATA_ID</span>,
-    <span class="ident">phantom</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">client_id</span>: <span class="ident">sys::SIMCONNECT_CLIENT_DATA_ID</span>,
+    <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "msfs";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>
