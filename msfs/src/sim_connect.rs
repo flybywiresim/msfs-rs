@@ -590,7 +590,8 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.data_definitions[&TypeId::of::<T>()];
         if define_id == self.dwDefineID {
-            Some(unsafe { &*(&self.dwData as *const sys::DWORD as *const T) })
+            // UB: creates unaligned reference
+            Some(unsafe { &*(std::ptr::addr_of!(self.dwData) as *const T) })
         } else {
             None
         }
@@ -607,7 +608,8 @@ impl sys::SIMCONNECT_RECV_CLIENT_DATA {
     pub fn into<T: ClientDataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.client_data_definitions[&TypeId::of::<T>()];
         if define_id == self._base.dwDefineID {
-            Some(unsafe { &*(&self._base.dwData as *const sys::DWORD as *const T) })
+            // UB: creates unaligned reference
+            Some(unsafe { &*(std::ptr::addr_of!(self._base.dwData) as *const T) })
         } else {
             None
         }
