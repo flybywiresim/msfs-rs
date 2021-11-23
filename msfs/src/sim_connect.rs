@@ -463,6 +463,51 @@ impl<'a> SimConnect<'a> {
         }
         Ok(())
     }
+
+    pub fn subscribe_to_system_event(
+        &mut self,
+        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        system_event_name: &str,
+    ) -> Result<()> {
+        let system_event_name = std::ffi::CString::new(system_event_name).unwrap();
+        unsafe {
+            map_err(sys::SimConnect_SubscribeToSystemEvent(
+                self.handle,
+                event_id,
+                system_event_name.as_ptr(),
+            ))?;
+        }
+        Ok(())
+    }
+
+    pub fn unsubscribe_from_system_event(
+        &mut self,
+        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_UnsubscribeFromSystemEvent(
+                self.handle,
+                event_id,
+            ))?;
+        }
+        Ok(())
+    }
+
+    pub fn set_system_event_state(
+        &mut self,
+        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
+        on: bool,
+    ) -> Result<()> {
+        let state = if on { 1 } else { 0 };
+        unsafe {
+            map_err(sys::SimConnect_SetSystemEventState(
+                self.handle,
+                event_id,
+                state,
+            ))?;
+        }
+        Ok(())
+    }
 }
 
 impl<'a> Drop for SimConnect<'a> {
