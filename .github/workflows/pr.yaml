@@ -1,0 +1,9 @@
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          docker run --rm -v "$(pwd)":/external ghcr.io/flybywiresim/dev-env:latest scripts/ci.sh
