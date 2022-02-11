@@ -227,7 +227,7 @@ impl Path {
     /// Angles are in radians.
     pub fn arc(&self, cx: f32, cy: f32, r: f32, a0: f32, a1: f32, dir: Direction) {
         unsafe {
-            sys::nvgArc(self.ctx, cx, cy, r, a0, a1, dir as i32);
+            sys::nvgArc(self.ctx, cx, cy, r, a0, a1, dir.to_sys() as _);
         }
     }
 
@@ -245,7 +245,7 @@ impl Path {
         dir: Direction,
     ) {
         unsafe {
-            sys::nvgEllipticalArc(self.ctx, cx, cy, rx, ry, a0, a1, dir as i32);
+            sys::nvgEllipticalArc(self.ctx, cx, cy, rx, ry, a0, a1, dir.to_sys() as _);
         }
     }
 
@@ -311,13 +311,21 @@ impl Path {
 }
 
 /// Winding direction
-#[derive(Debug)]
-#[repr(u32)]
+#[derive(Debug, Clone, Copy)]
 pub enum Direction {
     /// Winding for holes.
-    Clockwise = sys::NVGwinding_NVG_CW,
+    Clockwise,
     /// Winding for solid shapes.
-    CounterClockwise = sys::NVGwinding_NVG_CCW,
+    CounterClockwise,
+}
+
+impl Direction {
+    fn to_sys(self) -> sys::NVGwinding {
+        match self {
+            Direction::Clockwise => sys::NVGwinding_NVG_CW,
+            Direction::CounterClockwise => sys::NVGwinding_NVG_CCW,
+        }
+    }
 }
 
 #[derive(Debug)]
