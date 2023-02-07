@@ -279,7 +279,7 @@ impl<'a> SimConnect<'a> {
                 self.handle,
                 0,
                 event_id,
-                if mask { 1 } else { 0 },
+                mask.into(),
             ))?;
 
             map_err(sys::SimConnect_SetNotificationGroupPriority(
@@ -500,7 +500,7 @@ impl<'a> SimConnect<'a> {
         event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
         on: bool,
     ) -> Result<()> {
-        let state = if on { 1 } else { 0 };
+        let state = on.into();
         unsafe {
             map_err(sys::SimConnect_SetSystemEventState(
                 self.handle,
