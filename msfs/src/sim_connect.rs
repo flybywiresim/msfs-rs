@@ -522,7 +522,7 @@ impl<'a> Drop for SimConnect<'a> {
 
 macro_rules! recv {
     ($V:ident) => {
-        $V!{
+        $V! {
             (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EXCEPTION,
                 SIMCONNECT_RECV_EXCEPTION,
