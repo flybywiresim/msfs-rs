@@ -261,8 +261,7 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
 
         let ty = meta["type"].clone();
         array += &format!(
-            "  ({:?}, {:?}, {}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{}),\n",
-            name, unit, epsilon, ty
+            "  ({name:?}, {unit:?}, {epsilon}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{ty}),\n"
         );
     }
     array += "]";

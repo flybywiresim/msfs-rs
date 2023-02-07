@@ -45,10 +45,12 @@ fn map_err(result: sys::HRESULT) -> Result<()> {
     }
 }
 
+type SimConnectCallback<'a> = dyn FnMut(&mut SimConnect, SimConnectRecv) + 'a;
+
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect<'a> {
     handle: sys::HANDLE,
-    callback: Box<dyn FnMut(&mut SimConnect, SimConnectRecv) + 'a>,
+    callback: Box<SimConnectCallback<'a>>,
     data_definitions: HashMap<TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
     client_data_definitions: HashMap<TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID>,
     event_id_counter: sys::DWORD,
