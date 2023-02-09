@@ -7,10 +7,6 @@ use syn::{
     parse_macro_input, Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
 };
 
-mod sys {
-    include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-}
-
 /// Declare a standalone module.
 /// ```rs
 /// #[standalone_module]
@@ -253,24 +249,19 @@ pub fn sim_connect_data_definition(_args: TokenStream, item: TokenStream) -> Tok
         }),
     );
 
-    let simvars = sys::get_simvars();
-
     let mut array = String::from("&[\n");
     for meta in data {
         let name = meta["name"].clone();
-        let unit = meta.get("unit").unwrap_or_else(|| {
-            simvars
-                .get(&name)
-                .unwrap_or_else(|| panic!("{} needs a #[unit] decorator", name))
-        });
+        let unit = meta
+            .get("unit")
+            .unwrap_or_else(|| panic!("{} needs a #[unit] decorator", name));
 
         let fallback = "0.0".to_string();
         let epsilon = meta.get("epsilon").unwrap_or(&fallback);
 
         let ty = meta["type"].clone();
         array += &format!(
-            "  ({:?}, {:?}, {}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{}),\n",
-            name, unit, epsilon, ty
+            "  ({name:?}, {unit:?}, {epsilon}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{ty}),\n"
         );
     }
     array += "]";

@@ -45,10 +45,12 @@ fn map_err(result: sys::HRESULT) -> Result<()> {
     }
 }
 
+type SimConnectCallback<'a> = dyn FnMut(&mut SimConnect, SimConnectRecv) + 'a;
+
 /// A SimConnect session. This provides access to data within the MSFS sim.
 pub struct SimConnect<'a> {
     handle: sys::HANDLE,
-    callback: Box<dyn FnMut(&mut SimConnect, SimConnectRecv) + 'a>,
+    callback: Box<SimConnectCallback<'a>>,
     data_definitions: HashMap<TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
     client_data_definitions: HashMap<TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID>,
     event_id_counter: sys::DWORD,
@@ -277,7 +279,7 @@ impl<'a> SimConnect<'a> {
                 self.handle,
                 0,
                 event_id,
-                if mask { 1 } else { 0 },
+                mask.into(),
             ))?;
 
             map_err(sys::SimConnect_SetNotificationGroupPriority(
@@ -498,7 +500,7 @@ impl<'a> SimConnect<'a> {
         event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
         on: bool,
     ) -> Result<()> {
-        let state = if on { 1 } else { 0 };
+        let state = on.into();
         unsafe {
             map_err(sys::SimConnect_SetSystemEventState(
                 self.handle,
@@ -520,7 +522,7 @@ impl<'a> Drop for SimConnect<'a> {
 
 macro_rules! recv {
     ($V:ident) => {
-        $V!(
+        $V! {
             (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EXCEPTION,
                 SIMCONNECT_RECV_EXCEPTION,
@@ -556,7 +558,7 @@ macro_rules! recv {
                 SIMCONNECT_RECV_ASSIGNED_OBJECT_ID,
                 AssignedObjectId
             ),
-        );
+        }
     };
 }
 
