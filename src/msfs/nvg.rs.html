@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs&#x2F;src&#x2F;nvg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nvg.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../msfs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs/src/nvg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nvg.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../msfs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -458,169 +458,168 @@
 <span id="458">458</span>
 <span id="459">459</span>
 <span id="460">460</span>
-</pre><pre class="rust">
-<span class="doccomment">//! NanoVG is small antialiased vector graphics rendering library with a lean</span>
-<span class="doccomment">//! API modeled after the HTML5 Canvas API. It can be used to draw gauge</span>
-<span class="doccomment">//! instruments in MSFS. See `Gauge::create_nanovg`.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! NanoVG is small antialiased vector graphics rendering library with a lean
+//! API modeled after the HTML5 Canvas API. It can be used to draw gauge
+//! instruments in MSFS. See `Gauge::create_nanovg`.
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::sys</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::sys;
 
-<span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span><span class="prelude-ty">Result </span>= std::result::Result&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt;;
 
-<span class="doccomment">/// A NanoVG render context.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::NVGcontext</span>,
+<span class="doccomment">/// A NanoVG render context.
+</span><span class="kw">pub struct </span>Context {
+    ctx: <span class="kw-2">*mut </span>sys::NVGcontext,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Create a NanoVG render context from an `FsContext`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">fs_ctx</span>: <span class="ident">sys::FsContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uninit</span> <span class="op">=</span> <span class="ident">std::mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">sys::NVGparams</span><span class="op">&gt;</span><span class="ident">::zeroed</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">uninit</span>.<span class="ident">assume_init</span>() };
-        <span class="ident">params</span>.<span class="ident">userPtr</span> <span class="op">=</span> <span class="ident">fs_ctx</span>;
-        <span class="ident">params</span>.<span class="ident">edgeAntiAlias</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Create a NanoVG render context from an `FsContext`.
+    </span><span class="kw">pub fn </span>create(fs_ctx: sys::FsContext) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>uninit = std::mem::MaybeUninit::&lt;sys::NVGparams&gt;::zeroed();
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="kw">unsafe </span>{ uninit.assume_init() };
+        params.userPtr = fs_ctx;
+        params.edgeAntiAlias = <span class="number">1</span>;
 
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">sys::nvgCreateInternal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>) };
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">is_null</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span> { <span class="ident">ctx</span> })
+        <span class="kw">let </span>ctx = <span class="kw">unsafe </span>{ sys::nvgCreateInternal(<span class="kw-2">&amp;mut </span>params) };
+        <span class="kw">if </span>ctx.is_null() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(<span class="self">Self </span>{ ctx })
         }
     }
 
-    <span class="doccomment">/// Draw a frame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">draw_frame</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Frame</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">width</span>: <span class="ident">usize</span>, <span class="ident">height</span>: <span class="ident">usize</span>, <span class="ident">f</span>: <span class="ident">F</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgBeginFrame</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">width</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">height</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="number">1.0</span>);
+    <span class="doccomment">/// Draw a frame.
+    </span><span class="kw">pub fn </span>draw_frame&lt;F: Fn(<span class="kw-2">&amp;</span>Frame) -&gt; <span class="prelude-ty">Result</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, width: usize, height: usize, f: F) {
+        <span class="kw">unsafe </span>{
+            sys::nvgBeginFrame(<span class="self">self</span>.ctx, width <span class="kw">as </span>f32, height <span class="kw">as </span>f32, <span class="number">1.0</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">Frame</span> { <span class="ident">ctx</span>: <span class="self">self</span>.<span class="ident">ctx</span> };
+        <span class="kw">let </span>frame = Frame { ctx: <span class="self">self</span>.ctx };
 
-        <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">frame</span>) {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                <span class="ident">sys::nvgEndFrame</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+        <span class="kw">match </span>f(<span class="kw-2">&amp;</span>frame) {
+            <span class="prelude-val">Ok</span>(()) =&gt; <span class="kw">unsafe </span>{
+                sys::nvgEndFrame(<span class="self">self</span>.ctx);
             },
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                <span class="ident">sys::nvgCancelFrame</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe </span>{
+                sys::nvgCancelFrame(<span class="self">self</span>.ctx);
             },
         }
     }
 
-    <span class="doccomment">/// NanoVG allows you to load .ttf files and use the font to render text.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The appearance of the text can be defined by setting the current text style</span>
-    <span class="doccomment">/// and by specifying the fill color. Common text and font settings such as</span>
-    <span class="doccomment">/// font size, letter spacing and text align are supported. Font blur allows you</span>
-    <span class="doccomment">/// to create simple text effects such as drop shadows.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// At render time the font face can be set based on the font handles or name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Font measure functions return values in local space, the calculations are</span>
-    <span class="doccomment">/// carried in the same resolution as the final rendering. This is done because</span>
-    <span class="doccomment">/// the text glyph positions are snapped to the nearest pixels sharp rendering.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The local space means that values are not rotated or scale as per the current</span>
-    <span class="doccomment">/// transformation. For example if you set font size to 12, which would mean that</span>
-    <span class="doccomment">/// line height is 16, then regardless of the current scaling and rotation, the</span>
-    <span class="doccomment">/// returned line height is always 16. Some measures may vary because of the scaling</span>
-    <span class="doccomment">/// since aforementioned pixel snapping.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// While this may sound a little odd, the setup allows you to always render the</span>
-    <span class="doccomment">/// same way regardless of scaling.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: currently only solid color fill is supported for text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_font</span>(
+    <span class="doccomment">/// NanoVG allows you to load .ttf files and use the font to render text.
+    ///
+    /// The appearance of the text can be defined by setting the current text style
+    /// and by specifying the fill color. Common text and font settings such as
+    /// font size, letter spacing and text align are supported. Font blur allows you
+    /// to create simple text effects such as drop shadows.
+    ///
+    /// At render time the font face can be set based on the font handles or name.
+    ///
+    /// Font measure functions return values in local space, the calculations are
+    /// carried in the same resolution as the final rendering. This is done because
+    /// the text glyph positions are snapped to the nearest pixels sharp rendering.
+    ///
+    /// The local space means that values are not rotated or scale as per the current
+    /// transformation. For example if you set font size to 12, which would mean that
+    /// line height is 16, then regardless of the current scaling and rotation, the
+    /// returned line height is always 16. Some measures may vary because of the scaling
+    /// since aforementioned pixel snapping.
+    ///
+    /// While this may sound a little odd, the setup allows you to always render the
+    /// same way regardless of scaling.
+    ///
+    /// Note: currently only solid color fill is supported for text.
+    </span><span class="kw">pub fn </span>create_font(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">filename</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Font</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">filename</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">sys::nvgCreateFont</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="ident">filename</span>.<span class="ident">as_ptr</span>()) };
-        <span class="kw">match</span> <span class="ident">handle</span> {
-            <span class="op">-</span><span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">std::io::Error::new</span>(
-                <span class="ident">std::io::ErrorKind::Other</span>,
+        name: <span class="kw-2">&amp;</span>str,
+        filename: <span class="kw-2">&amp;</span>str,
+    ) -&gt; std::result::Result&lt;Font, Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+        <span class="kw">let </span>name = std::ffi::CString::new(name).unwrap();
+        <span class="kw">let </span>filename = std::ffi::CString::new(filename).unwrap();
+        <span class="kw">let </span>handle = <span class="kw">unsafe </span>{ sys::nvgCreateFont(<span class="self">self</span>.ctx, name.as_ptr(), filename.as_ptr()) };
+        <span class="kw">match </span>handle {
+            -<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
                 <span class="string">&quot;unable to load font&quot;</span>,
             ))),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Font</span> { <span class="ident">handle</span> }),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Font { handle }),
         }
     }
 
-    <span class="doccomment">/// NanoVG allows you to load jpg, png, psd, tga, pic and gif files to be used for rendering.</span>
-    <span class="doccomment">/// In addition you can upload your own image. The image loading is provided by stb_image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_image</span>(
+    <span class="doccomment">/// NanoVG allows you to load jpg, png, psd, tga, pic and gif files to be used for rendering.
+    /// In addition you can upload your own image. The image loading is provided by stb_image.
+    </span><span class="kw">pub fn </span>create_image(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filename</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Image</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">filename</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">sys::nvgCreateImage</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">filename</span>.<span class="ident">as_ptr</span>(), <span class="number">0</span>) };
-        <span class="kw">match</span> <span class="ident">handle</span> {
-            <span class="op">-</span><span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">std::io::Error::new</span>(
-                <span class="ident">std::io::ErrorKind::Other</span>,
+        filename: <span class="kw-2">&amp;</span>str,
+    ) -&gt; std::result::Result&lt;Image, Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+        <span class="kw">let </span>filename = std::ffi::CString::new(filename).unwrap();
+        <span class="kw">let </span>handle = <span class="kw">unsafe </span>{ sys::nvgCreateImage(<span class="self">self</span>.ctx, filename.as_ptr(), <span class="number">0</span>) };
+        <span class="kw">match </span>handle {
+            -<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
                 <span class="string">&quot;unable to load image&quot;</span>,
             ))),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Image</span> {
-                <span class="ident">ctx</span>: <span class="self">self</span>.<span class="ident">ctx</span>,
-                <span class="ident">handle</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Image {
+                ctx: <span class="self">self</span>.ctx,
+                handle,
             }),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgDeleteInternal</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>Context {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            sys::nvgDeleteInternal(<span class="self">self</span>.ctx);
         }
     }
 }
 
-<span class="doccomment">/// Methods to draw on a frame. See `Context::draw_frame`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Frame</span> {
-    <span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::NVGcontext</span>,
+<span class="doccomment">/// Methods to draw on a frame. See `Context::draw_frame`.
+</span><span class="kw">pub struct </span>Frame {
+    ctx: <span class="kw-2">*mut </span>sys::NVGcontext,
 }
 
-<span class="kw">impl</span> <span class="ident">Frame</span> {
-    <span class="doccomment">/// Draw a path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">draw_path</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// sys::nvgSave(self.ctx);</span>
-            <span class="comment">// sys::nvgReset(self.ctx);</span>
-            <span class="ident">sys::nvgBeginPath</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+<span class="kw">impl </span>Frame {
+    <span class="doccomment">/// Draw a path.
+    </span><span class="kw">pub fn </span>draw_path&lt;F: Fn(<span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Result</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, style: <span class="kw-2">&amp;</span>Style, f: F) -&gt; <span class="prelude-ty">Result </span>{
+        <span class="kw">unsafe </span>{
+            <span class="comment">// sys::nvgSave(self.ctx);
+            // sys::nvgReset(self.ctx);
+            </span>sys::nvgBeginPath(<span class="self">self</span>.ctx);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stroke</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">style</span>.<span class="ident">stroke</span> {
-            <span class="kw">match</span> <span class="ident">stroke</span> {
-                <span class="ident">PaintOrColor::Paint</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys::nvgStrokePaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(stroke) = <span class="kw-2">&amp;</span>style.stroke {
+            <span class="kw">match </span>stroke {
+                PaintOrColor::Paint(p) =&gt; <span class="kw">unsafe </span>{
+                    sys::nvgStrokePaint(<span class="self">self</span>.ctx, <span class="kw-2">&amp;</span>p.<span class="number">0</span>);
                 },
-                <span class="ident">PaintOrColor::Color</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys::nvgStrokeColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="number">0</span>);
+                PaintOrColor::Color(c) =&gt; <span class="kw">unsafe </span>{
+                    sys::nvgStrokeColor(<span class="self">self</span>.ctx, <span class="kw-2">&amp;</span>c.<span class="number">0</span>);
                 },
             }
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fill</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">style</span>.<span class="ident">fill</span> {
-            <span class="kw">match</span> <span class="ident">fill</span> {
-                <span class="ident">PaintOrColor::Paint</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys::nvgFillPaint</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fill) = <span class="kw-2">&amp;</span>style.fill {
+            <span class="kw">match </span>fill {
+                PaintOrColor::Paint(p) =&gt; <span class="kw">unsafe </span>{
+                    sys::nvgFillPaint(<span class="self">self</span>.ctx, <span class="kw-2">&amp;</span>p.<span class="number">0</span>);
                 },
-                <span class="ident">PaintOrColor::Color</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
-                    <span class="ident">sys::nvgFillColor</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="number">0</span>);
+                PaintOrColor::Color(c) =&gt; <span class="kw">unsafe </span>{
+                    sys::nvgFillColor(<span class="self">self</span>.ctx, <span class="kw-2">&amp;</span>c.<span class="number">0</span>);
                 },
             }
         }
 
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span> { <span class="ident">ctx</span>: <span class="self">self</span>.<span class="ident">ctx</span> };
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>);
+        <span class="kw">let </span>path = Path { ctx: <span class="self">self</span>.ctx };
+        <span class="kw">let </span>r = f(<span class="kw-2">&amp;</span>path);
 
-        <span class="kw">if</span> <span class="ident">style</span>.<span class="ident">stroke</span>.<span class="ident">is_some</span>() {
-            <span class="kw">unsafe</span> {
-                <span class="ident">sys::nvgStroke</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+        <span class="kw">if </span>style.stroke.is_some() {
+            <span class="kw">unsafe </span>{
+                sys::nvgStroke(<span class="self">self</span>.ctx);
             }
         }
-        <span class="kw">if</span> <span class="ident">style</span>.<span class="ident">fill</span>.<span class="ident">is_some</span>() {
-            <span class="kw">unsafe</span> {
-                <span class="ident">sys::nvgFill</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+        <span class="kw">if </span>style.fill.is_some() {
+            <span class="kw">unsafe </span>{
+                sys::nvgFill(<span class="self">self</span>.ctx);
             }
         }
 
@@ -628,298 +627,296 @@
         unsafe {
             sys::nvgRestore(self.ctx);
         }
-        */</span>
+        */
 
-        <span class="ident">r</span>
+        </span>r
     }
 }
 
-<span class="doccomment">/// A path.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Path</span> {
-    <span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::NVGcontext</span>,
+<span class="doccomment">/// A path.
+</span><span class="kw">pub struct </span>Path {
+    ctx: <span class="kw-2">*mut </span>sys::NVGcontext,
 }
 
-<span class="kw">impl</span> <span class="ident">Path</span> {
-    <span class="doccomment">/// Starts new sub-path with specified point as first point.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgMoveTo</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+<span class="kw">impl </span>Path {
+    <span class="doccomment">/// Starts new sub-path with specified point as first point.
+    </span><span class="kw">pub fn </span>move_to(<span class="kw-2">&amp;</span><span class="self">self</span>, x: f32, y: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgMoveTo(<span class="self">self</span>.ctx, x, y);
         }
     }
 
-    <span class="doccomment">/// Adds line segment from the last point in the path to the specified point.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgLineTo</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="doccomment">/// Adds line segment from the last point in the path to the specified point.
+    </span><span class="kw">pub fn </span>line_to(<span class="kw-2">&amp;</span><span class="self">self</span>, x: f32, y: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgLineTo(<span class="self">self</span>.ctx, x, y);
         }
     }
 
-    <span class="doccomment">/// Adds cubic bezier segment from last point in the path via two control points to the specified point.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bezier_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c1x</span>: <span class="ident">f32</span>, <span class="ident">c1y</span>: <span class="ident">f32</span>, <span class="ident">c2x</span>: <span class="ident">f32</span>, <span class="ident">c2y</span>: <span class="ident">f32</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgBezierTo</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">c1x</span>, <span class="ident">c1y</span>, <span class="ident">c2x</span>, <span class="ident">c2y</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="doccomment">/// Adds cubic bezier segment from last point in the path via two control points to the specified point.
+    </span><span class="kw">pub fn </span>bezier_to(<span class="kw-2">&amp;</span><span class="self">self</span>, c1x: f32, c1y: f32, c2x: f32, c2y: f32, x: f32, y: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgBezierTo(<span class="self">self</span>.ctx, c1x, c1y, c2x, c2y, x, y);
         }
     }
 
-    <span class="doccomment">/// Adds quadratic bezier segment from last point in the path via a control point to the</span>
-    <span class="doccomment">/// specified point.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">f32</span>, <span class="ident">cy</span>: <span class="ident">f32</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgQuadTo</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="doccomment">/// Adds quadratic bezier segment from last point in the path via a control point to the
+    /// specified point.
+    </span><span class="kw">pub fn </span>quad_to(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: f32, cy: f32, x: f32, y: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgQuadTo(<span class="self">self</span>.ctx, cx, cy, x, y);
         }
     }
 
-    <span class="doccomment">/// Adds an arc segment at the corner defined by the last path point, and two specified points.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arc_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x1</span>: <span class="ident">f32</span>, <span class="ident">y1</span>: <span class="ident">f32</span>, <span class="ident">x2</span>: <span class="ident">f32</span>, <span class="ident">y2</span>: <span class="ident">f32</span>, <span class="ident">radius</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgArcTo</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">x1</span>, <span class="ident">y1</span>, <span class="ident">x2</span>, <span class="ident">y2</span>, <span class="ident">radius</span>);
+    <span class="doccomment">/// Adds an arc segment at the corner defined by the last path point, and two specified points.
+    </span><span class="kw">pub fn </span>arc_to(<span class="kw-2">&amp;</span><span class="self">self</span>, x1: f32, y1: f32, x2: f32, y2: f32, radius: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgArcTo(<span class="self">self</span>.ctx, x1, y1, x2, y2, radius);
         }
     }
 
-    <span class="doccomment">/// Closes current sub-path with a line segment.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgClosePath</span>(<span class="self">self</span>.<span class="ident">ctx</span>);
+    <span class="doccomment">/// Closes current sub-path with a line segment.
+    </span><span class="kw">pub fn </span>close_path(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            sys::nvgClosePath(<span class="self">self</span>.ctx);
         }
     }
 
-    <span class="doccomment">/// Creates a new circle arc shaped sub-path. The arc center is at (`cx`,`cy`), the arc radius</span>
-    <span class="doccomment">/// is `r`, and the arc is drawn from angle `a0` to `a1`, and swept in direction `dir`.</span>
-    <span class="doccomment">/// Angles are in radians.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">f32</span>, <span class="ident">cy</span>: <span class="ident">f32</span>, <span class="ident">r</span>: <span class="ident">f32</span>, <span class="ident">a0</span>: <span class="ident">f32</span>, <span class="ident">a1</span>: <span class="ident">f32</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgArc</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">r</span>, <span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">dir</span>.<span class="ident">to_sys</span>() <span class="kw">as</span> <span class="kw">_</span>);
+    <span class="doccomment">/// Creates a new circle arc shaped sub-path. The arc center is at (`cx`,`cy`), the arc radius
+    /// is `r`, and the arc is drawn from angle `a0` to `a1`, and swept in direction `dir`.
+    /// Angles are in radians.
+    </span><span class="kw">pub fn </span>arc(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: f32, cy: f32, r: f32, a0: f32, a1: f32, dir: Direction) {
+        <span class="kw">unsafe </span>{
+            sys::nvgArc(<span class="self">self</span>.ctx, cx, cy, r, a0, a1, dir.to_sys() <span class="kw">as _</span>);
         }
     }
 
-    <span class="doccomment">/// Creates a new oval arc shaped sub-path. The arc center is at (`cx`, `cy`), the arc radius</span>
-    <span class="doccomment">/// is (`rx`, `ry`), and the arc is draw from angle a0 to a1, and swept in direction `dir`.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">elliptical_arc</span>(
+    <span class="doccomment">/// Creates a new oval arc shaped sub-path. The arc center is at (`cx`, `cy`), the arc radius
+    /// is (`rx`, `ry`), and the arc is draw from angle a0 to a1, and swept in direction `dir`.
+    </span><span class="attribute">#[allow(clippy::too_many_arguments)]
+    </span><span class="kw">pub fn </span>elliptical_arc(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="ident">f32</span>,
-        <span class="ident">cy</span>: <span class="ident">f32</span>,
-        <span class="ident">rx</span>: <span class="ident">f32</span>,
-        <span class="ident">ry</span>: <span class="ident">f32</span>,
-        <span class="ident">a0</span>: <span class="ident">f32</span>,
-        <span class="ident">a1</span>: <span class="ident">f32</span>,
-        <span class="ident">dir</span>: <span class="ident">Direction</span>,
+        cx: f32,
+        cy: f32,
+        rx: f32,
+        ry: f32,
+        a0: f32,
+        a1: f32,
+        dir: Direction,
     ) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgEllipticalArc</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">rx</span>, <span class="ident">ry</span>, <span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">dir</span>.<span class="ident">to_sys</span>() <span class="kw">as</span> <span class="kw">_</span>);
+        <span class="kw">unsafe </span>{
+            sys::nvgEllipticalArc(<span class="self">self</span>.ctx, cx, cy, rx, ry, a0, a1, dir.to_sys() <span class="kw">as _</span>);
         }
     }
 
-    <span class="doccomment">/// Creates new rectangle shaped sub-path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>, <span class="ident">w</span>: <span class="ident">f32</span>, <span class="ident">h</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgRect</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">w</span>, <span class="ident">h</span>);
+    <span class="doccomment">/// Creates new rectangle shaped sub-path.
+    </span><span class="kw">pub fn </span>rect(<span class="kw-2">&amp;</span><span class="self">self</span>, x: f32, y: f32, w: f32, h: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgRect(<span class="self">self</span>.ctx, x, y, w, h);
         }
     }
 
-    <span class="doccomment">/// Creates a new rounded rectangle sub-path with rounded corners</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rounded_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>, <span class="ident">w</span>: <span class="ident">f32</span>, <span class="ident">h</span>: <span class="ident">f32</span>, <span class="ident">r</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgRoundedRect</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">w</span>, <span class="ident">h</span>, <span class="ident">r</span>);
+    <span class="doccomment">/// Creates a new rounded rectangle sub-path with rounded corners
+    </span><span class="attribute">#[allow(clippy::many_single_char_names)]
+    </span><span class="kw">pub fn </span>rounded_rect(<span class="kw-2">&amp;</span><span class="self">self</span>, x: f32, y: f32, w: f32, h: f32, r: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgRoundedRect(<span class="self">self</span>.ctx, x, y, w, h, r);
         }
     }
 
-    <span class="doccomment">/// Creates new rounded rectangle shaped sub-path with varying radii for each corner.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rounded_rect_varying</span>(
+    <span class="doccomment">/// Creates new rounded rectangle shaped sub-path with varying radii for each corner.
+    </span><span class="attribute">#[allow(clippy::too_many_arguments)]
+    #[allow(clippy::many_single_char_names)]
+    </span><span class="kw">pub fn </span>rounded_rect_varying(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">x</span>: <span class="ident">f32</span>,
-        <span class="ident">y</span>: <span class="ident">f32</span>,
-        <span class="ident">w</span>: <span class="ident">f32</span>,
-        <span class="ident">h</span>: <span class="ident">f32</span>,
-        <span class="ident">rad_top_left</span>: <span class="ident">f32</span>,
-        <span class="ident">rad_top_right</span>: <span class="ident">f32</span>,
-        <span class="ident">rad_bottom_right</span>: <span class="ident">f32</span>,
-        <span class="ident">rad_bottom_left</span>: <span class="ident">f32</span>,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        rad_top_left: f32,
+        rad_top_right: f32,
+        rad_bottom_right: f32,
+        rad_bottom_left: f32,
     ) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgRoundedRectVarying</span>(
-                <span class="self">self</span>.<span class="ident">ctx</span>,
-                <span class="ident">x</span>,
-                <span class="ident">y</span>,
-                <span class="ident">w</span>,
-                <span class="ident">h</span>,
-                <span class="ident">rad_top_left</span>,
-                <span class="ident">rad_top_right</span>,
-                <span class="ident">rad_bottom_right</span>,
-                <span class="ident">rad_bottom_left</span>,
+        <span class="kw">unsafe </span>{
+            sys::nvgRoundedRectVarying(
+                <span class="self">self</span>.ctx,
+                x,
+                y,
+                w,
+                h,
+                rad_top_left,
+                rad_top_right,
+                rad_bottom_right,
+                rad_bottom_left,
             );
         }
     }
 
-    <span class="doccomment">/// Creates a new ellipse shaped sub-path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ellipse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">f32</span>, <span class="ident">cy</span>: <span class="ident">f32</span>, <span class="ident">rx</span>: <span class="ident">f32</span>, <span class="ident">ry</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgEllipse</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">rx</span>, <span class="ident">ry</span>);
+    <span class="doccomment">/// Creates a new ellipse shaped sub-path.
+    </span><span class="kw">pub fn </span>ellipse(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: f32, cy: f32, rx: f32, ry: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgEllipse(<span class="self">self</span>.ctx, cx, cy, rx, ry);
         }
     }
 
-    <span class="doccomment">/// Creates a new circle shaped path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">f32</span>, <span class="ident">cy</span>: <span class="ident">f32</span>, <span class="ident">r</span>: <span class="ident">f32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgCircle</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">r</span>);
+    <span class="doccomment">/// Creates a new circle shaped path.
+    </span><span class="kw">pub fn </span>circle(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: f32, cy: f32, r: f32) {
+        <span class="kw">unsafe </span>{
+            sys::nvgCircle(<span class="self">self</span>.ctx, cx, cy, r);
         }
     }
 
-    <span class="comment">// TODO: fill</span>
+    <span class="comment">// TODO: fill
+</span>}
+
+<span class="doccomment">/// Winding direction
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub enum </span>Direction {
+    <span class="doccomment">/// Winding for holes.
+    </span>Clockwise,
+    <span class="doccomment">/// Winding for solid shapes.
+    </span>CounterClockwise,
 }
 
-<span class="doccomment">/// Winding direction</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Direction</span> {
-    <span class="doccomment">/// Winding for holes.</span>
-    <span class="ident">Clockwise</span>,
-    <span class="doccomment">/// Winding for solid shapes.</span>
-    <span class="ident">CounterClockwise</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Direction</span> {
-    <span class="kw">fn</span> <span class="ident">to_sys</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::NVGwinding</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Direction::Clockwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::NVGwinding_NVG_CW</span>,
-            <span class="ident">Direction::CounterClockwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::NVGwinding_NVG_CCW</span>,
+<span class="kw">impl </span>Direction {
+    <span class="kw">fn </span>to_sys(<span class="self">self</span>) -&gt; sys::NVGwinding {
+        <span class="kw">match </span><span class="self">self </span>{
+            Direction::Clockwise =&gt; sys::NVGwinding_NVG_CW,
+            Direction::CounterClockwise =&gt; sys::NVGwinding_NVG_CCW,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PaintOrColor</span> {
-    <span class="ident">Paint</span>(<span class="ident">Paint</span>),
-    <span class="ident">Color</span>(<span class="ident">Color</span>),
+<span class="attribute">#[derive(Debug)]
+#[doc(hidden)]
+</span><span class="kw">pub enum </span>PaintOrColor {
+    Paint(Paint),
+    Color(Color),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Paint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PaintOrColor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">p</span>: <span class="ident">Paint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PaintOrColor</span> {
-        <span class="ident">PaintOrColor::Paint</span>(<span class="ident">p</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Color</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PaintOrColor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="ident">Color</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PaintOrColor</span> {
-        <span class="ident">PaintOrColor::Color</span>(<span class="ident">c</span>)
+<span class="kw">impl </span>From&lt;Paint&gt; <span class="kw">for </span>PaintOrColor {
+    <span class="kw">fn </span>from(p: Paint) -&gt; PaintOrColor {
+        PaintOrColor::Paint(p)
     }
 }
 
-<span class="doccomment">/// The stroke and/or fill which will be applied to a path.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Style</span> {
-    <span class="ident">stroke</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span>,
-    <span class="ident">fill</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Style</span> {
-    <span class="doccomment">/// Set the stroke of this style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stroke</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stroke</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">stroke</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">stroke</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the fill of this style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PaintOrColor</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fill</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fill</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">fill</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
+<span class="kw">impl </span>From&lt;Color&gt; <span class="kw">for </span>PaintOrColor {
+    <span class="kw">fn </span>from(c: Color) -&gt; PaintOrColor {
+        PaintOrColor::Color(c)
     }
 }
 
-<span class="doccomment">/// Colors in NanoVG are stored as unsigned ints in ABGR format.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Color</span>(<span class="ident">sys::NVGcolor</span>);
+<span class="doccomment">/// The stroke and/or fill which will be applied to a path.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>Style {
+    stroke: <span class="prelude-ty">Option</span>&lt;PaintOrColor&gt;,
+    fill: <span class="prelude-ty">Option</span>&lt;PaintOrColor&gt;,
+}
 
-<span class="kw">impl</span> <span class="ident">Color</span> {
-    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 255 (1.0).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rgb</span>(<span class="ident">r</span>: <span class="ident">u8</span>, <span class="ident">g</span>: <span class="ident">u8</span>, <span class="ident">b</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgRGB</span>(<span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>) })
+<span class="kw">impl </span>Style {
+    <span class="doccomment">/// Set the stroke of this style.
+    </span><span class="kw">pub fn </span>stroke&lt;T: Into&lt;PaintOrColor&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, stroke: T) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.stroke = <span class="prelude-val">Some</span>(stroke.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the fill of this style.
+    </span><span class="kw">pub fn </span>fill&lt;T: Into&lt;PaintOrColor&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fill: T) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fill = <span class="prelude-val">Some</span>(fill.into());
+        <span class="self">self
+    </span>}
+}
+
+<span class="doccomment">/// Colors in NanoVG are stored as unsigned ints in ABGR format.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Color(sys::NVGcolor);
+
+<span class="kw">impl </span>Color {
+    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 255 (1.0).
+    </span><span class="kw">pub fn </span>from_rgb(r: u8, g: u8, b: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgRGB(r, g, b) })
     }
 
-    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rgbf</span>(<span class="ident">r</span>: <span class="ident">f32</span>, <span class="ident">g</span>: <span class="ident">f32</span>, <span class="ident">b</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgRGBf</span>(<span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>) })
+    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
+    </span><span class="kw">pub fn </span>from_rgbf(r: f32, g: f32, b: f32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgRGBf(r, g, b) })
     }
 
-    <span class="doccomment">/// Returns a color value from red, green, blue and alpha values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rgba</span>(<span class="ident">r</span>: <span class="ident">u8</span>, <span class="ident">g</span>: <span class="ident">u8</span>, <span class="ident">b</span>: <span class="ident">u8</span>, <span class="ident">a</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgRGBA</span>(<span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>, <span class="ident">a</span>) })
+    <span class="doccomment">/// Returns a color value from red, green, blue and alpha values.
+    </span><span class="kw">pub fn </span>from_rgba(r: u8, g: u8, b: u8, a: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgRGBA(r, g, b, a) })
     }
 
-    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rgbaf</span>(<span class="ident">r</span>: <span class="ident">f32</span>, <span class="ident">g</span>: <span class="ident">f32</span>, <span class="ident">b</span>: <span class="ident">f32</span>, <span class="ident">a</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgRGBAf</span>(<span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>, <span class="ident">a</span>) })
+    <span class="doccomment">/// Returns a color value from red, green, blue values. Alpha will be set to 1.0f.
+    </span><span class="kw">pub fn </span>from_rgbaf(r: f32, g: f32, b: f32, a: f32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgRGBAf(r, g, b, a) })
     }
 
-    <span class="doccomment">/// Returns color value specified by hue, saturation and lightness.</span>
-    <span class="doccomment">/// HSL values are all in range [0..1], alpha will be set to 255.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hsv</span>(<span class="ident">h</span>: <span class="ident">f32</span>, <span class="ident">s</span>: <span class="ident">f32</span>, <span class="ident">l</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgHSL</span>(<span class="ident">h</span>, <span class="ident">s</span>, <span class="ident">l</span>) })
+    <span class="doccomment">/// Returns color value specified by hue, saturation and lightness.
+    /// HSL values are all in range [0..1], alpha will be set to 255.
+    </span><span class="kw">pub fn </span>from_hsv(h: f32, s: f32, l: f32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgHSL(h, s, l) })
     }
 
-    <span class="doccomment">/// Returns color value specified by hue, saturation and lightness.</span>
-    <span class="doccomment">/// HSL values are all in range [0..1], alpha will be set to 255.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hsva</span>(<span class="ident">h</span>: <span class="ident">f32</span>, <span class="ident">s</span>: <span class="ident">f32</span>, <span class="ident">l</span>: <span class="ident">f32</span>, <span class="ident">a</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgHSLA</span>(<span class="ident">h</span>, <span class="ident">s</span>, <span class="ident">l</span>, <span class="ident">a</span>) })
+    <span class="doccomment">/// Returns color value specified by hue, saturation and lightness.
+    /// HSL values are all in range [0..1], alpha will be set to 255.
+    </span><span class="kw">pub fn </span>from_hsva(h: f32, s: f32, l: f32, a: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="kw">unsafe </span>{ sys::nvgHSLA(h, s, l, a) })
     }
 }
 
-<span class="doccomment">/// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.</span>
-<span class="doccomment">/// These can be used as paints for strokes and fills.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Paint</span>(<span class="ident">sys::NVGpaint</span>);
+<span class="doccomment">/// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.
+/// These can be used as paints for strokes and fills.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Paint(sys::NVGpaint);
 
-<span class="kw">impl</span> <span class="ident">Paint</span> {
-    <span class="doccomment">/// Creates and returns an image pattern. Parameters (`x`, `y`) specify the left-top location of the image pattern,</span>
-    <span class="doccomment">/// (`w`, `h`) is the size of the image, `angle` is the rotation around the top-left corner, and `image` is the image</span>
-    <span class="doccomment">/// to render.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_image</span>(
-        <span class="ident">image</span>: <span class="kw-2">&amp;</span><span class="ident">Image</span>,
-        <span class="ident">x</span>: <span class="ident">f32</span>,
-        <span class="ident">y</span>: <span class="ident">f32</span>,
-        <span class="ident">w</span>: <span class="ident">f32</span>,
-        <span class="ident">h</span>: <span class="ident">f32</span>,
-        <span class="ident">angle</span>: <span class="ident">f32</span>,
-        <span class="ident">alpha</span>: <span class="ident">f32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Paint</span> {
-        <span class="ident">Paint</span>(<span class="kw">unsafe</span> { <span class="ident">sys::nvgImagePattern</span>(<span class="ident">image</span>.<span class="ident">ctx</span>, <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">w</span>, <span class="ident">h</span>, <span class="ident">angle</span>, <span class="ident">image</span>.<span class="ident">handle</span>, <span class="ident">alpha</span>) })
+<span class="kw">impl </span>Paint {
+    <span class="doccomment">/// Creates and returns an image pattern. Parameters (`x`, `y`) specify the left-top location of the image pattern,
+    /// (`w`, `h`) is the size of the image, `angle` is the rotation around the top-left corner, and `image` is the image
+    /// to render.
+    </span><span class="kw">pub fn </span>from_image(
+        image: <span class="kw-2">&amp;</span>Image,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        angle: f32,
+        alpha: f32,
+    ) -&gt; Paint {
+        Paint(<span class="kw">unsafe </span>{ sys::nvgImagePattern(image.ctx, x, y, w, h, angle, image.handle, alpha) })
     }
 }
 
-<span class="doccomment">/// A font handle.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Font</span> {
-    <span class="ident">handle</span>: <span class="ident">std::os::raw::c_int</span>,
+<span class="doccomment">/// A font handle.
+</span><span class="kw">pub struct </span>Font {
+    handle: std::os::raw::c_int,
 }
 
-<span class="doccomment">/// An image handle.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Image</span> {
-    <span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys::NVGcontext</span>,
-    <span class="ident">handle</span>: <span class="ident">std::os::raw::c_int</span>,
+<span class="doccomment">/// An image handle.
+</span><span class="kw">pub struct </span>Image {
+    ctx: <span class="kw-2">*mut </span>sys::NVGcontext,
+    handle: std::os::raw::c_int,
 }
 
-<span class="kw">impl</span> <span class="ident">Image</span> {
-    <span class="doccomment">/// Returns the dimensions of a created image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">w</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgImageSize</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">handle</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">h</span>);
+<span class="kw">impl </span>Image {
+    <span class="doccomment">/// Returns the dimensions of a created image.
+    </span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize) {
+        <span class="kw">let </span><span class="kw-2">mut </span>w = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>h = <span class="number">0</span>;
+        <span class="kw">unsafe </span>{
+            sys::nvgImageSize(<span class="self">self</span>.ctx, <span class="self">self</span>.handle, <span class="kw-2">&amp;mut </span>w, <span class="kw-2">&amp;mut </span>h);
         }
-        (<span class="ident">w</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">h</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        (w <span class="kw">as </span>usize, h <span class="kw">as </span>usize)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Image</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sys::nvgDeleteImage</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">handle</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>Image {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            sys::nvgDeleteImage(<span class="self">self</span>.ctx, <span class="self">self</span>.handle);
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

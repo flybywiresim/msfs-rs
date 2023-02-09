@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs_derive&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../msfs_derive/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs_derive/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../msfs_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../msfs_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../msfs_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -327,330 +327,311 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-</pre><pre class="rust">
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse</span>::{<span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">SynResult</span>},
-    <span class="ident">parse_macro_input</span>, <span class="ident">Expr</span>, <span class="ident">Ident</span>, <span class="ident">ItemFn</span>, <span class="ident">ItemStruct</span>, <span class="ident">Lit</span>, <span class="ident">Meta</span>, <span class="ident">Token</span>, <span class="ident">Type</span>,
+</pre><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
+<span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>quote::{format_ident, quote};
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>syn::{
+    parse::{Parse, ParseStream, <span class="prelude-ty">Result </span><span class="kw">as </span>SynResult},
+    parse_macro_input, Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
 };
 
-<span class="kw">mod</span> <span class="ident">sys</span> {
-    <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/bindings.rs&quot;</span>));
-}
+<span class="doccomment">/// Declare a standalone module.
+/// ```rs
+/// #[standalone_module]
+/// async fn module(mut module: msfs::StandaloneModule) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+///   while let Some(event) = module.next_event().await {
+///     // ...
+///   }
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>standalone_module(_args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>input = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>ItemFn);
 
-<span class="doccomment">/// Declare a standalone module.</span>
-<span class="doccomment">/// ```rs</span>
-<span class="doccomment">/// #[standalone_module]</span>
-<span class="doccomment">/// async fn module(mut module: msfs::StandaloneModule) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">///   while let Some(event) = module.next_event().await {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">standalone_module</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
-
-    <span class="kw">let</span> <span class="ident">rusty_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">executor_name</span> <span class="op">=</span> <span class="macro">format_ident!</span>(
+    <span class="kw">let </span>rusty_name = input.sig.ident.clone();
+    <span class="kw">let </span>executor_name = <span class="macro">format_ident!</span>(
         <span class="string">&quot;{}_executor_do_not_use_or_you_will_be_fired&quot;</span>,
-        <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>
+        input.sig.ident
     );
 
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        #<span class="ident">input</span>
+    <span class="kw">let </span>output = <span class="macro">quote! </span>{
+        #input
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
-        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: <span class="ident">::msfs::StandaloneModuleExecutor</span> <span class="op">=</span> <span class="ident">::msfs::StandaloneModuleExecutor</span> {
-            <span class="ident">executor</span>: <span class="ident">::msfs::executor::Executor</span> {
-                <span class="ident">handle</span>: <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">std::boxed::Box::pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">m</span>)),
-                <span class="ident">future</span>: <span class="prelude-val">None</span>,
-                <span class="ident">tx</span>: <span class="prelude-val">None</span>,
+        <span class="attribute">#[allow(non_upper_case_globals)]
+        </span><span class="kw">static </span><span class="kw-2">mut </span>#executor_name: ::msfs::StandaloneModuleExecutor = ::msfs::StandaloneModuleExecutor {
+            executor: ::msfs::executor::Executor {
+                handle: |m| std::boxed::Box::pin(#rusty_name(m)),
+                future: <span class="prelude-val">None</span>,
+                tx: <span class="prelude-val">None</span>,
             },
         };
 
-        <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_init</span>() {
-            <span class="kw">unsafe</span> {
-                #<span class="ident">executor_name</span>.<span class="ident">handle_init</span>();
+        <span class="attribute">#[no_mangle]
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>module_init() {
+            <span class="kw">unsafe </span>{
+                #executor_name.handle_init();
             }
         }
 
-        <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">module_deinit</span>() {
-            <span class="kw">unsafe</span> {
-                #<span class="ident">executor_name</span>.<span class="ident">handle_deinit</span>();
+        <span class="attribute">#[no_mangle]
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>module_deinit() {
+            <span class="kw">unsafe </span>{
+                #executor_name.handle_deinit();
             }
         }
     };
 
-    <span class="ident">TokenStream::from</span>(<span class="ident">output</span>)
+    TokenStream::from(output)
 }
 
-<span class="kw">struct</span> <span class="ident">GaugeArgs</span> {
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>GaugeArgs {
+    name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">GaugeArgs</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SynResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;name&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">=</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">GaugeArgs</span> {
-                    <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">to_string</span>()),
+<span class="kw">impl </span>Parse <span class="kw">for </span>GaugeArgs {
+    <span class="kw">fn </span>parse(input: ParseStream) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>input.parse::&lt;Ident&gt;() {
+            <span class="prelude-val">Ok</span>(i) <span class="kw">if </span>i == <span class="string">&quot;name&quot; </span>=&gt; {
+                input.parse::&lt;<span class="macro">Token!</span>[=]&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(GaugeArgs {
+                    name: <span class="prelude-val">Some</span>(input.parse::&lt;Ident&gt;()<span class="question-mark">?</span>.to_string()),
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">GaugeArgs</span> { <span class="ident">name</span>: <span class="prelude-val">None</span> }),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(GaugeArgs { name: <span class="prelude-val">None </span>}),
         }
     }
 }
 
-<span class="doccomment">/// Declare a gauge callback. It will be automatically exported with the name</span>
-<span class="doccomment">/// `NAME_gauge_callback`, where `NAME` is the name of the decorated function.</span>
-<span class="doccomment">/// ```rs</span>
-<span class="doccomment">/// use futures::stream::{Stream, StreamExt};</span>
-<span class="doccomment">/// // Declare and export `FOO_gauge_callback`</span>
-<span class="doccomment">/// #[msfs::gauge]</span>
-<span class="doccomment">/// async fn FOO(mut gauge: msfs::Gauge) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">///   while let Some(event) = gauge.next_event().await {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro can also be given a parameter, `name`, to rename the exported function.</span>
-<span class="doccomment">/// ```rs</span>
-<span class="doccomment">/// // Declare and export `FOO_gauge_callback`</span>
-<span class="doccomment">/// #[msfs::gauge(name=FOO)]</span>
-<span class="doccomment">/// async fn xyz(...) {}</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gauge</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">GaugeArgs</span>);
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
+<span class="doccomment">/// Declare a gauge callback. It will be automatically exported with the name
+/// `NAME_gauge_callback`, where `NAME` is the name of the decorated function.
+/// ```rs
+/// use futures::stream::{Stream, StreamExt};
+/// // Declare and export `FOO_gauge_callback`
+/// #[msfs::gauge]
+/// async fn FOO(mut gauge: msfs::Gauge) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+///   while let Some(event) = gauge.next_event().await {
+///     // ...
+///   }
+/// }
+/// ```
+///
+/// The macro can also be given a parameter, `name`, to rename the exported function.
+/// ```rs
+/// // Declare and export `FOO_gauge_callback`
+/// #[msfs::gauge(name=FOO)]
+/// async fn xyz(...) {}
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>gauge(args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>args = <span class="macro">parse_macro_input!</span>(args <span class="kw">as </span>GaugeArgs);
+    <span class="kw">let </span>input = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>ItemFn);
 
-    <span class="kw">let</span> <span class="ident">rusty_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">executor_name</span> <span class="op">=</span> <span class="macro">format_ident!</span>(
+    <span class="kw">let </span>rusty_name = input.sig.ident.clone();
+    <span class="kw">let </span>executor_name = <span class="macro">format_ident!</span>(
         <span class="string">&quot;{}_executor_do_not_use_or_you_will_be_fired&quot;</span>,
-        <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>
+        input.sig.ident
     );
 
-    <span class="kw">let</span> <span class="ident">extern_name</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">name</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>());
-    <span class="kw">let</span> <span class="ident">extern_gauge_name</span> <span class="op">=</span> <span class="macro">format_ident!</span>(<span class="string">&quot;{}_gauge_callback&quot;</span>, <span class="ident">extern_name</span>);
-    <span class="kw">let</span> <span class="ident">extern_mouse_name</span> <span class="op">=</span> <span class="macro">format_ident!</span>(<span class="string">&quot;{}_mouse_callback&quot;</span>, <span class="ident">extern_name</span>);
+    <span class="kw">let </span>extern_name = args.name.unwrap_or_else(|| input.sig.ident.to_string());
+    <span class="kw">let </span>extern_gauge_name = <span class="macro">format_ident!</span>(<span class="string">&quot;{}_gauge_callback&quot;</span>, extern_name);
+    <span class="kw">let </span>extern_mouse_name = <span class="macro">format_ident!</span>(<span class="string">&quot;{}_mouse_callback&quot;</span>, extern_name);
 
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        #<span class="ident">input</span>
+    <span class="kw">let </span>output = <span class="macro">quote! </span>{
+        #input
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
-        <span class="kw">static</span> <span class="kw-2">mut</span> #<span class="ident">executor_name</span>: <span class="ident">::msfs::GaugeExecutor</span> <span class="op">=</span> <span class="ident">::msfs::GaugeExecutor</span> {
-            <span class="ident">fs_ctx</span>: <span class="prelude-val">None</span>,
-            <span class="ident">executor</span>: <span class="ident">::msfs::executor::Executor</span> {
-                <span class="ident">handle</span>: <span class="op">|</span><span class="ident">gauge</span><span class="op">|</span> <span class="ident">std::boxed::Box::pin</span>(#<span class="ident">rusty_name</span>(<span class="ident">gauge</span>)),
-                <span class="ident">tx</span>: <span class="prelude-val">None</span>,
-                <span class="ident">future</span>: <span class="prelude-val">None</span>,
+        <span class="attribute">#[allow(non_upper_case_globals)]
+        </span><span class="kw">static </span><span class="kw-2">mut </span>#executor_name: ::msfs::GaugeExecutor = ::msfs::GaugeExecutor {
+            fs_ctx: <span class="prelude-val">None</span>,
+            executor: ::msfs::executor::Executor {
+                handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+                tx: <span class="prelude-val">None</span>,
+                future: <span class="prelude-val">None</span>,
             },
         };
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> #<span class="ident">extern_gauge_name</span>(
-            <span class="ident">ctx</span>: <span class="ident">::msfs::sys::FsContext</span>,
-            <span class="ident">service_id</span>: <span class="ident">std::os::raw::c_int</span>,
-            <span class="ident">p_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">std::os::raw::c_void</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            <span class="kw">unsafe</span> {
-                #<span class="ident">executor_name</span>.<span class="ident">handle_gauge</span>(<span class="ident">ctx</span>, <span class="ident">service_id</span>, <span class="ident">p_data</span>)
+        <span class="attribute">#[doc(hidden)]
+        #[no_mangle]
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>#extern_gauge_name(
+            ctx: ::msfs::sys::FsContext,
+            service_id: std::os::raw::c_int,
+            p_data: <span class="kw-2">*mut </span>std::os::raw::c_void,
+        ) -&gt; bool {
+            <span class="kw">unsafe </span>{
+                #executor_name.handle_gauge(ctx, service_id, p_data)
             }
         }
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> #<span class="ident">extern_mouse_name</span>(
-            <span class="ident">fx</span>: <span class="ident">std::os::raw::c_float</span>,
-            <span class="ident">fy</span>: <span class="ident">std::os::raw::c_float</span>,
-            <span class="ident">i_flags</span>: <span class="ident">std::os::raw::c_uint</span>,
+        <span class="attribute">#[doc(hidden)]
+        #[no_mangle]
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>#extern_mouse_name(
+            fx: std::os::raw::c_float,
+            fy: std::os::raw::c_float,
+            i_flags: std::os::raw::c_uint,
         ) {
-             <span class="kw">unsafe</span> {
-                #<span class="ident">executor_name</span>.<span class="ident">handle_mouse</span>(<span class="ident">fx</span>, <span class="ident">fy</span>, <span class="ident">i_flags</span>);
+             <span class="kw">unsafe </span>{
+                #executor_name.handle_mouse(fx, fy, i_flags);
              }
          }
     };
 
-    <span class="ident">TokenStream::from</span>(<span class="ident">output</span>)
+    TokenStream::from(output)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_struct_fields</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ItemStruct</span>,
-    <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">get_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">fn </span>parse_struct_fields(
+    input: <span class="kw-2">&amp;mut </span>ItemStruct,
+    attributes: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    get_type: <span class="prelude-ty">Option</span>&lt;<span class="kw">fn</span>(<span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str&gt;,
+) -&gt; Vec&lt;HashMap&lt;String, String&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
 
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>.<span class="ident">fields</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="kw">for </span>(i, field) <span class="kw">in </span><span class="kw-2">&amp;mut </span>input.fields.iter_mut().enumerate() {
+        <span class="kw">let </span><span class="kw-2">mut </span>meta = HashMap::new();
 
-        <span class="ident">meta</span>.<span class="ident">insert</span>(
-            <span class="string">&quot;field_name&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ident</span> {
-                <span class="ident">ident</span>.<span class="ident">to_string</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">i</span>.<span class="ident">to_string</span>()
+        meta.insert(
+            <span class="string">&quot;field_name&quot;</span>.to_string(),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = <span class="kw-2">&amp;</span>field.ident {
+                ident.to_string()
+            } <span class="kw">else </span>{
+                i.to_string()
             },
         );
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">get_type</span>) <span class="op">=</span> <span class="ident">get_type</span> {
-            <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span> {
-                <span class="ident">Type::Path</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unsupported type&quot;</span>),
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(get_type) = get_type {
+            <span class="kw">let </span>ty = <span class="kw">match </span><span class="kw-2">&amp;</span>field.ty {
+                Type::Path(p) =&gt; p.path.get_ident().unwrap().to_string(),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported type&quot;</span>),
             };
 
-            <span class="ident">meta</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">get_type</span>(<span class="ident">ty</span>.<span class="ident">as_str</span>()).<span class="ident">to_string</span>());
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
-            <span class="ident">meta</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>.<span class="ident">to_string</span>(), <span class="macro">quote!</span>(#<span class="ident">t</span>).<span class="ident">to_string</span>());
+            meta.insert(<span class="string">&quot;type&quot;</span>.to_string(), get_type(ty.as_str()).to_string());
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>t = <span class="kw-2">&amp;</span>field.ty;
+            meta.insert(<span class="string">&quot;type&quot;</span>.to_string(), <span class="macro">quote!</span>(#t).to_string());
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span> {
-            <span class="kw">let</span> <span class="ident">simish</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">a</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>() {
-                <span class="ident">attributes</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>())
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            };
-            <span class="kw">if</span> <span class="ident">simish</span> {
-                <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">parse_meta</span>().<span class="ident">unwrap</span>() {
-                    <span class="ident">Meta::NameValue</span>(<span class="ident">mnv</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">mnv</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>();
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mnv</span>.<span class="ident">lit</span> {
-                            <span class="ident">Lit::Str</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">value</span>(),
-                            <span class="ident">Lit::Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">base10_digits</span>().<span class="ident">to_string</span>(),
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;argument must be a string or float&quot;</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>attrs = Vec::new();
+        <span class="kw">for </span>a <span class="kw">in </span><span class="kw-2">&amp;</span>field.attrs {
+            <span class="kw">let </span>simish = <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = a.path.get_ident() {
+                attributes.contains(<span class="kw-2">&amp;</span>i.to_string().as_str())
+            } <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>};
+            <span class="kw">if </span>simish {
+                <span class="kw">let </span>(name, value) = <span class="kw">match </span>a.parse_meta().unwrap() {
+                    Meta::NameValue(mnv) =&gt; {
+                        <span class="kw">let </span>name = mnv.path.get_ident().unwrap().to_string();
+                        <span class="kw">let </span>value = <span class="kw">match </span>mnv.lit {
+                            Lit::Str(s) =&gt; s.value(),
+                            Lit::Float(f) =&gt; f.base10_digits().to_string(),
+                            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;argument must be a string or float&quot;</span>),
                         };
-                        (<span class="ident">name</span>, <span class="ident">value</span>)
+                        (name, value)
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;attribute must be in for #[name = \&quot;value\&quot;]&quot;</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attribute must be in for #[name = \&quot;value\&quot;]&quot;</span>),
                 };
 
-                <span class="ident">meta</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">value</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">a</span>.<span class="ident">clone</span>());
+                meta.insert(name, value);
+            } <span class="kw">else </span>{
+                attrs.push(a.clone());
             }
         }
-        <span class="ident">field</span>.<span class="ident">attrs</span> <span class="op">=</span> <span class="ident">attrs</span>;
+        field.attrs = attrs;
 
-        <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">meta</span>);
+        data.push(meta);
     }
 
-    <span class="ident">data</span>
+    data
 }
 
-<span class="doccomment">/// Generate a struct which can be used with SimConnect&#39;s data definitions.</span>
-<span class="doccomment">/// ```rs</span>
-<span class="doccomment">/// #[sim_connect::data_definition]</span>
-<span class="doccomment">/// struct ControlSurfaces {</span>
-<span class="doccomment">///     #[name = &quot;ELEVATOR POSITION&quot;]</span>
-<span class="doccomment">///     #[unit = &quot;Position&quot;]</span>
-<span class="doccomment">///     elevator: f64,</span>
-<span class="doccomment">///     #[name = &quot;AILERON POSITION&quot;]</span>
-<span class="doccomment">///     #[unit = &quot;Position&quot;]</span>
-<span class="doccomment">///     ailerons: f64,</span>
-<span class="doccomment">///     #[name = &quot;RUDDER POSITION&quot;]</span>
-<span class="doccomment">///     #[unit = &quot;Position&quot;]</span>
-<span class="doccomment">///     rudder: f64,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// sim.add_data_definition::&lt;ControlSurfaces&gt;();</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sim_connect_data_definition</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemStruct</span>);
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
+<span class="doccomment">/// Generate a struct which can be used with SimConnect&#39;s data definitions.
+/// ```rs
+/// #[sim_connect::data_definition]
+/// struct ControlSurfaces {
+///     #[name = &quot;ELEVATOR POSITION&quot;]
+///     #[unit = &quot;Position&quot;]
+///     elevator: f64,
+///     #[name = &quot;AILERON POSITION&quot;]
+///     #[unit = &quot;Position&quot;]
+///     ailerons: f64,
+///     #[name = &quot;RUDDER POSITION&quot;]
+///     #[unit = &quot;Position&quot;]
+///     rudder: f64,
+/// }
+///
+/// sim.add_data_definition::&lt;ControlSurfaces&gt;();
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>sim_connect_data_definition(_args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>input = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>ItemStruct);
+    <span class="kw">let </span>name = input.ident.clone();
 
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">parse_struct_fields</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>,
+    <span class="kw">let </span>data = parse_struct_fields(
+        <span class="kw-2">&amp;mut </span>input,
         <span class="kw-2">&amp;</span>[<span class="string">&quot;name&quot;</span>, <span class="string">&quot;unit&quot;</span>, <span class="string">&quot;epsilon&quot;</span>],
-        <span class="prelude-val">Some</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="string">&quot;bool&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;INT32&quot;</span>,
-            <span class="string">&quot;i32&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;INT32&quot;</span>,
-            <span class="string">&quot;i64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;INT64&quot;</span>,
-            <span class="string">&quot;f32&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;FLOAT32&quot;</span>,
-            <span class="string">&quot;f64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;FLOAT64&quot;</span>,
-            <span class="string">&quot;DataXYZ&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;XYZ&quot;</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unsupported type {}&quot;</span>, <span class="ident">ty</span>),
+        <span class="prelude-val">Some</span>(|ty| <span class="kw">match </span>ty {
+            <span class="string">&quot;bool&quot; </span>=&gt; <span class="string">&quot;INT32&quot;</span>,
+            <span class="string">&quot;i32&quot; </span>=&gt; <span class="string">&quot;INT32&quot;</span>,
+            <span class="string">&quot;i64&quot; </span>=&gt; <span class="string">&quot;INT64&quot;</span>,
+            <span class="string">&quot;f32&quot; </span>=&gt; <span class="string">&quot;FLOAT32&quot;</span>,
+            <span class="string">&quot;f64&quot; </span>=&gt; <span class="string">&quot;FLOAT64&quot;</span>,
+            <span class="string">&quot;DataXYZ&quot; </span>=&gt; <span class="string">&quot;XYZ&quot;</span>,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported type {}&quot;</span>, ty),
         }),
     );
 
-    <span class="kw">let</span> <span class="ident">simvars</span> <span class="op">=</span> <span class="ident">sys::get_simvars</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>array = String::from(<span class="string">&quot;&amp;[\n&quot;</span>);
+    <span class="kw">for </span>meta <span class="kw">in </span>data {
+        <span class="kw">let </span>name = meta[<span class="string">&quot;name&quot;</span>].clone();
+        <span class="kw">let </span>unit = meta
+            .get(<span class="string">&quot;unit&quot;</span>)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;{} needs a #[unit] decorator&quot;</span>, name));
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;&amp;[\n&quot;</span>);
-    <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">data</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">meta</span>[<span class="string">&quot;name&quot;</span>].<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">get</span>(<span class="string">&quot;unit&quot;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">simvars</span>
-                .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{} needs a #[unit] decorator&quot;</span>, <span class="ident">name</span>))
-        });
+        <span class="kw">let </span>fallback = <span class="string">&quot;0.0&quot;</span>.to_string();
+        <span class="kw">let </span>epsilon = meta.get(<span class="string">&quot;epsilon&quot;</span>).unwrap_or(<span class="kw-2">&amp;</span>fallback);
 
-        <span class="kw">let</span> <span class="ident">fallback</span> <span class="op">=</span> <span class="string">&quot;0.0&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">get</span>(<span class="string">&quot;epsilon&quot;</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">fallback</span>);
-
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">meta</span>[<span class="string">&quot;type&quot;</span>].<span class="ident">clone</span>();
-        <span class="ident">array</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;  ({:?}, {:?}, {}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{}),\n&quot;</span>,
-            <span class="ident">name</span>, <span class="ident">unit</span>, <span class="ident">epsilon</span>, <span class="ident">ty</span>
-        );
+        <span class="kw">let </span>ty = meta[<span class="string">&quot;type&quot;</span>].clone();
+        array += <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            <span class="string">&quot;  ({name:?}, {unit:?}, {epsilon}, ::msfs::sys::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_{ty}),\n&quot;
+        </span>);
     }
-    <span class="ident">array</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;]&quot;</span>;
-    <span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">syn::parse_str</span>::<span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="ident">unwrap</span>();
+    array += <span class="string">&quot;]&quot;</span>;
+    <span class="kw">let </span>array = syn::parse_str::&lt;Expr&gt;(<span class="kw-2">&amp;</span>array).unwrap();
 
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        #<span class="ident">input</span>
+    <span class="kw">let </span>output = <span class="macro">quote! </span>{
+        <span class="attribute">#[repr(C)]
+        </span>#input
 
-        <span class="kw">impl</span> <span class="ident">::msfs::sim_connect::DataDefinition</span> <span class="kw">for</span> #<span class="ident">name</span> {
-            <span class="kw">const</span> <span class="ident">DEFINITIONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f32</span>, <span class="ident">::msfs::sys::SIMCONNECT_DATATYPE</span>)] <span class="op">=</span> #<span class="ident">array</span>;
+        <span class="kw">impl </span>::msfs::sim_connect::DataDefinition <span class="kw">for </span>#name {
+            <span class="kw">const </span>DEFINITIONS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, f32, ::msfs::sys::SIMCONNECT_DATATYPE)] = #array;
         }
     };
 
-    <span class="ident">TokenStream::from</span>(<span class="ident">output</span>)
+    TokenStream::from(output)
 }
 
-<span class="doccomment">/// Generate a struct which can be used with SimConnect&#39;s client data definitions.</span>
-<span class="doccomment">/// ```rs</span>
-<span class="doccomment">/// #[sim_connect::client_data_definition]</span>
-<span class="doccomment">/// struct SomeData {</span>
-<span class="doccomment">///     foo: u8,</span>
-<span class="doccomment">///     bar: f64,</span>
-<span class="doccomment">///     #[epsilon = 0.5]</span>
-<span class="doccomment">///     baz: i8,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sim_connect_client_data_definition</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">ItemStruct</span>);
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
+<span class="doccomment">/// Generate a struct which can be used with SimConnect&#39;s client data definitions.
+/// ```rs
+/// #[sim_connect::client_data_definition]
+/// struct SomeData {
+///     foo: u8,
+///     bar: f64,
+///     #[epsilon = 0.5]
+///     baz: i8,
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>sim_connect_client_data_definition(_args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>input = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>ItemStruct);
+    <span class="kw">let </span>name = input.ident.clone();
 
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">parse_struct_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;epsilon&quot;</span>], <span class="prelude-val">None</span>);
+    <span class="kw">let </span>data = parse_struct_fields(<span class="kw-2">&amp;mut </span>input, <span class="kw-2">&amp;</span>[<span class="string">&quot;epsilon&quot;</span>], <span class="prelude-val">None</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;vec![\n&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>array = String::from(<span class="string">&quot;vec![\n&quot;</span>);
 
-    <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">data</span> {
-        <span class="kw">let</span> <span class="ident">fallback</span> <span class="op">=</span> <span class="string">&quot;0.0&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">get</span>(<span class="string">&quot;epsilon&quot;</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">fallback</span>);
+    <span class="kw">for </span>meta <span class="kw">in </span>data {
+        <span class="kw">let </span>fallback = <span class="string">&quot;0.0&quot;</span>.to_string();
+        <span class="kw">let </span>epsilon = meta.get(<span class="string">&quot;epsilon&quot;</span>).unwrap_or(<span class="kw-2">&amp;</span>fallback);
 
-        <span class="ident">array</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+        array += <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;    (unsafe {{
                      let uninit = std::mem::MaybeUninit::&lt;{struct_name}&gt;::uninit();
                      let base = uninit.as_ptr() as *const {struct_name};
@@ -658,24 +639,22 @@
                      (field as usize) - (base as usize)
                  }}, std::mem::size_of::&lt;{type}&gt;(), {epsilon}),
             &quot;</span>,
-            <span class="ident">struct_name</span><span class="op">=</span><span class="ident">name</span>, <span class="ident">field_name</span><span class="op">=</span><span class="ident">meta</span>[<span class="string">&quot;field_name&quot;</span>], <span class="kw">type</span><span class="op">=</span><span class="ident">meta</span>[<span class="string">&quot;type&quot;</span>], <span class="ident">epsilon</span><span class="op">=</span><span class="ident">epsilon</span>,
+            struct_name=name, field_name=meta[<span class="string">&quot;field_name&quot;</span>], <span class="kw">type</span>=meta[<span class="string">&quot;type&quot;</span>], epsilon=epsilon,
         );
     }
 
-    <span class="ident">array</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;]&quot;</span>;
+    array += <span class="string">&quot;]&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">syn::parse_str</span>::<span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        #<span class="ident">input</span>
+    <span class="kw">let </span>array = syn::parse_str::&lt;Expr&gt;(<span class="kw-2">&amp;</span>array).unwrap();
+    <span class="kw">let </span>output = <span class="macro">quote! </span>{
+        #input
 
-        <span class="kw">impl</span> <span class="ident">::msfs::sim_connect::ClientDataDefinition</span> <span class="kw">for</span> #<span class="ident">name</span> {
-            <span class="kw">fn</span> <span class="ident">get_definitions</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> { #<span class="ident">array</span> }
+        <span class="kw">impl </span>::msfs::sim_connect::ClientDataDefinition <span class="kw">for </span>#name {
+            <span class="kw">fn </span>get_definitions() -&gt; Vec&lt;(usize, usize, f32)&gt; { #array }
         }
     };
 
-    <span class="ident">TokenStream::from</span>(<span class="ident">output</span>)
+    TokenStream::from(output)
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs_derive" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="msfs_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
