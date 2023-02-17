@@ -5,6 +5,7 @@
 //! - MSFS Gauge API
 //! - SimConnect API
 //! - NanoVG API
+//! - Networking API
 //!
 //! ## Building
 //!
@@ -38,6 +39,9 @@ pub mod legacy;
 
 #[cfg(any(target_arch = "wasm32", doc))]
 pub mod nvg;
+
+#[cfg(any(target_arch = "wasm32", doc))]
+pub mod network;
 
 #[doc(hidden)]
 pub mod executor;

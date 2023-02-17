@@ -9,6 +9,7 @@ license = "MIT"
 [dependencies]
 msfs_derive = { path = "../msfs_derive", version = "0.2.0" }
 futures = "0.3"
+libc = "0.2"
 
 [build-dependencies]
 bindgen = "0.59"

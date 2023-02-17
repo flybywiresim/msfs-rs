@@ -3,5 +3,6 @@
 #include <MSFS/Legacy/gauges.h>
 #include <MSFS/MSFS.h>
 #include <MSFS/MSFS_Render.h>
+#include <MSFS/MSFS_Network.h>
 #include <MSFS/Render/nanovg.h>
 #include <SimConnect.h>
