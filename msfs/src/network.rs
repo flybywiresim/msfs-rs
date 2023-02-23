@@ -32,55 +32,44 @@ impl<'a> NetworkRequestBuilder<'a> {
     }
 
     /// Do HTTP GET request
-    pub fn get(mut self) -> Option<NetworkRequest> {
-        let mut params = self.generate_params(std::ptr::null_mut());
-        let request_id = unsafe {
-            sys::fsNetworkHttpRequestGet(
-                self.url.as_ptr(),
-                &mut params as *mut sys::FsNetworkHttpRequestParam,
-                None,
-                ptr::null_mut(),
-            )
-        };
-        if request_id == 0 {
-            None
-        } else {
-            Some(NetworkRequest(request_id))
-        }
+    pub fn get(self) -> Option<NetworkRequest> {
+        self.do_request(None, sys::fsNetworkHttpRequestGet)
     }
 
     /// Do HTTP POST request
-    pub fn post(mut self, post_field: &str) -> Option<NetworkRequest> {
+    pub fn post(self, post_field: &str) -> Option<NetworkRequest> {
         let post_field = CString::new(post_field).unwrap();
-        let raw_post_field = post_field.into_raw();
+        self.do_request(Some(post_field), sys::fsNetworkHttpRequestPost)
+    }
+
+    /// Do HTTP PUT request
+    pub fn put(self) -> Option<NetworkRequest> {
+        self.do_request(None, sys::fsNetworkHttpRequestPut)
+    }
+
+    fn do_request(
+        mut self,
+        post_field: Option<CString>,
+        request: unsafe extern "C" fn(
+            *const ::std::os::raw::c_char,
+            *mut sys::FsNetworkHttpRequestParam,
+            sys::HttpRequestCallback,
+            *mut ::std::os::raw::c_void,
+        ) -> sys::FsNetworkRequestId,
+    ) -> Option<NetworkRequest> {
+        let raw_post_field = post_field.map_or(ptr::null_mut(), |f| f.into_raw());
         let mut params = self.generate_params(raw_post_field);
         let request_id = unsafe {
-            let id = sys::fsNetworkHttpRequestPost(
+            let id = request(
                 self.url.as_ptr(),
                 &mut params as *mut sys::FsNetworkHttpRequestParam,
                 None,
                 ptr::null_mut(),
             );
-            drop(CString::from_raw(raw_post_field));
+            if !raw_post_field.is_null() {
+                drop(CString::from_raw(raw_post_field));
+            }
             id
-        };
-        if request_id == 0 {
-            None
-        } else {
-            Some(NetworkRequest(request_id))
-        }
-    }
-
-    /// Do HTTP PUT request
-    pub fn put(mut self) -> Option<NetworkRequest> {
-        let mut params = self.generate_params(ptr::null_mut());
-        let request_id = unsafe {
-            sys::fsNetworkHttpRequestPut(
-                self.url.as_ptr(),
-                &mut params as *mut sys::FsNetworkHttpRequestParam,
-                None,
-                ptr::null_mut(),
-            )
         };
         if request_id == 0 {
             None
