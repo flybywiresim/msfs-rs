@@ -10,6 +10,7 @@ pub struct NetworkRequestBuilder<'a> {
     url: CString,
     headers: Vec<CString>,
     data: Option<&'a mut [u8]>,
+    callback: Option<Box<dyn Fn(NetworkRequest, i32)>>,
 }
 impl<'a> NetworkRequestBuilder<'a> {
     /// Create a new network request
@@ -18,16 +19,24 @@ impl<'a> NetworkRequestBuilder<'a> {
             url: CString::new(url).ok()?,
             headers: vec![],
             data: None,
+            callback: None,
         })
     }
 
+    /// Set a HTTP header
     pub fn with_header(mut self, header: &str) -> Option<Self> {
         self.headers.push(CString::new(header).ok()?);
         Some(self)
     }
 
+    /// Set the data to be sent
     pub fn with_data(mut self, data: &'a mut [u8]) -> Self {
         self.data = Some(data);
+        self
+    }
+
+    pub fn with_callback(mut self, callback: impl Fn(NetworkRequest, i32) + 'static) -> Self {
+        self.callback = Some(Box::new(callback));
         self
     }
 
@@ -63,7 +72,7 @@ impl<'a> NetworkRequestBuilder<'a> {
             let id = request(
                 self.url.as_ptr(),
                 &mut params as *mut sys::FsNetworkHttpRequestParam,
-                None,
+                Some(Self::c_wrapper),
                 ptr::null_mut(),
             );
             if !raw_post_field.is_null() {
@@ -98,6 +107,24 @@ impl<'a> NetworkRequestBuilder<'a> {
             dataSize: data_len as std::os::raw::c_uint,
         }
     }
+
+    extern "C" fn c_wrapper(
+        request_id: sys::FsNetworkRequestId,
+        status_code: i32,
+        user_data: *mut ffi::c_void,
+    ) {
+        // let (callback, user_data) = self.callback.map_or((None, ptr::null_mut()), |cb| {
+        //     (Some(Self::c_callback), Box::into_raw(cb) as *mut ffi::c_void)
+        // });
+        println!("Rust: c_wrapper called with id {request_id}, status {status_code} and data {user_data:?}");
+    }
+
+    // fn closure_to_ffi<F: Fn(NetworkRequest, i32)>(f: Box<F>) -> (*mut F, sys::HttpRequestCallback) {
+    //     extern "C" fn c_wrapper<F: Fn(NetworkRequest, i32)>(request_id: sys::FsNetworkRequestId, status_code: i32, user_data: *mut ffi::c_void) {
+    //         let callback = Box::<F>::from_raw(user_data as *mut F);
+    //     }
+    //     (Box::into_raw(f), Some(c_wrapper::<F>))
+    // }
 }
 
 /// Network request handle
