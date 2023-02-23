@@ -150,7 +150,7 @@ impl NetworkRequest {
         unsafe {
             let a = sys::fsNetworkHttpRequestGetHeaderSection(self.0, section.as_ptr());
             if a.is_null() {
-                return None;
+                None
             } else {
                 Some(OwnedCStr::from_ptr(a))
             }
