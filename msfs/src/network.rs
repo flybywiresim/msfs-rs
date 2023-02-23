@@ -118,12 +118,12 @@ impl NetworkRequest {
         unsafe { sys::fsNetworkHttpCancelRequest(self.0) }
     }
 
-    pub fn data_size(&self) -> u32 {
-        unsafe { sys::fsNetworkHttpRequestGetDataSize(self.0) }
+    pub fn data_size(&self) -> usize {
+        unsafe { sys::fsNetworkHttpRequestGetDataSize(self.0) as usize }
     }
 
     pub fn data(&self) -> Option<OwnedCVec> {
-        let data_size = self.data_size() as usize;
+        let data_size = self.data_size();
         if data_size == 0 {
             return None;
         }
