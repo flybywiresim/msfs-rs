@@ -116,7 +116,6 @@ impl<'a> NetworkRequestBuilder<'a> {
         status_code: i32,
         user_data: *mut ffi::c_void,
     ) {
-        println!("Rust: c_wrapper called with id {request_id}, status {status_code} and data {user_data:?}");
         if !user_data.is_null() {
             let closure: Box<NetworkCallback> = unsafe { Box::from_raw(user_data as *mut _) };
             closure(NetworkRequest(request_id), status_code);
