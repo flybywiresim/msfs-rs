@@ -123,6 +123,30 @@ impl<'a> NetworkRequestBuilder<'a> {
     }
 }
 
+pub enum NetworkRequestState {
+    Invalid,
+    New,
+    WaitingForData,
+    DataReady,
+    Failed,
+}
+impl From<sys::FsNetworkHttpRequestState> for NetworkRequestState {
+    fn from(value: sys::FsNetworkHttpRequestState) -> Self {
+        match value {
+            sys::FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_INVALID => Self::Invalid,
+            sys::FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_NEW => Self::New,
+            sys::FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_WAITING_FOR_DATA => {
+                Self::WaitingForData
+            }
+            sys::FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_DATA_READY => {
+                Self::DataReady
+            }
+            sys::FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_FAILED => Self::Failed,
+            _ => panic!("Unknown request state"),
+        }
+    }
+}
+
 /// Network request handle
 pub struct NetworkRequest(sys::FsNetworkRequestId);
 impl NetworkRequest {
@@ -153,8 +177,8 @@ impl NetworkRequest {
         unsafe { sys::fsNetworkHttpRequestGetErrorCode(self.0) }
     }
 
-    pub fn state(&self) -> sys::FsNetworkHttpRequestState {
-        unsafe { sys::fsNetworkHttpRequestGetState(self.0) }
+    pub fn state(&self) -> NetworkRequestState {
+        unsafe { sys::fsNetworkHttpRequestGetState(self.0).into() }
     }
 
     pub fn header_section(&self, section: &str) -> Option<OwnedCStr> {
