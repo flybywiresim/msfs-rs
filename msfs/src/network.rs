@@ -90,6 +90,8 @@ impl<'a> NetworkRequestBuilder<'a> {
             id
         };
         if request_id == 0 {
+            // Free the callback
+            let _: Box<NetworkCallback> = unsafe { Box::from_raw(callback_data as *mut _) };
             None
         } else {
             Some(NetworkRequest(request_id))
@@ -123,8 +125,8 @@ impl<'a> NetworkRequestBuilder<'a> {
         user_data: *mut ffi::c_void,
     ) {
         if !user_data.is_null() {
-            let closure: Box<NetworkCallback> = unsafe { Box::from_raw(user_data as *mut _) };
-            closure(NetworkRequest(request_id), status_code);
+            let callback: Box<NetworkCallback> = unsafe { Box::from_raw(user_data as *mut _) };
+            callback(NetworkRequest(request_id), status_code);
         }
     }
 }
