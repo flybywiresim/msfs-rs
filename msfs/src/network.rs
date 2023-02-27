@@ -131,6 +131,7 @@ impl<'a> NetworkRequestBuilder<'a> {
     }
 }
 
+/// The states in which a network request can be in
 pub enum NetworkRequestState {
     Invalid,
     New,
@@ -158,14 +159,17 @@ impl From<sys::FsNetworkHttpRequestState> for NetworkRequestState {
 /// Network request handle
 pub struct NetworkRequest(sys::FsNetworkRequestId);
 impl NetworkRequest {
+    /// Cancel a network request
     pub fn cancel(&self) -> bool {
         unsafe { sys::fsNetworkHttpCancelRequest(self.0) }
     }
 
+    /// Get the size of the data
     pub fn data_size(&self) -> usize {
         unsafe { sys::fsNetworkHttpRequestGetDataSize(self.0) as usize }
     }
 
+    /// Get the data
     pub fn data(&self) -> Option<OwnedCVec> {
         let data_size = self.data_size();
         if data_size == 0 {
@@ -181,14 +185,17 @@ impl NetworkRequest {
         }
     }
 
+    /// Get the HTTP status code or negative if the request failed
     pub fn error_code(&self) -> i32 {
         unsafe { sys::fsNetworkHttpRequestGetErrorCode(self.0) }
     }
 
+    /// Get the current state of the request
     pub fn state(&self) -> NetworkRequestState {
         unsafe { sys::fsNetworkHttpRequestGetState(self.0).into() }
     }
 
+    /// Get a specific header section
     pub fn header_section(&self, section: &str) -> Option<OwnedCStr> {
         let section = CString::new(section).ok()?;
         unsafe {
