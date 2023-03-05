@@ -130,6 +130,7 @@ impl<'a> NetworkRequestBuilder<'a> {
 }
 
 /// The states in which a network request can be in
+#[derive(Clone, Copy)]
 pub enum NetworkRequestState {
     Invalid,
     New,
@@ -155,6 +156,7 @@ impl From<sys::FsNetworkHttpRequestState> for NetworkRequestState {
 }
 
 /// Network request handle
+#[derive(Clone, Copy)]
 pub struct NetworkRequest(sys::FsNetworkRequestId);
 impl NetworkRequest {
     /// Cancel a network request
