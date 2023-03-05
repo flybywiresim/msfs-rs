@@ -19,18 +19,12 @@ pub struct NetworkRequestBuilder<'a> {
 impl<'a> NetworkRequestBuilder<'a> {
     /// Create a new network request
     pub fn new(url: &str) -> Option<Self> {
-        // We check that the url contains at least one / after the domain else the simulator crashes.
-        // See: https://devsupport.flightsimulator.com/questions/14954/wasm-network-api-crashes-simulator.html
-        if url.chars().filter(|&c| c == '/').count() >= 3 {
-            Some(Self {
-                url: CString::new(url).ok()?,
-                headers: vec![],
-                data: None,
-                callback: None,
-            })
-        } else {
-            None
-        }
+        Some(Self {
+            url: CString::new(url).ok()?,
+            headers: vec![],
+            data: None,
+            callback: None,
+        })
     }
 
     /// Set a HTTP header
