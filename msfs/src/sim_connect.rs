@@ -468,18 +468,19 @@ impl<'a> SimConnect<'a> {
 
     pub fn subscribe_to_system_event(
         &mut self,
-        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
         system_event_name: &str,
     ) -> Result<()> {
-        let system_event_name = std::ffi::CString::new(system_event_name).unwrap();
+        let event_id = self.event_id_counter;
+        self.event_id_counter += 1;
         unsafe {
+            let system_event_name = std::ffi::CString::new(system_event_name).unwrap();
             map_err(sys::SimConnect_SubscribeToSystemEvent(
                 self.handle,
                 event_id,
                 system_event_name.as_ptr(),
             ))?;
         }
-        Ok(())
+        Ok((event_id))
     }
 
     pub fn unsubscribe_from_system_event(
