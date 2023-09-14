@@ -1,6 +1,6 @@
 [package]
 name = "msfs"
-version = "0.1.1"
+version = "0.1.0"
 authors = ["snek"]
 edition = "2018"
 description = "Rust bindings for the MSFS SDK"
@@ -12,5 +12,5 @@ futures = "0.3"
 
 [build-dependencies]
 bindgen = "0.59"
-msfs_sdk = { path = "../msfs_sdk", version = "0.1.1" }
+msfs_sdk = { path = "../msfs_sdk", version = "0.1.0" }
 cc = "1.0"

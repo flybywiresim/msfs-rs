@@ -1,6 +1,6 @@
 [package]
 name = "msfs_sdk"
-version = "0.1.1"
+version = "0.1.0"
 authors = ["snek"]
 edition = "2018"
 description = "Crate to find MSFS SDK"
