@@ -469,7 +469,7 @@ impl<'a> SimConnect<'a> {
     pub fn subscribe_to_system_event(
         &mut self,
         system_event_name: &str,
-    ) -> Result<()> {
+    ) -> Result<sys::DWORD> {
         let event_id = self.event_id_counter;
         self.event_id_counter += 1;
         unsafe {
