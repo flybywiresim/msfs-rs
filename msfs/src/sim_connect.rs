@@ -480,7 +480,7 @@ impl<'a> SimConnect<'a> {
                 system_event_name.as_ptr(),
             ))?;
         }
-        Ok((event_id))
+        Ok(event_id)
     }
 
     pub fn unsubscribe_from_system_event(
