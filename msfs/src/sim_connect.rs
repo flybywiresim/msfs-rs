@@ -267,8 +267,9 @@ impl<'a> SimConnect<'a> {
     ) -> Result<sys::DWORD> {
         let event_id = self.event_id_counter;
         self.event_id_counter += 1;
+        let event_name = std::ffi::CString::new(event_name).unwrap();
+
         unsafe {
-            let event_name = std::ffi::CString::new(event_name).unwrap();
             map_err(sys::SimConnect_MapClientEventToSimEvent(
                 self.handle,
                 event_id,
@@ -313,8 +314,9 @@ impl<'a> SimConnect<'a> {
     fn get_client_data_id(&mut self, name: &str) -> Result<sys::SIMCONNECT_CLIENT_DATA_ID> {
         let client_id = self.client_data_id_counter;
         self.client_data_id_counter += 1;
+        let name = std::ffi::CString::new(name).unwrap();
+
         unsafe {
-            let name = std::ffi::CString::new(name).unwrap();
             map_err(sys::SimConnect_MapClientDataNameToID(
                 self.handle,
                 name.as_ptr(),
@@ -472,8 +474,9 @@ impl<'a> SimConnect<'a> {
     ) -> Result<sys::DWORD> {
         let event_id = self.event_id_counter;
         self.event_id_counter += 1;
+        let system_event_name = std::ffi::CString::new(system_event_name).unwrap();
+        
         unsafe {
-            let system_event_name = std::ffi::CString::new(system_event_name).unwrap();
             map_err(sys::SimConnect_SubscribeToSystemEvent(
                 self.handle,
                 event_id,
