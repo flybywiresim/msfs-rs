@@ -687,6 +687,7 @@
 <span id="687">687</span>
 <span id="688">688</span>
 <span id="689">689</span>
+<span id="690">690</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::too_many_arguments)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::sys;
@@ -956,8 +957,9 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;sys::DWORD&gt; {
         <span class="kw">let </span>event_id = <span class="self">self</span>.event_id_counter;
         <span class="self">self</span>.event_id_counter += <span class="number">1</span>;
+        <span class="kw">let </span>event_name = std::ffi::CString::new(event_name).unwrap();
+
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>event_name = std::ffi::CString::new(event_name).unwrap();
             map_err(sys::SimConnect_MapClientEventToSimEvent(
                 <span class="self">self</span>.handle,
                 event_id,
@@ -1002,8 +1004,9 @@
     <span class="kw">fn </span>get_client_data_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;sys::SIMCONNECT_CLIENT_DATA_ID&gt; {
         <span class="kw">let </span>client_id = <span class="self">self</span>.client_data_id_counter;
         <span class="self">self</span>.client_data_id_counter += <span class="number">1</span>;
+        <span class="kw">let </span>name = std::ffi::CString::new(name).unwrap();
+
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>name = std::ffi::CString::new(name).unwrap();
             map_err(sys::SimConnect_MapClientDataNameToID(
                 <span class="self">self</span>.handle,
                 name.as_ptr(),
@@ -1155,12 +1158,11 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub fn </span>subscribe_to_system_event(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        event_id: sys::SIMCONNECT_CLIENT_EVENT_ID,
-        system_event_name: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">pub fn </span>subscribe_to_system_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, system_event_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;sys::DWORD&gt; {
+        <span class="kw">let </span>event_id = <span class="self">self</span>.event_id_counter;
+        <span class="self">self</span>.event_id_counter += <span class="number">1</span>;
         <span class="kw">let </span>system_event_name = std::ffi::CString::new(system_event_name).unwrap();
+
         <span class="kw">unsafe </span>{
             map_err(sys::SimConnect_SubscribeToSystemEvent(
                 <span class="self">self</span>.handle,
@@ -1168,7 +1170,7 @@
                 system_event_name.as_ptr(),
             ))<span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(event_id)
     }
 
     <span class="kw">pub fn </span>unsubscribe_from_system_event(

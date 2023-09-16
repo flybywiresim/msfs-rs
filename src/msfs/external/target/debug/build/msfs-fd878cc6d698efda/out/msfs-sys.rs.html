@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/external/target/debug/build/msfs-450045e6bb5ab805/out/msfs-sys.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>msfs-sys.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../../../../normalize.css"><link rel="stylesheet" href="../../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../../../storage.js"></script><script defer src="../../../../../../../../source-script.js"></script><script defer src="../../../../../../../../source-files.js"></script><script defer src="../../../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../../../msfs/index.html"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/external/target/debug/build/msfs-fd878cc6d698efda/out/msfs-sys.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>msfs-sys.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../../../../normalize.css"><link rel="stylesheet" href="../../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../../../storage.js"></script><script defer src="../../../../../../../../source-script.js"></script><script defer src="../../../../../../../../source-files.js"></script><script defer src="../../../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../../../msfs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../../../msfs/index.html"><img class="rust-logo" src="../../../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -23325,6 +23325,264 @@
 <span id="23325">23325</span>
 <span id="23326">23326</span>
 <span id="23327">23327</span>
+<span id="23328">23328</span>
+<span id="23329">23329</span>
+<span id="23330">23330</span>
+<span id="23331">23331</span>
+<span id="23332">23332</span>
+<span id="23333">23333</span>
+<span id="23334">23334</span>
+<span id="23335">23335</span>
+<span id="23336">23336</span>
+<span id="23337">23337</span>
+<span id="23338">23338</span>
+<span id="23339">23339</span>
+<span id="23340">23340</span>
+<span id="23341">23341</span>
+<span id="23342">23342</span>
+<span id="23343">23343</span>
+<span id="23344">23344</span>
+<span id="23345">23345</span>
+<span id="23346">23346</span>
+<span id="23347">23347</span>
+<span id="23348">23348</span>
+<span id="23349">23349</span>
+<span id="23350">23350</span>
+<span id="23351">23351</span>
+<span id="23352">23352</span>
+<span id="23353">23353</span>
+<span id="23354">23354</span>
+<span id="23355">23355</span>
+<span id="23356">23356</span>
+<span id="23357">23357</span>
+<span id="23358">23358</span>
+<span id="23359">23359</span>
+<span id="23360">23360</span>
+<span id="23361">23361</span>
+<span id="23362">23362</span>
+<span id="23363">23363</span>
+<span id="23364">23364</span>
+<span id="23365">23365</span>
+<span id="23366">23366</span>
+<span id="23367">23367</span>
+<span id="23368">23368</span>
+<span id="23369">23369</span>
+<span id="23370">23370</span>
+<span id="23371">23371</span>
+<span id="23372">23372</span>
+<span id="23373">23373</span>
+<span id="23374">23374</span>
+<span id="23375">23375</span>
+<span id="23376">23376</span>
+<span id="23377">23377</span>
+<span id="23378">23378</span>
+<span id="23379">23379</span>
+<span id="23380">23380</span>
+<span id="23381">23381</span>
+<span id="23382">23382</span>
+<span id="23383">23383</span>
+<span id="23384">23384</span>
+<span id="23385">23385</span>
+<span id="23386">23386</span>
+<span id="23387">23387</span>
+<span id="23388">23388</span>
+<span id="23389">23389</span>
+<span id="23390">23390</span>
+<span id="23391">23391</span>
+<span id="23392">23392</span>
+<span id="23393">23393</span>
+<span id="23394">23394</span>
+<span id="23395">23395</span>
+<span id="23396">23396</span>
+<span id="23397">23397</span>
+<span id="23398">23398</span>
+<span id="23399">23399</span>
+<span id="23400">23400</span>
+<span id="23401">23401</span>
+<span id="23402">23402</span>
+<span id="23403">23403</span>
+<span id="23404">23404</span>
+<span id="23405">23405</span>
+<span id="23406">23406</span>
+<span id="23407">23407</span>
+<span id="23408">23408</span>
+<span id="23409">23409</span>
+<span id="23410">23410</span>
+<span id="23411">23411</span>
+<span id="23412">23412</span>
+<span id="23413">23413</span>
+<span id="23414">23414</span>
+<span id="23415">23415</span>
+<span id="23416">23416</span>
+<span id="23417">23417</span>
+<span id="23418">23418</span>
+<span id="23419">23419</span>
+<span id="23420">23420</span>
+<span id="23421">23421</span>
+<span id="23422">23422</span>
+<span id="23423">23423</span>
+<span id="23424">23424</span>
+<span id="23425">23425</span>
+<span id="23426">23426</span>
+<span id="23427">23427</span>
+<span id="23428">23428</span>
+<span id="23429">23429</span>
+<span id="23430">23430</span>
+<span id="23431">23431</span>
+<span id="23432">23432</span>
+<span id="23433">23433</span>
+<span id="23434">23434</span>
+<span id="23435">23435</span>
+<span id="23436">23436</span>
+<span id="23437">23437</span>
+<span id="23438">23438</span>
+<span id="23439">23439</span>
+<span id="23440">23440</span>
+<span id="23441">23441</span>
+<span id="23442">23442</span>
+<span id="23443">23443</span>
+<span id="23444">23444</span>
+<span id="23445">23445</span>
+<span id="23446">23446</span>
+<span id="23447">23447</span>
+<span id="23448">23448</span>
+<span id="23449">23449</span>
+<span id="23450">23450</span>
+<span id="23451">23451</span>
+<span id="23452">23452</span>
+<span id="23453">23453</span>
+<span id="23454">23454</span>
+<span id="23455">23455</span>
+<span id="23456">23456</span>
+<span id="23457">23457</span>
+<span id="23458">23458</span>
+<span id="23459">23459</span>
+<span id="23460">23460</span>
+<span id="23461">23461</span>
+<span id="23462">23462</span>
+<span id="23463">23463</span>
+<span id="23464">23464</span>
+<span id="23465">23465</span>
+<span id="23466">23466</span>
+<span id="23467">23467</span>
+<span id="23468">23468</span>
+<span id="23469">23469</span>
+<span id="23470">23470</span>
+<span id="23471">23471</span>
+<span id="23472">23472</span>
+<span id="23473">23473</span>
+<span id="23474">23474</span>
+<span id="23475">23475</span>
+<span id="23476">23476</span>
+<span id="23477">23477</span>
+<span id="23478">23478</span>
+<span id="23479">23479</span>
+<span id="23480">23480</span>
+<span id="23481">23481</span>
+<span id="23482">23482</span>
+<span id="23483">23483</span>
+<span id="23484">23484</span>
+<span id="23485">23485</span>
+<span id="23486">23486</span>
+<span id="23487">23487</span>
+<span id="23488">23488</span>
+<span id="23489">23489</span>
+<span id="23490">23490</span>
+<span id="23491">23491</span>
+<span id="23492">23492</span>
+<span id="23493">23493</span>
+<span id="23494">23494</span>
+<span id="23495">23495</span>
+<span id="23496">23496</span>
+<span id="23497">23497</span>
+<span id="23498">23498</span>
+<span id="23499">23499</span>
+<span id="23500">23500</span>
+<span id="23501">23501</span>
+<span id="23502">23502</span>
+<span id="23503">23503</span>
+<span id="23504">23504</span>
+<span id="23505">23505</span>
+<span id="23506">23506</span>
+<span id="23507">23507</span>
+<span id="23508">23508</span>
+<span id="23509">23509</span>
+<span id="23510">23510</span>
+<span id="23511">23511</span>
+<span id="23512">23512</span>
+<span id="23513">23513</span>
+<span id="23514">23514</span>
+<span id="23515">23515</span>
+<span id="23516">23516</span>
+<span id="23517">23517</span>
+<span id="23518">23518</span>
+<span id="23519">23519</span>
+<span id="23520">23520</span>
+<span id="23521">23521</span>
+<span id="23522">23522</span>
+<span id="23523">23523</span>
+<span id="23524">23524</span>
+<span id="23525">23525</span>
+<span id="23526">23526</span>
+<span id="23527">23527</span>
+<span id="23528">23528</span>
+<span id="23529">23529</span>
+<span id="23530">23530</span>
+<span id="23531">23531</span>
+<span id="23532">23532</span>
+<span id="23533">23533</span>
+<span id="23534">23534</span>
+<span id="23535">23535</span>
+<span id="23536">23536</span>
+<span id="23537">23537</span>
+<span id="23538">23538</span>
+<span id="23539">23539</span>
+<span id="23540">23540</span>
+<span id="23541">23541</span>
+<span id="23542">23542</span>
+<span id="23543">23543</span>
+<span id="23544">23544</span>
+<span id="23545">23545</span>
+<span id="23546">23546</span>
+<span id="23547">23547</span>
+<span id="23548">23548</span>
+<span id="23549">23549</span>
+<span id="23550">23550</span>
+<span id="23551">23551</span>
+<span id="23552">23552</span>
+<span id="23553">23553</span>
+<span id="23554">23554</span>
+<span id="23555">23555</span>
+<span id="23556">23556</span>
+<span id="23557">23557</span>
+<span id="23558">23558</span>
+<span id="23559">23559</span>
+<span id="23560">23560</span>
+<span id="23561">23561</span>
+<span id="23562">23562</span>
+<span id="23563">23563</span>
+<span id="23564">23564</span>
+<span id="23565">23565</span>
+<span id="23566">23566</span>
+<span id="23567">23567</span>
+<span id="23568">23568</span>
+<span id="23569">23569</span>
+<span id="23570">23570</span>
+<span id="23571">23571</span>
+<span id="23572">23572</span>
+<span id="23573">23573</span>
+<span id="23574">23574</span>
+<span id="23575">23575</span>
+<span id="23576">23576</span>
+<span id="23577">23577</span>
+<span id="23578">23578</span>
+<span id="23579">23579</span>
+<span id="23580">23580</span>
+<span id="23581">23581</span>
+<span id="23582">23582</span>
+<span id="23583">23583</span>
+<span id="23584">23584</span>
+<span id="23585">23585</span>
 </pre><pre class="rust"><code><span class="comment">/* automatically generated by rust-bindgen 0.59.2 */
 
 </span><span class="attribute">#[repr(C)]
@@ -26963,6 +27221,7 @@
 <span class="kw">pub const </span>KEY_CYCLIC_LATERAL_RIGHT: u32 = <span class="number">67547</span>;
 <span class="kw">pub const </span>KEY_CYCLIC_LONGITUDINAL_DOWN: u32 = <span class="number">67548</span>;
 <span class="kw">pub const </span>KEY_CYCLIC_LONGITUDINAL_UP: u32 = <span class="number">67549</span>;
+<span class="kw">pub const </span>KEY_ELECT_FUEL_PUMP_SET: u32 = <span class="number">67550</span>;
 <span class="kw">pub const </span>THIRD_PARTY_EVENT_ID_MIN: u32 = <span class="number">69632</span>;
 <span class="kw">pub const </span>THIRD_PARTY_EVENT_ID_MAX: u32 = <span class="number">131071</span>;
 <span class="kw">pub const </span>IDENT_MAIN_PANEL: u32 = <span class="number">0</span>;
@@ -36272,7 +36531,6 @@
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_APPROACH_ACTIVE: GAUGE_TOKEN = <span class="number">1063</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_APPROACH_ARM: GAUGE_TOKEN = <span class="number">1064</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_APPROACH_CAPTURED: GAUGE_TOKEN = <span class="number">1065</span>;
-<span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_APPROACH_IS_LOCALIZER: GAUGE_TOKEN = <span class="number">1065</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_BANK_MODE: GAUGE_TOKEN = <span class="number">1066</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_DISENGAGED: GAUGE_TOKEN = <span class="number">1067</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_GLIDESLOPE_ACTIVE: GAUGE_TOKEN = <span class="number">1068</span>;
@@ -36492,7 +36750,8 @@
 <span class="kw">pub const </span>GAUGE_TOKEN_RACE_LAST_LAP_TIME: GAUGE_TOKEN = <span class="number">1282</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_CIRCUIT_NAVCOM4_ON: GAUGE_TOKEN = <span class="number">1283</span>;
 <span class="kw">pub const </span>GAUGE_TOKEN_BREAKER_NAVCOM4: GAUGE_TOKEN = <span class="number">1284</span>;
-<span class="kw">pub const </span>GAUGE_TOKEN_C_GAUGE_TOKEN: GAUGE_TOKEN = <span class="number">1285</span>;
+<span class="kw">pub const </span>GAUGE_TOKEN_AUTOPILOT_APPROACH_IS_LOCALIZER: GAUGE_TOKEN = <span class="number">1285</span>;
+<span class="kw">pub const </span>GAUGE_TOKEN_C_GAUGE_TOKEN: GAUGE_TOKEN = <span class="number">1286</span>;
 <span class="kw">pub type </span>GAUGE_TOKEN = ::std::os::raw::c_uint;
 <span class="kw">pub const </span>VAR_TYPE_VAR_TYPE_NONE: VAR_TYPE = <span class="number">0</span>;
 <span class="kw">pub const </span>VAR_TYPE_TYPE_BOOL8: VAR_TYPE = <span class="number">1</span>;
@@ -43187,6 +43446,7 @@
 <span class="kw">pub const </span>SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_FACILITY_DATA: SIMCONNECT_RECV_ID = <span class="number">28</span>;
 <span class="kw">pub const </span>SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_FACILITY_DATA_END: SIMCONNECT_RECV_ID = <span class="number">29</span>;
 <span class="kw">pub const </span>SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_FACILITY_MINIMAL_LIST: SIMCONNECT_RECV_ID = <span class="number">30</span>;
+<span class="kw">pub const </span>SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_JETWAY_DATA: SIMCONNECT_RECV_ID = <span class="number">31</span>;
 <span class="kw">pub type </span>SIMCONNECT_RECV_ID = ::std::os::raw::c_uint;
 <span class="kw">pub const </span>SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_INVALID: SIMCONNECT_DATATYPE = <span class="number">0</span>;
 <span class="kw">pub const </span>SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_INT32: SIMCONNECT_DATATYPE = <span class="number">1</span>;
@@ -43248,6 +43508,7 @@
     SIMCONNECT_EXCEPTION_OBJECT_AI = <span class="number">35</span>,
     SIMCONNECT_EXCEPTION_OBJECT_ATC = <span class="number">36</span>,
     SIMCONNECT_EXCEPTION_OBJECT_SCHEDULE = <span class="number">37</span>,
+    SIMCONNECT_EXCEPTION_JETWAY_DATA = <span class="number">38</span>,
 }
 <span class="kw">pub const </span>SIMCONNECT_SIMOBJECT_TYPE_SIMCONNECT_SIMOBJECT_TYPE_USER: SIMCONNECT_SIMOBJECT_TYPE = <span class="number">0</span>;
 <span class="kw">pub const </span>SIMCONNECT_SIMOBJECT_TYPE_SIMCONNECT_SIMOBJECT_TYPE_ALL: SIMCONNECT_SIMOBJECT_TYPE = <span class="number">1</span>;
@@ -45626,6 +45887,56 @@
         )
     );
 }
+<span class="attribute">#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>SIMCONNECT_DATA_PBH {
+    <span class="kw">pub </span>Pitch: f32,
+    <span class="kw">pub </span>Bank: f32,
+    <span class="kw">pub </span>Heading: f32,
+}
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bindgen_test_layout_SIMCONNECT_DATA_PBH() {
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::size_of::&lt;SIMCONNECT_DATA_PBH&gt;(),
+        <span class="number">12usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_DATA_PBH))
+    );
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::align_of::&lt;SIMCONNECT_DATA_PBH&gt;(),
+        <span class="number">1usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_DATA_PBH))
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_DATA_PBH&gt;())).Pitch <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">0usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_DATA_PBH),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Pitch)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_DATA_PBH&gt;())).Bank <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">4usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_DATA_PBH),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Bank)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_DATA_PBH&gt;())).Heading <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">8usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_DATA_PBH),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Heading)
+        )
+    );
+}
 <span class="attribute">#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>SIMCONNECT_FACILITY_MINIMAL {
@@ -46012,6 +46323,203 @@
             <span class="macro">stringify!</span>(SIMCONNECT_DATA_XYZ),
             <span class="string">&quot;::&quot;</span>,
             <span class="macro">stringify!</span>(z)
+        )
+    );
+}
+<span class="attribute">#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>SIMCONNECT_JETWAY_DATA {
+    <span class="kw">pub </span>AirportIcao: [::std::os::raw::c_char; <span class="number">8usize</span>],
+    <span class="kw">pub </span>ParkingIndex: ::std::os::raw::c_int,
+    <span class="kw">pub </span>Lla: SIMCONNECT_DATA_LATLONALT,
+    <span class="kw">pub </span>Pbh: SIMCONNECT_DATA_PBH,
+    <span class="kw">pub </span>Status: ::std::os::raw::c_int,
+    <span class="kw">pub </span>Door: ::std::os::raw::c_int,
+    <span class="kw">pub </span>ExitDoorRelativePos: SIMCONNECT_DATA_XYZ,
+    <span class="kw">pub </span>MainHandlePos: SIMCONNECT_DATA_XYZ,
+    <span class="kw">pub </span>SecondaryHandle: SIMCONNECT_DATA_XYZ,
+    <span class="kw">pub </span>WheelGroundLock: SIMCONNECT_DATA_XYZ,
+    <span class="kw">pub </span>JetwayObjectId: DWORD,
+    <span class="kw">pub </span>AttachedObjectId: DWORD,
+}
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bindgen_test_layout_SIMCONNECT_JETWAY_DATA() {
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::size_of::&lt;SIMCONNECT_JETWAY_DATA&gt;(),
+        <span class="number">168usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA))
+    );
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::align_of::&lt;SIMCONNECT_JETWAY_DATA&gt;(),
+        <span class="number">1usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA))
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).AirportIcao <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">0usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(AirportIcao)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).ParkingIndex <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">8usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(ParkingIndex)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).Lla <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">12usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Lla)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).Pbh <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">36usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Pbh)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).Status <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">48usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Status)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).Door <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize },
+        <span class="number">52usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(Door)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).ExitDoorRelativePos <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_
+                as </span>usize
+        },
+        <span class="number">56usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(ExitDoorRelativePos)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).MainHandlePos <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">80usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(MainHandlePos)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).SecondaryHandle <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">104usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(SecondaryHandle)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).WheelGroundLock <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">128usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(WheelGroundLock)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).JetwayObjectId <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">152usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(JetwayObjectId)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_JETWAY_DATA&gt;())).AttachedObjectId <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">160usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(AttachedObjectId)
+        )
+    );
+}
+<span class="attribute">#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>SIMCONNECT_RECV_JETWAY_DATA {
+    <span class="kw">pub </span>_base: SIMCONNECT_RECV_LIST_TEMPLATE,
+    <span class="kw">pub </span>rgData: [SIMCONNECT_JETWAY_DATA; <span class="number">1usize</span>],
+}
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bindgen_test_layout_SIMCONNECT_RECV_JETWAY_DATA() {
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::size_of::&lt;SIMCONNECT_RECV_JETWAY_DATA&gt;(),
+        <span class="number">224usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_RECV_JETWAY_DATA))
+    );
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::align_of::&lt;SIMCONNECT_RECV_JETWAY_DATA&gt;(),
+        <span class="number">1usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(SIMCONNECT_RECV_JETWAY_DATA))
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::std::ptr::null::&lt;SIMCONNECT_RECV_JETWAY_DATA&gt;())).rgData <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
+        },
+        <span class="number">56usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(SIMCONNECT_RECV_JETWAY_DATA),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(rgData)
         )
     );
 }
@@ -46650,6 +47158,14 @@
         ICAO: <span class="kw-2">*const </span>::std::os::raw::c_char,
         Region: <span class="kw-2">*const </span>::std::os::raw::c_char,
         Type: ::std::os::raw::c_char,
+    ) -&gt; HRESULT;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>SimConnect_RequestJetwayData(
+        hSimConnect: HANDLE,
+        AirportIcao: <span class="kw-2">*const </span>::std::os::raw::c_char,
+        ArrayCount: DWORD,
+        Indexes: <span class="kw-2">*mut </span>::std::os::raw::c_int,
     ) -&gt; HRESULT;
 }
 </code></pre></div>
