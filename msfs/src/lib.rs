@@ -30,6 +30,7 @@
 mod msfs;
 pub mod sim_connect;
 pub mod sys;
+pub mod communication;
 
 pub use msfs::*;
 
