@@ -618,8 +618,8 @@ impl sys::SIMCONNECT_RECV_EVENT_EX1 {
     }
 
     /// The data for this event.
-    pub fn data_ex1(&self) -> &[sys::DWORD] {
-        &[
+    pub fn data_ex1(&self) -> [sys::DWORD; 5] {
+        [
             self.dwData0,
             self.dwData1,
             self.dwData2,
