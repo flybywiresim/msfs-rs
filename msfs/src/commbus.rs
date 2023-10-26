@@ -1,4 +1,4 @@
-//! This file implements the communication API available in the MSFS SDK.
+//! Bindings for the commbus API available in the MSFS SDK.
 
 use std::{
     ffi::{self, CString},
