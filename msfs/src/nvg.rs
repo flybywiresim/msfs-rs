@@ -328,7 +328,6 @@ impl Direction {
     }
 }
 
-#[derive(Debug)]
 #[doc(hidden)]
 pub enum PaintOrColor {
     Paint(Paint),
@@ -348,7 +347,7 @@ impl From<Color> for PaintOrColor {
 }
 
 /// The stroke and/or fill which will be applied to a path.
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct Style {
     stroke: Option<PaintOrColor>,
     fill: Option<PaintOrColor>,
@@ -369,7 +368,6 @@ impl Style {
 }
 
 /// Colors in NanoVG are stored as unsigned ints in ABGR format.
-#[derive(Debug)]
 pub struct Color(sys::NVGcolor);
 
 impl Color {
@@ -408,7 +406,6 @@ impl Color {
 
 /// NanoVG supports four types of paints: linear gradient, box gradient, radial gradient and image pattern.
 /// These can be used as paints for strokes and fills.
-#[derive(Debug)]
 pub struct Paint(sys::NVGpaint);
 
 impl Paint {

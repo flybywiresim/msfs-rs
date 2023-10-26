@@ -38,7 +38,7 @@ fn main() {
             .blocklist_function("nvgStrokePaint")
             .parse_callbacks(Box::new(bindgen::CargoCallbacks))
             .rustified_enum("SIMCONNECT_EXCEPTION")
-            .impl_debug(true);
+            .impl_debug(false);
 
         if wasm {
             bindings = bindings.clang_arg("-D_MSFS_WASM 1");
