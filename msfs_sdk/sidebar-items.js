@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["calculate_msfs_sdk_path",""]]};
+window.SIDEBAR_ITEMS = {"fn":["calculate_msfs_sdk_path"]};
