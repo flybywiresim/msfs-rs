@@ -1,14 +1,13 @@
 //! Bindings for the commbus API available in the MSFS SDK.
-
+use crate::sys;
 use std::{
     ffi::{self, CString},
     slice,
 };
 
-use crate::sys;
+type CommBusCallback = Box<dyn Fn(&[u8])>;
 
-type CommBusCallback = Box<dyn Fn(&[i8])>;
-
+/// Used to specify the type of module/gauge to broadcast an event to.
 #[derive(Default)]
 pub enum CommBusBroadcastFlags {
     JS,
@@ -39,12 +38,14 @@ impl From<CommBusBroadcastFlags> for sys::FsCommBusBroadcastFlags {
     }
 }
 
+/// CommBus handle. When this handle goes out of scope the callback will be unregistered.
 pub struct CommBus {
     event_name: CString,
     callback: Box<CommBusCallback>,
 }
 impl CommBus {
-    pub fn register(event_name: &str, callback: impl Fn(&[i8]) + 'static) -> Option<Self> {
+    /// Register to a communication event.
+    pub fn register(event_name: &str, callback: impl Fn(&[u8]) + 'static) -> Option<Self> {
         let this = Self {
             event_name: CString::new(event_name).ok()?,
             callback: Box::new(Box::new(callback)),
@@ -63,6 +64,7 @@ impl CommBus {
         }
     }
 
+    /// Call a communication event.
     pub fn call(event_name: &str, args: &[i8], called: CommBusBroadcastFlags) -> bool {
         if let Ok(event_name) = CString::new(event_name) {
             unsafe {
@@ -83,8 +85,8 @@ impl CommBus {
             let (callback, args) = unsafe {
                 (
                     Box::from_raw(ctx as *mut CommBusCallback),
-                    // SAFETY: because i8 is 1 byte we can use size directly as length of the slice
-                    slice::from_raw_parts(args, size as usize),
+                    // SAFETY: because i8/u8 is 1 byte we can use size directly as length of the slice
+                    slice::from_raw_parts(args as *const u8, size as usize),
                 )
             };
             callback(args);
