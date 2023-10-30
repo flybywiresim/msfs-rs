@@ -72,7 +72,8 @@ impl<'a> NetworkRequestBuilder<'a> {
         ) -> sys::FsNetworkRequestId,
     ) -> Option<NetworkRequest> {
         // SAFETY: we need a *mut i8 for the FsNetworkHttpRequestParam struct but this should be fine.
-        let raw_post_field = post_field.map_or(ptr::null_mut(), |f| f.as_c_str().as_ptr() as *mut i8);
+        let raw_post_field =
+            post_field.map_or(ptr::null_mut(), |f| f.as_c_str().as_ptr() as *mut i8);
         let mut params = self.generate_params(raw_post_field);
         let callback_data = self.callback.map_or(ptr::null_mut(), Box::into_raw) as *mut _;
         let request_id = unsafe {
