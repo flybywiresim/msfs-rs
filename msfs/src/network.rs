@@ -7,7 +7,7 @@ use std::{
 
 use crate::sys;
 
-type NetworkCallback = Box<dyn Fn(NetworkRequest, i32)>;
+type NetworkCallback = Box<dyn FnOnce(NetworkRequest, i32)>;
 
 /// A builder to build network requests
 pub struct NetworkRequestBuilder<'a> {
@@ -41,7 +41,7 @@ impl<'a> NetworkRequestBuilder<'a> {
 
     /// Set a callback which will be called after the request finished or failed.
     /// The parameters are the network request and the http status code (negative if failed)
-    pub fn with_callback(mut self, callback: impl Fn(NetworkRequest, i32) + 'static) -> Self {
+    pub fn with_callback(mut self, callback: impl FnOnce(NetworkRequest, i32) + 'static) -> Self {
         self.callback = Some(Box::new(Box::new(callback)));
         self
     }
