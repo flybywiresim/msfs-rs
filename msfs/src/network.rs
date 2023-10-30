@@ -71,20 +71,17 @@ impl<'a> NetworkRequestBuilder<'a> {
             *mut ::std::os::raw::c_void,
         ) -> sys::FsNetworkRequestId,
     ) -> Option<NetworkRequest> {
-        let raw_post_field = post_field.map_or(ptr::null_mut(), |f| f.into_raw());
+        // SAFETY: we need a *mut i8 for the FsNetworkHttpRequestParam struct but this should be fine.
+        let raw_post_field = post_field.map_or(ptr::null_mut(), |f| f.as_c_str().as_ptr() as *mut i8);
         let mut params = self.generate_params(raw_post_field);
         let callback_data = self.callback.map_or(ptr::null_mut(), Box::into_raw) as *mut _;
         let request_id = unsafe {
-            let id = request(
+            request(
                 self.url.as_ptr(),
                 &mut params as *mut sys::FsNetworkHttpRequestParam,
                 Some(Self::c_wrapper),
                 callback_data,
-            );
-            if !raw_post_field.is_null() {
-                drop(CString::from_raw(raw_post_field));
-            }
-            id
+            )
         };
         if request_id == 0 {
             // Free the callback
