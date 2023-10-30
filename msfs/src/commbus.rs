@@ -5,7 +5,7 @@ use std::{
     slice,
 };
 
-type CommBusCallback = Box<dyn Fn(&[u8])>;
+type CommBusCallback<'a> = Box<dyn Fn(&[u8]) + 'a>;
 
 /// Used to specify the type of module/gauge to broadcast an event to.
 #[derive(Default)]
@@ -39,13 +39,13 @@ impl From<CommBusBroadcastFlags> for sys::FsCommBusBroadcastFlags {
 }
 
 /// CommBus handle. When this handle goes out of scope the callback will be unregistered.
-pub struct CommBus {
+pub struct CommBus<'a> {
     event_name: CString,
-    callback: Box<CommBusCallback>,
+    callback: Box<CommBusCallback<'a>>,
 }
-impl CommBus {
+impl<'a> CommBus<'a> {
     /// Register to a communication event.
-    pub fn register(event_name: &str, callback: impl Fn(&[u8]) + 'static) -> Option<Self> {
+    pub fn register(event_name: &str, callback: impl Fn(&[u8]) + 'a) -> Option<Self> {
         let this = Self {
             event_name: CString::new(event_name).ok()?,
             callback: Box::new(Box::new(callback)),
@@ -84,7 +84,7 @@ impl CommBus {
         if !ctx.is_null() {
             let (callback, args) = unsafe {
                 (
-                    Box::from_raw(ctx as *mut CommBusCallback),
+                    Box::from_raw(ctx as *mut CommBusCallback<'a>),
                     // SAFETY: because i8/u8 is 1 byte we can use size directly as length of the slice
                     slice::from_raw_parts(args as *const u8, size as usize),
                 )
@@ -95,7 +95,7 @@ impl CommBus {
         }
     }
 }
-impl Drop for CommBus {
+impl Drop for CommBus<'_> {
     fn drop(&mut self) {
         unsafe {
             sys::fsCommBusUnregister(self.event_name.as_ptr(), Some(Self::c_callback));
