@@ -1,11 +1,10 @@
 //! Bindings to the networking API. It can be used to do HTTPS requests.
 
+use crate::sys;
 use std::{
     ffi::{self, CStr, CString},
-    ptr,
+    ptr, slice,
 };
-
-use crate::sys;
 
 type NetworkCallback = Box<dyn FnOnce(NetworkRequest, i32)>;
 
@@ -170,7 +169,7 @@ impl NetworkRequest {
     }
 
     /// Get the data
-    pub fn data(&self) -> Option<OwnedCVec> {
+    pub fn data(&self) -> Option<Vec<u8>> {
         let data_size = self.data_size();
         if data_size == 0 {
             return None;
@@ -180,7 +179,9 @@ impl NetworkRequest {
             if data.is_null() {
                 None
             } else {
-                Some(OwnedCVec::from_raw(data, data_size))
+                let result = slice::from_raw_parts(data, data_size).to_owned();
+                libc::free(data as *mut ffi::c_void);
+                Some(result)
             }
         }
     }
@@ -196,61 +197,17 @@ impl NetworkRequest {
     }
 
     /// Get a specific header section
-    pub fn header_section(&self, section: &str) -> Option<OwnedCStr> {
+    pub fn header_section(&self, section: &str) -> Option<String> {
         let section = CString::new(section).ok()?;
         unsafe {
             let a = sys::fsNetworkHttpRequestGetHeaderSection(self.0, section.as_ptr());
             if a.is_null() {
                 None
             } else {
-                Some(OwnedCStr::from_ptr(a))
+                let result = CStr::from_ptr(a).to_str().ok().map(|s| s.to_owned());
+                libc::free(a as *mut ffi::c_void);
+                result
             }
-        }
-    }
-}
-
-pub struct OwnedCStr<'a>(&'a CStr);
-impl OwnedCStr<'_> {
-    fn from_ptr(data: *const ffi::c_char) -> Self {
-        Self(unsafe { CStr::from_ptr(data) })
-    }
-}
-impl std::ops::Deref for OwnedCStr<'_> {
-    type Target = CStr;
-
-    fn deref(&self) -> &Self::Target {
-        self.0
-    }
-}
-impl Drop for OwnedCStr<'_> {
-    fn drop(&mut self) {
-        // SAFETY: the CStr itself will be droped right afterwards which doesn't have any deconstructor
-        unsafe {
-            libc::free(self.0.as_ptr() as *mut ffi::c_void);
-        }
-    }
-}
-
-pub struct OwnedCVec {
-    data: *const u8,
-    size: usize,
-}
-impl OwnedCVec {
-    fn from_raw(data: *const u8, size: usize) -> Self {
-        Self { data, size }
-    }
-}
-impl std::ops::Deref for OwnedCVec {
-    type Target = [u8];
-
-    fn deref(&self) -> &Self::Target {
-        unsafe { std::slice::from_raw_parts(self.data, self.size) }
-    }
-}
-impl Drop for OwnedCVec {
-    fn drop(&mut self) {
-        unsafe {
-            libc::free(self.data as *mut ffi::c_void);
         }
     }
 }
