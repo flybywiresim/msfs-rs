@@ -74,7 +74,24 @@ impl<'a> NetworkRequestBuilder<'a> {
         // SAFETY: we need a *mut i8 for the FsNetworkHttpRequestParam struct but this should be fine.
         let raw_post_field =
             post_field.map_or(ptr::null_mut(), |f| f.as_c_str().as_ptr() as *mut i8);
-        let mut params = self.generate_params(raw_post_field);
+        // SAFETY: Because the struct in the C code is not defined as const char* we need to cast
+        // the *const into *mut which should be safe because the function should not change it anyway
+        let mut headers = self
+            .headers
+            .iter_mut()
+            .map(|h| h.as_ptr() as *mut i8)
+            .collect::<Vec<_>>();
+        let data_len = self.data.as_ref().map_or(0, |d| d.len());
+        let mut params = sys::FsNetworkHttpRequestParam {
+            postField: raw_post_field,
+            headerOptions: headers.as_mut_ptr(),
+            headerOptionsSize: headers.len() as std::os::raw::c_uint,
+            data: self
+                .data
+                .as_mut()
+                .map_or(ptr::null_mut(), |d| d.as_mut_ptr()),
+            dataSize: data_len as std::os::raw::c_uint,
+        };
         let callback_data = self.callback.map_or(ptr::null_mut(), Box::into_raw) as *mut _;
         let request_id = unsafe {
             request(
@@ -90,27 +107,6 @@ impl<'a> NetworkRequestBuilder<'a> {
             None
         } else {
             Some(NetworkRequest(request_id))
-        }
-    }
-
-    fn generate_params(&mut self, post_field: *mut i8) -> sys::FsNetworkHttpRequestParam {
-        // Safety: Because the struct in the C code is not defined as const char* we need to cast
-        // the *const into *mut which should be safe because the function should not change it anyway
-        let mut headers: Vec<_> = self
-            .headers
-            .iter_mut()
-            .map(|h| h.as_ptr() as *mut i8)
-            .collect();
-        let data_len = self.data.as_ref().map_or(0, |d| d.len());
-        sys::FsNetworkHttpRequestParam {
-            postField: post_field,
-            headerOptions: headers.as_mut_ptr(),
-            headerOptionsSize: self.headers.len() as std::os::raw::c_uint,
-            data: self
-                .data
-                .as_mut()
-                .map_or(ptr::null_mut(), |d| d.as_mut_ptr()),
-            dataSize: data_len as std::os::raw::c_uint,
         }
     }
 
