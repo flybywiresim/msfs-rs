@@ -5,7 +5,9 @@ use std::{
     slice,
 };
 
-type CommBusCallback<'a> = Box<dyn Fn(&[u8]) + 'a>;
+// SAFETY: It should be safe to use `FnMut` as callback
+// as the execution is not happen in parallel (hopefully).
+type CommBusCallback<'a> = Box<dyn FnMut(&[u8]) + 'a>;
 
 /// Used to specify the type of module/gauge to broadcast an event to.
 #[derive(Default)]
@@ -45,7 +47,7 @@ pub struct CommBus<'a> {
 }
 impl<'a> CommBus<'a> {
     /// Register to a communication event.
-    pub fn register(event_name: &str, callback: impl Fn(&[u8]) + 'a) -> Option<Self> {
+    pub fn register(event_name: &str, callback: impl FnMut(&[u8]) + 'a) -> Option<Self> {
         let this = Self {
             event_name: CString::new(event_name).ok()?,
             callback: Box::new(Box::new(callback)),
@@ -82,7 +84,7 @@ impl<'a> CommBus<'a> {
 
     extern "C" fn c_callback(args: *const ffi::c_char, size: ffi::c_uint, ctx: *mut ffi::c_void) {
         if !ctx.is_null() {
-            let (callback, args) = unsafe {
+            let (mut callback, args) = unsafe {
                 (
                     Box::from_raw(ctx as *mut CommBusCallback<'a>),
                     // SAFETY: because i8/u8 is 1 byte we can use size directly as length of the slice
