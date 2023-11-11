@@ -123,7 +123,7 @@ impl<'a> NetworkRequestBuilder<'a> {
 }
 
 /// The states in which a network request can be in
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkRequestState {
     Invalid,
     New,
