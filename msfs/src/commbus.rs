@@ -7,7 +7,7 @@ use std::{
 
 // SAFETY: It should be safe to use `FnMut` as callback
 // as the execution is not happen in parallel (hopefully).
-type CommBusCallback<'a> = Box<dyn FnMut(&[u8]) + 'a>;
+type CommBusCallback<'a> = Box<dyn FnMut(&str) + 'a>;
 
 /// Used to specify the type of module/gauge to broadcast an event to.
 #[derive(Default)]
@@ -46,8 +46,8 @@ pub struct CommBus<'a> {
     callback: Box<CommBusCallback<'a>>,
 }
 impl<'a> CommBus<'a> {
-    /// Register to a communication event.
-    pub fn register(event_name: &str, callback: impl FnMut(&[u8]) + 'a) -> Option<Self> {
+    /// Registers to a communication event.
+    pub fn register(event_name: &str, callback: impl FnMut(&str) + 'a) -> Option<Self> {
         let this = Self {
             event_name: CString::new(event_name).ok()?,
             callback: Box::new(Box::new(callback)),
@@ -66,14 +66,15 @@ impl<'a> CommBus<'a> {
         }
     }
 
-    /// Call a communication event.
-    pub fn call(event_name: &str, args: &[i8], called: CommBusBroadcastFlags) -> bool {
-        if let Ok(event_name) = CString::new(event_name) {
+    /// Calls a communication event.
+    /// Returns `true` if the call was successful.
+    pub fn call(event_name: &str, args: &str, called: CommBusBroadcastFlags) -> bool {
+        if let (Ok(event_name), Ok(args_cstr)) = (CString::new(event_name), CString::new(args)) {
             unsafe {
                 sys::fsCommBusCall(
                     event_name.as_ptr(),
-                    args.as_ptr(),
-                    args.len() as ffi::c_uint,
+                    args_cstr.as_ptr(),
+                    (args.len() + 1) as ffi::c_uint,
                     called.into(),
                 )
             }
@@ -91,7 +92,7 @@ impl<'a> CommBus<'a> {
                     slice::from_raw_parts(args as *const u8, size as usize),
                 )
             };
-            callback(args);
+            callback(&String::from_utf8_lossy(args));
             // Don't free callback as it's still registered
             Box::leak(callback);
         }
