@@ -1,7 +1,9 @@
 //! Bindings for the commbus API available in the MSFS SDK.
 use crate::sys;
 use std::{
+    cell::RefCell,
     ffi::{self, CString},
+    rc::Rc,
     slice,
 };
 
@@ -40,27 +42,22 @@ impl From<CommBusBroadcastFlags> for sys::FsCommBusBroadcastFlags {
     }
 }
 
-/// CommBus handle. When this handle goes out of scope the callback will be unregistered.
+#[derive(Default)]
 pub struct CommBus<'a> {
-    event_name: CString,
-    callback: Box<CommBusCallback<'a>>,
+    events: Vec<Rc<RefCell<Option<CommBusEvent<'a>>>>>,
 }
 impl<'a> CommBus<'a> {
     /// Registers to a communication event.
-    pub fn register(event_name: &str, callback: impl FnMut(&str) + 'a) -> Option<Self> {
-        let this = Self {
-            event_name: CString::new(event_name).ok()?,
-            callback: Box::new(Box::new(callback)),
-        };
-        let res = unsafe {
-            sys::fsCommBusRegister(
-                this.event_name.as_ptr(),
-                Some(Self::c_callback),
-                this.callback.as_ref() as *const _ as *mut _,
-            )
-        };
-        if res {
-            Some(this)
+    /// Returns `true` if the registration was successful.
+    pub fn register(
+        &mut self,
+        event_name: &str,
+        callback: impl FnMut(&str) + 'a,
+    ) -> Option<Rc<RefCell<Option<CommBusEvent<'a>>>>> {
+        if let Some(event) = CommBusEvent::register(event_name, callback) {
+            let event = Rc::new(RefCell::new(Some(event)));
+            self.events.push(event.clone());
+            Some(event)
         } else {
             None
         }
@@ -83,6 +80,40 @@ impl<'a> CommBus<'a> {
         }
     }
 
+    pub fn unregister_all(&mut self) {
+        for event in &self.events {
+            event.take();
+        }
+        self.events.clear();
+    }
+}
+
+/// CommBus handle. When this handle goes out of scope the callback will be unregistered.
+pub struct CommBusEvent<'a> {
+    event_name: CString,
+    callback: Box<CommBusCallback<'a>>,
+}
+impl<'a> CommBusEvent<'a> {
+    /// Registers to a communication event.
+    pub fn register(event_name: &str, callback: impl FnMut(&str) + 'a) -> Option<Self> {
+        let this = Self {
+            event_name: CString::new(event_name).ok()?,
+            callback: Box::new(Box::new(callback)),
+        };
+        let res = unsafe {
+            sys::fsCommBusRegister(
+                this.event_name.as_ptr(),
+                Some(Self::c_callback),
+                this.callback.as_ref() as *const _ as *mut _,
+            )
+        };
+        if res {
+            Some(this)
+        } else {
+            None
+        }
+    }
+
     extern "C" fn c_callback(args: *const ffi::c_char, size: ffi::c_uint, ctx: *mut ffi::c_void) {
         if !ctx.is_null() {
             let (mut callback, args) = unsafe {
@@ -98,7 +129,7 @@ impl<'a> CommBus<'a> {
         }
     }
 }
-impl Drop for CommBus<'_> {
+impl Drop for CommBusEvent<'_> {
     fn drop(&mut self) {
         unsafe {
             sys::fsCommBusUnregister(self.event_name.as_ptr(), Some(Self::c_callback));
