@@ -48,7 +48,8 @@ pub struct CommBus<'a> {
 }
 impl<'a> CommBus<'a> {
     /// Registers to a communication event.
-    /// Returns `true` if the registration was successful.
+    /// Returns the event if the registration was successful.
+    /// By calling `take` on the returned value the event gets unregistered.
     pub fn register(
         &mut self,
         event_name: &str,
@@ -80,6 +81,8 @@ impl<'a> CommBus<'a> {
         }
     }
 
+    /// Deregisters all communication events registered with this `CommBus` instance.
+    /// The same functionality can be achieved by dropping the `CommBus` instance and creating a new instance.
     pub fn unregister_all(&mut self) {
         for event in &self.events {
             event.take();
