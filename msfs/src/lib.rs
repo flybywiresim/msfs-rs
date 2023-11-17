@@ -6,7 +6,7 @@
 //! - SimConnect API
 //! - NanoVG API
 //! - Networking API
-//! - CommBus API
+//! - Communication Bus API
 //!
 //! ## Building
 //!
