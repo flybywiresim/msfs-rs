@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/external/target/debug/build/msfs-97eae5632bafe456/out/msfs-sys.rs`."><title>msfs-sys.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../../../../" data-static-root-path="../../../../../../../../static.files/" data-current-crate="msfs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../../../../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../../../../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../../../../../../source-files.js"></script><script defer src="../../../../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../../../../msfs/index.html"><img class="rust-logo" src="../../../../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/external/target/debug/build/msfs-ea7226cd15a8e436/out/msfs-sys.rs`."><title>msfs-sys.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../../../../" data-static-root-path="../../../../../../../../static.files/" data-current-crate="msfs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../../../../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../../../../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../../../../../../source-files.js"></script><script defer src="../../../../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../../../../msfs/index.html"><img class="rust-logo" src="../../../../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -23509,6 +23509,151 @@
 <a href="#23509" id="23509">23509</a>
 <a href="#23510" id="23510">23510</a>
 <a href="#23511" id="23511">23511</a>
+<a href="#23512" id="23512">23512</a>
+<a href="#23513" id="23513">23513</a>
+<a href="#23514" id="23514">23514</a>
+<a href="#23515" id="23515">23515</a>
+<a href="#23516" id="23516">23516</a>
+<a href="#23517" id="23517">23517</a>
+<a href="#23518" id="23518">23518</a>
+<a href="#23519" id="23519">23519</a>
+<a href="#23520" id="23520">23520</a>
+<a href="#23521" id="23521">23521</a>
+<a href="#23522" id="23522">23522</a>
+<a href="#23523" id="23523">23523</a>
+<a href="#23524" id="23524">23524</a>
+<a href="#23525" id="23525">23525</a>
+<a href="#23526" id="23526">23526</a>
+<a href="#23527" id="23527">23527</a>
+<a href="#23528" id="23528">23528</a>
+<a href="#23529" id="23529">23529</a>
+<a href="#23530" id="23530">23530</a>
+<a href="#23531" id="23531">23531</a>
+<a href="#23532" id="23532">23532</a>
+<a href="#23533" id="23533">23533</a>
+<a href="#23534" id="23534">23534</a>
+<a href="#23535" id="23535">23535</a>
+<a href="#23536" id="23536">23536</a>
+<a href="#23537" id="23537">23537</a>
+<a href="#23538" id="23538">23538</a>
+<a href="#23539" id="23539">23539</a>
+<a href="#23540" id="23540">23540</a>
+<a href="#23541" id="23541">23541</a>
+<a href="#23542" id="23542">23542</a>
+<a href="#23543" id="23543">23543</a>
+<a href="#23544" id="23544">23544</a>
+<a href="#23545" id="23545">23545</a>
+<a href="#23546" id="23546">23546</a>
+<a href="#23547" id="23547">23547</a>
+<a href="#23548" id="23548">23548</a>
+<a href="#23549" id="23549">23549</a>
+<a href="#23550" id="23550">23550</a>
+<a href="#23551" id="23551">23551</a>
+<a href="#23552" id="23552">23552</a>
+<a href="#23553" id="23553">23553</a>
+<a href="#23554" id="23554">23554</a>
+<a href="#23555" id="23555">23555</a>
+<a href="#23556" id="23556">23556</a>
+<a href="#23557" id="23557">23557</a>
+<a href="#23558" id="23558">23558</a>
+<a href="#23559" id="23559">23559</a>
+<a href="#23560" id="23560">23560</a>
+<a href="#23561" id="23561">23561</a>
+<a href="#23562" id="23562">23562</a>
+<a href="#23563" id="23563">23563</a>
+<a href="#23564" id="23564">23564</a>
+<a href="#23565" id="23565">23565</a>
+<a href="#23566" id="23566">23566</a>
+<a href="#23567" id="23567">23567</a>
+<a href="#23568" id="23568">23568</a>
+<a href="#23569" id="23569">23569</a>
+<a href="#23570" id="23570">23570</a>
+<a href="#23571" id="23571">23571</a>
+<a href="#23572" id="23572">23572</a>
+<a href="#23573" id="23573">23573</a>
+<a href="#23574" id="23574">23574</a>
+<a href="#23575" id="23575">23575</a>
+<a href="#23576" id="23576">23576</a>
+<a href="#23577" id="23577">23577</a>
+<a href="#23578" id="23578">23578</a>
+<a href="#23579" id="23579">23579</a>
+<a href="#23580" id="23580">23580</a>
+<a href="#23581" id="23581">23581</a>
+<a href="#23582" id="23582">23582</a>
+<a href="#23583" id="23583">23583</a>
+<a href="#23584" id="23584">23584</a>
+<a href="#23585" id="23585">23585</a>
+<a href="#23586" id="23586">23586</a>
+<a href="#23587" id="23587">23587</a>
+<a href="#23588" id="23588">23588</a>
+<a href="#23589" id="23589">23589</a>
+<a href="#23590" id="23590">23590</a>
+<a href="#23591" id="23591">23591</a>
+<a href="#23592" id="23592">23592</a>
+<a href="#23593" id="23593">23593</a>
+<a href="#23594" id="23594">23594</a>
+<a href="#23595" id="23595">23595</a>
+<a href="#23596" id="23596">23596</a>
+<a href="#23597" id="23597">23597</a>
+<a href="#23598" id="23598">23598</a>
+<a href="#23599" id="23599">23599</a>
+<a href="#23600" id="23600">23600</a>
+<a href="#23601" id="23601">23601</a>
+<a href="#23602" id="23602">23602</a>
+<a href="#23603" id="23603">23603</a>
+<a href="#23604" id="23604">23604</a>
+<a href="#23605" id="23605">23605</a>
+<a href="#23606" id="23606">23606</a>
+<a href="#23607" id="23607">23607</a>
+<a href="#23608" id="23608">23608</a>
+<a href="#23609" id="23609">23609</a>
+<a href="#23610" id="23610">23610</a>
+<a href="#23611" id="23611">23611</a>
+<a href="#23612" id="23612">23612</a>
+<a href="#23613" id="23613">23613</a>
+<a href="#23614" id="23614">23614</a>
+<a href="#23615" id="23615">23615</a>
+<a href="#23616" id="23616">23616</a>
+<a href="#23617" id="23617">23617</a>
+<a href="#23618" id="23618">23618</a>
+<a href="#23619" id="23619">23619</a>
+<a href="#23620" id="23620">23620</a>
+<a href="#23621" id="23621">23621</a>
+<a href="#23622" id="23622">23622</a>
+<a href="#23623" id="23623">23623</a>
+<a href="#23624" id="23624">23624</a>
+<a href="#23625" id="23625">23625</a>
+<a href="#23626" id="23626">23626</a>
+<a href="#23627" id="23627">23627</a>
+<a href="#23628" id="23628">23628</a>
+<a href="#23629" id="23629">23629</a>
+<a href="#23630" id="23630">23630</a>
+<a href="#23631" id="23631">23631</a>
+<a href="#23632" id="23632">23632</a>
+<a href="#23633" id="23633">23633</a>
+<a href="#23634" id="23634">23634</a>
+<a href="#23635" id="23635">23635</a>
+<a href="#23636" id="23636">23636</a>
+<a href="#23637" id="23637">23637</a>
+<a href="#23638" id="23638">23638</a>
+<a href="#23639" id="23639">23639</a>
+<a href="#23640" id="23640">23640</a>
+<a href="#23641" id="23641">23641</a>
+<a href="#23642" id="23642">23642</a>
+<a href="#23643" id="23643">23643</a>
+<a href="#23644" id="23644">23644</a>
+<a href="#23645" id="23645">23645</a>
+<a href="#23646" id="23646">23646</a>
+<a href="#23647" id="23647">23647</a>
+<a href="#23648" id="23648">23648</a>
+<a href="#23649" id="23649">23649</a>
+<a href="#23650" id="23650">23650</a>
+<a href="#23651" id="23651">23651</a>
+<a href="#23652" id="23652">23652</a>
+<a href="#23653" id="23653">23653</a>
+<a href="#23654" id="23654">23654</a>
+<a href="#23655" id="23655">23655</a>
+<a href="#23656" id="23656">23656</a>
 </pre></div><pre class="rust"><code><span class="comment">/* automatically generated by rust-bindgen 0.66.1 */
 
 </span><span class="attr">#[repr(C)]
@@ -41889,6 +42034,151 @@
         pData: <span class="kw-2">*mut </span>::std::os::raw::c_void,
     ) -&gt; bool,
 &gt;;
+<span class="kw">pub type </span>FsNetworkRequestId = ::std::os::raw::c_longlong;
+<span class="kw">pub type </span>HttpRequestCallback = ::std::option::Option&lt;
+    <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(
+        requestId: FsNetworkRequestId,
+        errorCode: ::std::os::raw::c_int,
+        userData: <span class="kw-2">*mut </span>::std::os::raw::c_void,
+    ),
+&gt;;
+<span class="attr">#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>FsNetworkHttpRequestParam {
+    <span class="kw">pub </span>postField: <span class="kw-2">*mut </span>::std::os::raw::c_char,
+    <span class="kw">pub </span>headerOptions: <span class="kw-2">*mut *mut </span>::std::os::raw::c_char,
+    <span class="kw">pub </span>headerOptionsSize: ::std::os::raw::c_uint,
+    <span class="kw">pub </span>data: <span class="kw-2">*mut </span>::std::os::raw::c_uchar,
+    <span class="kw">pub </span>dataSize: ::std::os::raw::c_uint,
+}
+<span class="attr">#[test]
+</span><span class="kw">fn </span>bindgen_test_layout_FsNetworkHttpRequestParam() {
+    <span class="kw">const </span>UNINIT: ::std::mem::MaybeUninit&lt;FsNetworkHttpRequestParam&gt; =
+        ::std::mem::MaybeUninit::uninit();
+    <span class="kw">let </span>ptr = UNINIT.as_ptr();
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::size_of::&lt;FsNetworkHttpRequestParam&gt;(),
+        <span class="number">32usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(FsNetworkHttpRequestParam))
+    );
+    <span class="macro">assert_eq!</span>(
+        ::std::mem::align_of::&lt;FsNetworkHttpRequestParam&gt;(),
+        <span class="number">1usize</span>,
+        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(FsNetworkHttpRequestParam))
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="macro">::std::ptr::addr_of!</span>((<span class="kw-2">*</span>ptr).postField) <span class="kw">as </span>usize - ptr <span class="kw">as </span>usize },
+        <span class="number">0usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(FsNetworkHttpRequestParam),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(postField)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="macro">::std::ptr::addr_of!</span>((<span class="kw-2">*</span>ptr).headerOptions) <span class="kw">as </span>usize - ptr <span class="kw">as </span>usize },
+        <span class="number">8usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(FsNetworkHttpRequestParam),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(headerOptions)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="macro">::std::ptr::addr_of!</span>((<span class="kw-2">*</span>ptr).headerOptionsSize) <span class="kw">as </span>usize - ptr <span class="kw">as </span>usize },
+        <span class="number">16usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(FsNetworkHttpRequestParam),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(headerOptionsSize)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="macro">::std::ptr::addr_of!</span>((<span class="kw-2">*</span>ptr).data) <span class="kw">as </span>usize - ptr <span class="kw">as </span>usize },
+        <span class="number">20usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(FsNetworkHttpRequestParam),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(data)
+        )
+    );
+    <span class="macro">assert_eq!</span>(
+        <span class="kw">unsafe </span>{ <span class="macro">::std::ptr::addr_of!</span>((<span class="kw-2">*</span>ptr).dataSize) <span class="kw">as </span>usize - ptr <span class="kw">as </span>usize },
+        <span class="number">28usize</span>,
+        <span class="macro">concat!</span>(
+            <span class="string">&quot;Offset of field: &quot;</span>,
+            <span class="macro">stringify!</span>(FsNetworkHttpRequestParam),
+            <span class="string">&quot;::&quot;</span>,
+            <span class="macro">stringify!</span>(dataSize)
+        )
+    );
+}
+<span class="kw">pub const </span>FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_INVALID:
+    FsNetworkHttpRequestState = <span class="number">0</span>;
+<span class="kw">pub const </span>FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_NEW: FsNetworkHttpRequestState =
+    <span class="number">1</span>;
+<span class="kw">pub const </span>FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_WAITING_FOR_DATA:
+    FsNetworkHttpRequestState = <span class="number">2</span>;
+<span class="kw">pub const </span>FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_DATA_READY:
+    FsNetworkHttpRequestState = <span class="number">3</span>;
+<span class="kw">pub const </span>FsNetworkHttpRequestState_FS_NETWORK_HTTP_REQUEST_STATE_FAILED:
+    FsNetworkHttpRequestState = <span class="number">4</span>;
+<span class="kw">pub type </span>FsNetworkHttpRequestState = ::std::os::raw::c_uchar;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGet(
+        url: <span class="kw-2">*const </span>::std::os::raw::c_char,
+        param: <span class="kw-2">*mut </span>FsNetworkHttpRequestParam,
+        callback: HttpRequestCallback,
+        userData: <span class="kw-2">*mut </span>::std::os::raw::c_void,
+    ) -&gt; FsNetworkRequestId;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestPost(
+        url: <span class="kw-2">*const </span>::std::os::raw::c_char,
+        param: <span class="kw-2">*mut </span>FsNetworkHttpRequestParam,
+        callback: HttpRequestCallback,
+        userData: <span class="kw-2">*mut </span>::std::os::raw::c_void,
+    ) -&gt; FsNetworkRequestId;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestPut(
+        url: <span class="kw-2">*const </span>::std::os::raw::c_char,
+        param: <span class="kw-2">*mut </span>FsNetworkHttpRequestParam,
+        callback: HttpRequestCallback,
+        userData: <span class="kw-2">*mut </span>::std::os::raw::c_void,
+    ) -&gt; FsNetworkRequestId;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGetState(requestId: FsNetworkRequestId)
+        -&gt; FsNetworkHttpRequestState;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGetErrorCode(requestId: FsNetworkRequestId)
+        -&gt; ::std::os::raw::c_int;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGetHeaderSection(
+        requestId: FsNetworkRequestId,
+        section: <span class="kw-2">*const </span>::std::os::raw::c_char,
+    ) -&gt; <span class="kw-2">*mut </span>::std::os::raw::c_char;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGetData(
+        requestId: FsNetworkRequestId,
+    ) -&gt; <span class="kw-2">*mut </span>::std::os::raw::c_uchar;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpRequestGetDataSize(
+        requestId: FsNetworkRequestId,
+    ) -&gt; ::std::os::raw::c_ulong;
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>fsNetworkHttpCancelRequest(requestId: FsNetworkRequestId) -&gt; bool;
+}
 <span class="attr">#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>NVGcontext {
