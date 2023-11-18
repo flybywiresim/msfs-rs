@@ -4,5 +4,6 @@
 #include <MSFS/MSFS.h>
 #include <MSFS/MSFS_Render.h>
 #include <MSFS/MSFS_Network.h>
+#include <MSFS/MSFS_CommBus.h>
 #include <MSFS/Render/nanovg.h>
 #include <SimConnect.h>
