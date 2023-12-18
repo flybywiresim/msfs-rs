@@ -541,7 +541,7 @@ macro_rules! recv {
             ),
             (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT,
-                SIMCONNECT_RECV_EVENT,
+                SIMCONNECT_RECV_EVENT_EX1,
                 Event
             ),
             (
@@ -606,7 +606,7 @@ macro_rules! recv_enum {
 }
 recv!(recv_enum);
 
-impl sys::SIMCONNECT_RECV_EVENT {
+impl sys::SIMCONNECT_RECV_EVENT_EX1 {
     /// The ID for this event.
     pub fn id(&self) -> sys::DWORD {
         self.uEventID
@@ -614,7 +614,18 @@ impl sys::SIMCONNECT_RECV_EVENT {
 
     /// The data for this event.
     pub fn data(&self) -> sys::DWORD {
-        self.dwData
+        self.dwData0
+    }
+
+    /// The data for this event.
+    pub fn data_ex1(&self) -> [sys::DWORD; 5] {
+        [
+            self.dwData0,
+            self.dwData1,
+            self.dwData2,
+            self.dwData3,
+            self.dwData4,
+        ]
     }
 }
 
