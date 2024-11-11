@@ -148,7 +148,7 @@ impl<'a> SimConnect<'a> {
 
             // Rust may reorder fields, so padding has to be calculated as min of
             // all fields instead of the last field.
-            let mut padding = std::usize::MAX;
+            let mut padding = usize::MAX;
             for (offset, size, epsilon) in T::get_definitions() {
                 padding = padding.min(std::mem::size_of::<T>() - (offset + size));
                 unsafe {
@@ -162,7 +162,7 @@ impl<'a> SimConnect<'a> {
                     ))?;
                 }
             }
-            if padding > 0 && padding != std::usize::MAX {
+            if padding > 0 && padding != usize::MAX {
                 unsafe {
                     map_err(sys::SimConnect_AddToClientDataDefinition(
                         handle,
