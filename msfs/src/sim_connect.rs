@@ -26,6 +26,7 @@ pub trait ClientDataDefinition: 'static {
 }
 
 /// Rusty HRESULT wrapper.
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct HResult(sys::HRESULT);
 impl std::fmt::Display for HResult {
