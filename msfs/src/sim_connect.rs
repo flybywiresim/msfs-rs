@@ -325,7 +325,6 @@ impl<'a> SimConnect<'a> {
                 event_id,
                 0,
                 0,
-
                 data[0],
                 data[1],
                 data[2],
