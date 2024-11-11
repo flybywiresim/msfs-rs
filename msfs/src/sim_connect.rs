@@ -311,6 +311,29 @@ impl<'a> SimConnect<'a> {
         }
     }
 
+    pub fn transmit_client_event_ex1(
+        &mut self,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        event_id: sys::DWORD,
+        data: [sys::DWORD; 5],
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_TransmitClientEvent_EX1(
+                self.handle,
+                object_id,
+                event_id,
+                0,
+                0,
+
+                data[0],
+                data[1],
+                data[2],
+                data[3],
+                data[4],
+            ))
+        }
+    }
+
     fn get_client_data_id(&mut self, name: &str) -> Result<sys::SIMCONNECT_CLIENT_DATA_ID> {
         let client_id = self.client_data_id_counter;
         self.client_data_id_counter += 1;
@@ -541,8 +564,13 @@ macro_rules! recv {
             ),
             (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT,
-                SIMCONNECT_RECV_EVENT_EX1,
+                SIMCONNECT_RECV_EVENT,
                 Event
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT_EX1,
+                SIMCONNECT_RECV_EVENT_EX1,
+                EventEx1
             ),
             (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA,
@@ -606,7 +634,7 @@ macro_rules! recv_enum {
 }
 recv!(recv_enum);
 
-impl sys::SIMCONNECT_RECV_EVENT_EX1 {
+impl sys::SIMCONNECT_RECV_EVENT {
     /// The ID for this event.
     pub fn id(&self) -> sys::DWORD {
         self.uEventID
@@ -614,11 +642,18 @@ impl sys::SIMCONNECT_RECV_EVENT_EX1 {
 
     /// The data for this event.
     pub fn data(&self) -> sys::DWORD {
-        self.dwData0
+        self.dwData
+    }
+}
+
+impl sys::SIMCONNECT_RECV_EVENT_EX1 {
+    /// The ID for this event.
+    pub fn id(&self) -> sys::DWORD {
+        self.uEventID
     }
 
     /// The data for this event.
-    pub fn data_ex1(&self) -> [sys::DWORD; 5] {
+    pub fn data(&self) -> [sys::DWORD; 5] {
         [
             self.dwData0,
             self.dwData1,
