@@ -26,6 +26,7 @@ pub trait ClientDataDefinition: 'static {
 }
 
 /// Rusty HRESULT wrapper.
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct HResult(sys::HRESULT);
 impl std::fmt::Display for HResult {
@@ -148,7 +149,7 @@ impl<'a> SimConnect<'a> {
 
             // Rust may reorder fields, so padding has to be calculated as min of
             // all fields instead of the last field.
-            let mut padding = std::usize::MAX;
+            let mut padding = usize::MAX;
             for (offset, size, epsilon) in T::get_definitions() {
                 padding = padding.min(std::mem::size_of::<T>() - (offset + size));
                 unsafe {
@@ -162,7 +163,7 @@ impl<'a> SimConnect<'a> {
                     ))?;
                 }
             }
-            if padding > 0 && padding != std::usize::MAX {
+            if padding > 0 && padding != usize::MAX {
                 unsafe {
                     map_err(sys::SimConnect_AddToClientDataDefinition(
                         handle,
@@ -307,6 +308,28 @@ impl<'a> SimConnect<'a> {
                 data,
                 0,
                 0,
+            ))
+        }
+    }
+
+    pub fn transmit_client_event_ex1(
+        &mut self,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        event_id: sys::DWORD,
+        data: [sys::DWORD; 5],
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_TransmitClientEvent_EX1(
+                self.handle,
+                object_id,
+                event_id,
+                0,
+                0,
+                data[0],
+                data[1],
+                data[2],
+                data[3],
+                data[4],
             ))
         }
     }
@@ -545,6 +568,11 @@ macro_rules! recv {
                 Event
             ),
             (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT_EX1,
+                SIMCONNECT_RECV_EVENT_EX1,
+                EventEx1
+            ),
+            (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA,
                 SIMCONNECT_RECV_SIMOBJECT_DATA,
                 SimObjectData
@@ -615,6 +643,24 @@ impl sys::SIMCONNECT_RECV_EVENT {
     /// The data for this event.
     pub fn data(&self) -> sys::DWORD {
         self.dwData
+    }
+}
+
+impl sys::SIMCONNECT_RECV_EVENT_EX1 {
+    /// The ID for this event.
+    pub fn id(&self) -> sys::DWORD {
+        self.uEventID
+    }
+
+    /// The data for this event.
+    pub fn data(&self) -> [sys::DWORD; 5] {
+        [
+            self.dwData0,
+            self.dwData1,
+            self.dwData2,
+            self.dwData3,
+            self.dwData4,
+        ]
     }
 }
 

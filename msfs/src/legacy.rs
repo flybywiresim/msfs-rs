@@ -115,6 +115,20 @@ pub fn trigger_key_event(event_id: sys::ID32, value: sys::UINT32) {
     }
 }
 
+/// trigger_key_event_EX1
+pub fn trigger_key_event_ex1(
+    event_id: sys::ID32,
+    value0: sys::UINT32,
+    value1: sys::UINT32,
+    value2: sys::UINT32,
+    value3: sys::UINT32,
+    value4: sys::UINT32,
+) {
+    unsafe {
+        sys::trigger_key_event_EX1(event_id, value0, value1, value2, value3, value4);
+    }
+}
+
 #[doc(hidden)]
 pub trait ExecuteCalculatorCodeImpl {
     fn execute(code: &std::ffi::CStr) -> Option<Self>
