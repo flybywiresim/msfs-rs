@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs/src/sim_connect.rs`."><title>sim_connect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="msfs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../msfs/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `msfs/src/sim_connect.rs`."><title>sim_connect.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="msfs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../msfs/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -688,6 +688,52 @@
 <a href="#688" id="688">688</a>
 <a href="#689" id="689">689</a>
 <a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::too_many_arguments)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::sys;
@@ -704,19 +750,20 @@
 <span class="kw">pub type </span>InitPosition = sys::SIMCONNECT_DATA_INITPOSITION;
 
 <span class="doccomment">/// A trait implemented by the `data_definition` attribute.
-</span><span class="kw">pub trait </span>DataDefinition: <span class="lifetime">&#39;static </span>{
+</span><span class="kw">pub trait </span>DataDefinition: <span class="lifetime">'static </span>{
     <span class="attr">#[doc(hidden)]
-    </span><span class="kw">const </span>DEFINITIONS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, f32, sys::SIMCONNECT_DATATYPE)];
+    </span><span class="kw">const </span>DEFINITIONS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, f32, sys::SIMCONNECT_DATATYPE)];
 }
 
 <span class="doccomment">/// A trait implemented by the `client_data_definition` attribute.
-</span><span class="kw">pub trait </span>ClientDataDefinition: <span class="lifetime">&#39;static </span>{
+</span><span class="kw">pub trait </span>ClientDataDefinition: <span class="lifetime">'static </span>{
     <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>get_definitions() -&gt; Vec&lt;(usize, usize, f32)&gt;;
 }
 
 <span class="doccomment">/// Rusty HRESULT wrapper.
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[allow(dead_code)]
+#[derive(Debug)]
 </span><span class="kw">pub struct </span>HResult(sys::HRESULT);
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>HResult {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
@@ -735,29 +782,29 @@
     }
 }
 
-<span class="kw">type </span>SimConnectCallback&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;mut </span>SimConnect, SimConnectRecv) + <span class="lifetime">&#39;a</span>;
+<span class="kw">type </span>SimConnectCallback&lt;<span class="lifetime">'a</span>&gt; = <span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;mut </span>SimConnect, SimConnectRecv) + <span class="lifetime">'a</span>;
 
 <span class="doccomment">/// A SimConnect session. This provides access to data within the MSFS sim.
-</span><span class="kw">pub struct </span>SimConnect&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>SimConnect&lt;<span class="lifetime">'a</span>&gt; {
     handle: sys::HANDLE,
-    callback: Box&lt;SimConnectCallback&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    callback: Box&lt;SimConnectCallback&lt;<span class="lifetime">'a</span>&gt;&gt;,
     data_definitions: HashMap&lt;TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID&gt;,
     client_data_definitions: HashMap&lt;TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID&gt;,
     event_id_counter: sys::DWORD,
     client_data_id_counter: sys::DWORD,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; std::fmt::Debug <span class="kw">for </span>SimConnect&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; std::fmt::Debug <span class="kw">for </span>SimConnect&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-        fmt.debug_struct(<span class="string">&quot;SimConnect&quot;</span>).finish()
+        fmt.debug_struct(<span class="string">"SimConnect"</span>).finish()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SimConnect&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; SimConnect&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
-    </span><span class="kw">pub fn </span>open&lt;F&gt;(name: <span class="kw-2">&amp;</span>str, callback: F) -&gt; <span class="prelude-ty">Result</span>&lt;Pin&lt;Box&lt;SimConnect&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;&gt;
+    </span><span class="kw">pub fn </span>open&lt;F&gt;(name: <span class="kw-2">&amp;</span>str, callback: F) -&gt; <span class="prelude-ty">Result</span>&lt;Pin&lt;Box&lt;SimConnect&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;&gt;
     <span class="kw">where
-        </span>F: FnMut(<span class="kw-2">&amp;mut </span>SimConnect, SimConnectRecv) + <span class="lifetime">&#39;a</span>,
+        </span>F: FnMut(<span class="kw-2">&amp;mut </span>SimConnect, SimConnectRecv) + <span class="lifetime">'a</span>,
     {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>handle = <span class="number">0</span>;
@@ -838,7 +885,7 @@
 
             // Rust may reorder fields, so padding has to be calculated as min of
             // all fields instead of the last field.
-            </span><span class="kw">let </span><span class="kw-2">mut </span>padding = std::usize::MAX;
+            </span><span class="kw">let </span><span class="kw-2">mut </span>padding = usize::MAX;
             <span class="kw">for </span>(offset, size, epsilon) <span class="kw">in </span>T::get_definitions() {
                 padding = padding.min(std::mem::size_of::&lt;T&gt;() - (offset + size));
                 <span class="kw">unsafe </span>{
@@ -852,7 +899,7 @@
                     ))<span class="question-mark">?</span>;
                 }
             }
-            <span class="kw">if </span>padding &gt; <span class="number">0 </span>&amp;&amp; padding != std::usize::MAX {
+            <span class="kw">if </span>padding &gt; <span class="number">0 </span>&amp;&amp; padding != usize::MAX {
                 <span class="kw">unsafe </span>{
                     map_err(sys::SimConnect_AddToClientDataDefinition(
                         handle,
@@ -868,7 +915,7 @@
         })
     }
 
-    <span class="kw">fn </span>get_id&lt;T: <span class="lifetime">&#39;static</span>, U: std::convert::TryFrom&lt;usize&gt; + Copy, F: Fn(U) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;&gt;(
+    <span class="kw">fn </span>get_id&lt;T: <span class="lifetime">'static</span>, U: std::convert::TryFrom&lt;usize&gt; + Copy, F: Fn(U) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;&gt;(
         map: <span class="kw-2">&amp;mut </span>HashMap&lt;TypeId, U&gt;,
         insert_fn: F,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;U&gt; {
@@ -905,7 +952,7 @@
     }
 
     <span class="doccomment">/// Retrieve information about simulation objects of a given type that are
-    /// within a specified radius of the user&#39;s aircraft.
+    /// within a specified radius of the user's aircraft.
     </span><span class="kw">pub fn </span>request_data_on_sim_object_type&lt;T: DataDefinition&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
@@ -997,6 +1044,28 @@
                 data,
                 <span class="number">0</span>,
                 <span class="number">0</span>,
+            ))
+        }
+    }
+
+    <span class="kw">pub fn </span>transmit_client_event_ex1(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        object_id: sys::SIMCONNECT_OBJECT_ID,
+        event_id: sys::DWORD,
+        data: [sys::DWORD; <span class="number">5</span>],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">unsafe </span>{
+            map_err(sys::SimConnect_TransmitClientEvent_EX1(
+                <span class="self">self</span>.handle,
+                object_id,
+                event_id,
+                <span class="number">0</span>,
+                <span class="number">0</span>,
+                data[<span class="number">0</span>],
+                data[<span class="number">1</span>],
+                data[<span class="number">2</span>],
+                data[<span class="number">3</span>],
+                data[<span class="number">4</span>],
             ))
         }
     }
@@ -1203,17 +1272,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>SimConnect&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Drop <span class="kw">for </span>SimConnect&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">unsafe </span>{
-            map_err(sys::SimConnect_Close(<span class="self">self</span>.handle)).expect(<span class="string">&quot;SimConnect_Close&quot;</span>);
+            map_err(sys::SimConnect_Close(<span class="self">self</span>.handle)).expect(<span class="string">"SimConnect_Close"</span>);
         }
     }
 }
 
-<span class="macro">macro_rules! </span>recv {
+<span class="macro">macro_rules!</span> recv {
     (<span class="macro-nonterminal">$V</span>:ident) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">V! </span>{
+        <span class="macro-nonterminal">$</span><span class="macro">V!</span> {
             (
                 <span class="macro-nonterminal">SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EXCEPTION</span>,
                 SIMCONNECT_RECV_EXCEPTION,
@@ -1235,6 +1304,11 @@
                 Event
             ),
             (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_EVENT_EX1,
+                SIMCONNECT_RECV_EVENT_EX1,
+                EventEx1
+            ),
+            (
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_SIMOBJECT_DATA,
                 SIMCONNECT_RECV_SIMOBJECT_DATA,
                 SimObjectData
@@ -1253,12 +1327,12 @@
     };
 }
 
-<span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>dispatch_cb(
+<span class="kw">extern </span><span class="string">"C" </span><span class="kw">fn </span>dispatch_cb(
     recv: <span class="kw-2">*mut </span>sys::SIMCONNECT_RECV,
     _cb_data: sys::DWORD,
     p_context: <span class="kw-2">*mut </span>std::ffi::c_void,
 ) {
-    <span class="macro">macro_rules! </span>recv_cb {
+    <span class="macro">macro_rules!</span> recv_cb {
         ($( (<span class="macro-nonterminal">$ID</span>:ident, <span class="macro-nonterminal">$T</span>:ident, <span class="macro-nonterminal">$E</span>:ident), )<span class="kw-2">*</span>) =&gt; {
             <span class="kw">unsafe </span>{
                 <span class="kw">match </span>(<span class="kw-2">*</span>recv).dwID <span class="kw">as </span>sys::SIMCONNECT_RECV_ID {
@@ -1282,14 +1356,14 @@
     }
 }
 
-<span class="macro">macro_rules! </span>recv_enum {
+<span class="macro">macro_rules!</span> recv_enum {
     ($( (<span class="macro-nonterminal">$ID</span>:ident, <span class="macro-nonterminal">$T</span>:ident, <span class="macro-nonterminal">$E</span>:ident), )<span class="kw-2">*</span>) =&gt; {
         <span class="doccomment">/// Message received from SimConnect.
         </span><span class="attr">#[derive(Debug)]
-        </span><span class="kw">pub enum </span>SimConnectRecv&lt;<span class="lifetime">&#39;a</span>&gt; {
+        </span><span class="kw">pub enum </span>SimConnectRecv&lt;<span class="lifetime">'a</span>&gt; {
             Null,
             $(
-                <span class="macro-nonterminal">$E</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sys::<span class="macro-nonterminal">$T</span>),
+                <span class="macro-nonterminal">$E</span>(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>sys::<span class="macro-nonterminal">$T</span>),
             )*
         }
     }
@@ -1305,6 +1379,24 @@
     <span class="doccomment">/// The data for this event.
     </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; sys::DWORD {
         <span class="self">self</span>.dwData
+    }
+}
+
+<span class="kw">impl </span>sys::SIMCONNECT_RECV_EVENT_EX1 {
+    <span class="doccomment">/// The ID for this event.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; sys::DWORD {
+        <span class="self">self</span>.uEventID
+    }
+
+    <span class="doccomment">/// The data for this event.
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [sys::DWORD; <span class="number">5</span>] {
+        [
+            <span class="self">self</span>.dwData0,
+            <span class="self">self</span>.dwData1,
+            <span class="self">self</span>.dwData2,
+            <span class="self">self</span>.dwData3,
+            <span class="self">self</span>.dwData4,
+        ]
     }
 }
 

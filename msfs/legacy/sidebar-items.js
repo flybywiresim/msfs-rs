@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["execute_calculator_code","trigger_key_event"],"struct":["AircraftVariable","CompiledCalculatorCode","NamedVariable"]};
+window.SIDEBAR_ITEMS = {"fn":["execute_calculator_code","trigger_key_event","trigger_key_event_ex1"],"struct":["AircraftVariable","CompiledCalculatorCode","NamedVariable"]};
