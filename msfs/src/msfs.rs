@@ -45,6 +45,7 @@ pub struct sSystemInstallData {
 pub struct SystemsData {
     parameterString: *mut libc::c_char,
     delta_time: f64,
+    event: MSFSEvent<'static>,
 }
 
 pub struct System {
@@ -57,6 +58,29 @@ pub struct SystemExecutor {
 }
 
 impl System {
+    pub fn open_simconnect<'a>(
+        &self,
+        name: &str,
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
+    {
+        let executor = self.executor;
+        let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
+            let executor = unsafe { &mut *executor };
+            let recv =
+                unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
+            let data: SystemsData = SystemsData {
+                parameterString: std::ptr::null_mut(),
+                delta_time: 0.,
+                event: MSFSEvent::SimConnect(recv),
+            };
+            executor
+                .executor
+                .send(Some(data))
+                .unwrap();
+        })?;
+        Ok(sim)
+    }
+
     pub fn next_event(&mut self) -> impl futures::Future<Output = Option<SystemsData>> + '_ {
         use futures::stream::StreamExt;
         async move { self.rx.next().await }
@@ -79,6 +103,7 @@ impl SystemExecutor {
             let data: SystemsData = SystemsData {
                 parameterString: std::ptr::null_mut(),
                 delta_time,
+                event: MSFSEvent::PreUpdate,
             };
         
             self.executor.send(Some(data)).unwrap();
