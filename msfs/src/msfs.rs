@@ -37,12 +37,12 @@ pub enum MSFSEvent<'a> {
 
 
 #[repr(C)]
-struct sSystemInstallData {
+pub struct sSystemInstallData {
     parameterString: *mut libc::c_char,
 
 }
 
-struct SystemsData {
+pub struct SystemsData {
     parameterString: *mut libc::c_char,
     delta_time: f64,
 }
@@ -75,13 +75,13 @@ impl SystemExecutor {
             self.fs_ctx = Some(ctx);
             self.executor
                 .start(Box::new(move |rx| System { executor, rx }))
-                .is_ok();
+                .unwrap();
             let data: SystemsData = SystemsData {
-                parameterString: parameters.parameterString,
+                parameterString: std::ptr::null_mut(),
                 delta_time,
             };
         
-            self.executor.send(Some(data)).is_ok();
+            self.executor.send(Some(data)).unwrap();
           /*   sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
             service_id => {
                 if let Some(data) = match service_id {
