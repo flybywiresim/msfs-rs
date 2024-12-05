@@ -43,7 +43,6 @@ pub struct sSystemInstallData {
 }
  */
 pub struct SystemsData {
-    parameterString: *mut libc::c_char,
     delta_time: f64,
     pub event: MSFSEvent<'static>,
 }
@@ -69,14 +68,13 @@ impl System {
             let recv =
                 unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
             let data: SystemsData = SystemsData {
-                parameterString: std::ffi::CString::new("test").unwrap().into_raw(),
                 delta_time: 0.,
                 event: MSFSEvent::SimConnect(recv),
             };
             executor
                 .executor
-                .send(Some(data));
-              
+                .send(Some(data))
+                .unwrap();
         })?;
         Ok(sim)
     } 
@@ -101,7 +99,6 @@ impl SystemExecutor {
                 .start(Box::new(move |rx| System { executor, rx }))
                 .unwrap();
             let data: SystemsData = SystemsData {
-                parameterString: std::ffi::CString::new("test").unwrap().into_raw(),
                 delta_time,
                 event: MSFSEvent::PreUpdate,
             };
