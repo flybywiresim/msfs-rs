@@ -123,7 +123,7 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
             pInstallData: ::msfs::sys::sSystemInstallData,
         ) -> bool {
             unsafe {
-                #executor_name.handle_systems_init(ctx, service_id, p_data)
+                #executor_name.handle_systems_init(ctx, p_data)
             }
         }
          
