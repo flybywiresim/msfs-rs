@@ -36,12 +36,12 @@ pub enum MSFSEvent<'a> {
 }
 
 
-#[repr(C)]
+/* #[repr(C)]
 pub struct sSystemInstallData {
     parameterString: *mut libc::c_char,
 
 }
-
+ */
 pub struct SystemsData {
     parameterString: *mut libc::c_char,
     delta_time: f64,
@@ -132,7 +132,7 @@ impl SystemExecutor {
         
     }
 
-    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sSystemInstallData) -> bool {
+    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sys::sSystemInstallData) -> bool {
 
          true
         
