@@ -101,7 +101,7 @@ impl SystemExecutor {
                 .start(Box::new(move |rx| System { executor, rx }))
                 .unwrap();
             let data: SystemsData = SystemsData {
-                parameterString: std::ptr::null_mut(),
+                parameterString: std::ffi::CString::new("test").unwrap().into_raw(),
                 delta_time,
                 event: MSFSEvent::PreUpdate,
             };
