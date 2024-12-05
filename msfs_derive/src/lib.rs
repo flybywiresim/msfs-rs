@@ -75,7 +75,7 @@ impl Parse for GaugeArgs {
 }
 
 #[proc_macro_attribute]
-pub fn systemsgauge(args: TokenStream, item: TokenStream) -> TokenStream {
+pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as GaugeArgs);
     let input = parse_macro_input!(item as ItemFn);
 

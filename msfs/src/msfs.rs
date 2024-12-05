@@ -18,7 +18,7 @@ impl sys::sGaugeDrawData {
 }
 
 use crate::sim_connect::{SimConnect, SimConnectRecv};
-pub use msfs_derive::{gauge, standalone_module};
+pub use msfs_derive::{gauge, standalone_module, system};
 
 /// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.
 #[derive(Debug)]
