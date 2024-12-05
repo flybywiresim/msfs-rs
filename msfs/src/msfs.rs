@@ -58,7 +58,7 @@ pub struct SystemExecutor {
 }
 
 impl System {
-   /*  pub fn open_simconnect<'a>(
+     pub fn open_simconnect<'a>(
         &self,
         name: &str,
     ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
@@ -79,7 +79,7 @@ impl System {
                 .unwrap();
         })?;
         Ok(sim)
-    } */
+    } 
 
     pub fn next_event(&mut self) -> impl futures::Future<Output = Option<SystemsData>> + '_ {
         use futures::stream::StreamExt;
