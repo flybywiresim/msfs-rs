@@ -45,7 +45,7 @@ pub struct sSystemInstallData {
 pub struct SystemsData {
     parameterString: *mut libc::c_char,
     delta_time: f64,
-    event: MSFSEvent<'static>,
+    pub event: MSFSEvent<'static>,
 }
 
 pub struct System {
@@ -132,7 +132,9 @@ impl SystemExecutor {
         
     }
 
-    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sSystemInstallData) {
+    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sSystemInstallData) -> bool {
+
+         true
         
     }
 }
