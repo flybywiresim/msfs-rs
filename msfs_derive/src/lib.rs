@@ -74,6 +74,64 @@ impl Parse for GaugeArgs {
     }
 }
 
+#[proc_macro_attribute]
+pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(args as GaugeArgs);
+    let input = parse_macro_input!(item as ItemFn);
+
+    let rusty_name = input.sig.ident.clone();
+    let executor_name = format_ident!(
+        "{}_executor_do_not_use_or_you_will_be_fired",
+        input.sig.ident
+    );
+
+    let extern_name = args.name.unwrap_or_else(|| input.sig.ident.to_string());
+    let extern_system_name_init = format_ident!("{}_system_init", extern_name);
+    let extern_system_name_update = format_ident!("{}_system_update", extern_name);
+    let extern_system_name_kill = format_ident!("{}_system_kill", extern_name);
+
+
+
+    let output = quote! {
+        #input
+
+        #[allow(non_upper_case_globals)]
+        static mut #executor_name: ::msfs::SystemExecutor = ::msfs::SystemExecutor {
+            fs_ctx: None,
+            executor: ::msfs::executor::Executor {
+                handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+                tx: None,
+                future: None,
+            },
+        };
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_update(
+            ctx: ::msfs::sys::FsContext,
+            dTime: f64,
+        ) -> bool {
+            unsafe {
+                #executor_name.handle_systems(ctx, dTime)
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_init(
+            ctx: ::msfs::sys::FsContext,
+            pInstallData: ::msfs::sys::sSystemInstallData,
+        ) -> bool {
+            unsafe {
+                #executor_name.handle_systems_init(ctx, service_id, p_data)
+            }
+        }
+         
+    };
+
+    TokenStream::from(output)
+}
+
 /// Declare a gauge callback. It will be automatically exported with the name
 /// `NAME_gauge_callback`, where `NAME` is the name of the decorated function.
 /// ```rs

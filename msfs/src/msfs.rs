@@ -35,6 +35,84 @@ pub enum MSFSEvent<'a> {
     SimConnect(SimConnectRecv<'a>),
 }
 
+
+#[repr(C)]
+struct sSystemInstallData {
+    parameterString: *mut libc::c_char,
+
+}
+
+struct SystemsData {
+    parameterString: *mut libc::c_char,
+    delta_time: f64,
+}
+
+pub struct System {
+    executor: *mut SystemExecutor,
+    rx: futures::channel::mpsc::Receiver<SystemsData>,
+}
+pub struct SystemExecutor {
+    pub fs_ctx: Option<sys::FsContext>,
+    pub executor: executor::Executor<System, SystemsData>,
+}
+
+impl System {
+    pub fn next_event(&mut self) -> impl futures::Future<Output = Option<SystemsData>> + '_ {
+        use futures::stream::StreamExt;
+        async move { self.rx.next().await }
+    }
+}
+
+impl SystemExecutor {
+    pub fn handle_systems(
+        &mut self,
+        ctx: sys::FsContext,
+        delta_time: f64
+    ) -> bool {
+        
+           
+            let executor = self as *mut SystemExecutor;
+            self.fs_ctx = Some(ctx);
+            self.executor
+                .start(Box::new(move |rx| System { executor, rx }))
+                .is_ok();
+            let data: SystemsData = SystemsData {
+                parameterString: parameters.parameterString,
+                delta_time,
+            };
+        
+            self.executor.send(Some(data)).is_ok();
+          /*   sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
+            service_id => {
+                if let Some(data) = match service_id {
+                    sys::PANEL_SERVICE_POST_INSTALL => Some(MSFSEvent::PostInstall),
+                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(MSFSEvent::PreInitialize),
+                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(MSFSEvent::PostInitialize),
+                    sys::PANEL_SERVICE_PRE_UPDATE => Some(MSFSEvent::PreUpdate),
+                    sys::PANEL_SERVICE_POST_UPDATE => Some(MSFSEvent::PostUpdate),
+                    sys::PANEL_SERVICE_PRE_DRAW => Some(MSFSEvent::PreDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_POST_DRAW => Some(MSFSEvent::PostDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_PRE_KILL => Some(MSFSEvent::PreKill),
+                    _ => None,
+                } {
+                    self.executor.send(Some(data)).is_ok()
+                } else {
+                    true
+                } */
+            true
+        
+    }
+
+    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sSystemInstallData) {
+        
+    }
+}
+
+
 /// Gauge
 pub struct Gauge {
     executor: *mut GaugeExecutor,
@@ -73,6 +151,7 @@ impl Gauge {
         async move { self.rx.next().await }
     }
 }
+
 
 #[doc(hidden)]
 pub struct GaugeExecutor {
