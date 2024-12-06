@@ -43,7 +43,7 @@ pub struct sSystemInstallData {
 }
  */
 pub struct SystemsData {
-    delta_time: f64,
+    pub delta_time: f64,
     pub event: MSFSEvent<'static>,
 }
 
