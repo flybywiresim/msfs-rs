@@ -136,6 +136,15 @@ impl SystemExecutor {
             .is_ok()
         
     }
+
+    pub fn handle_systems_kill(&mut self) -> bool {
+        let data: SystemsData = SystemsData {
+            delta_time: 0.,
+            event: MSFSEvent::PreKill,
+        };
+    
+        self.executor.send(Some(data)).is_ok()
+    }
 }
 
 

@@ -127,6 +127,17 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
                 #executor_name.handle_systems_init(ctx, pInstallData)
             }
         }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_kill(
+            ctx: ::msfs::sys::FsContext,
+            pInstallData: ::msfs::sys::sSystemInstallData,
+        ) -> bool {
+            unsafe {
+                #executor_name.handle_systems_kill()
+            }
+        }
          
     };
 
