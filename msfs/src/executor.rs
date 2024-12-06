@@ -37,7 +37,9 @@ impl<I, T> Executor<I, T> {
                 self.future = Some(f);
                 Ok(())
             }
-            e => e,
+            e => {
+                println!("ERROR: {:?}", e);
+                e},
         }
     }
 
