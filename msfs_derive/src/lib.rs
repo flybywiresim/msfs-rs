@@ -109,11 +109,11 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
         #[no_mangle]
         pub extern "C" fn #extern_system_name_update(
             ctx: ::msfs::sys::FsContext,
-            dTime: std::os::raw::c_double,
+            dTime: std::os::raw::c_float,
         ) -> bool {
             unsafe {
                 println!("Updating system {:?}", dTime);
-                #executor_name.handle_systems(ctx, dTime.into())
+                #executor_name.handle_systems(ctx, 0.0)
             }
         }
 
