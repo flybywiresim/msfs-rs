@@ -112,6 +112,7 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
             dTime: f64,
         ) -> bool {
             unsafe {
+                println!("Updating system {:?}", dTime);
                 #executor_name.handle_systems(ctx, dTime)
             }
         }
