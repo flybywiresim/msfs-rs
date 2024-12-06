@@ -112,7 +112,6 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
             dTime: std::os::raw::c_float,
         ) -> bool {
             unsafe {
-                println!("Updating system {:?}", dTime);
                 #executor_name.handle_systems(ctx, dTime.into())
             }
         }
