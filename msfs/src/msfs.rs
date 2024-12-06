@@ -71,10 +71,10 @@ impl System {
                 delta_time: 0.,
                 event: MSFSEvent::SimConnect(recv),
             };
-           /*  executor
+            executor
                 .executor
                 .send(Some(data))
-                .unwrap(); */
+                .unwrap();
         })?;
         Ok(sim)
     } 
@@ -93,7 +93,6 @@ impl SystemExecutor {
     ) -> bool {
         
            
-            let executor = self as *mut SystemExecutor;
             self.fs_ctx = Some(ctx);
          /*    self.executor
                 .start(Box::new(move |rx| System { executor, rx }))
@@ -130,8 +129,11 @@ impl SystemExecutor {
     }
 
     pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sys::sSystemInstallData) -> bool {
-
-         true
+        let executor = self as *mut SystemExecutor;
+        self.fs_ctx = Some(ctx);
+        self.executor
+            .start(Box::new(move |rx| System { executor, rx }))
+            .is_ok()
         
     }
 }
