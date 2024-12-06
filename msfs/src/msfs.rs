@@ -95,9 +95,9 @@ impl SystemExecutor {
            
             let executor = self as *mut SystemExecutor;
             self.fs_ctx = Some(ctx);
-            self.executor
+         /*    self.executor
                 .start(Box::new(move |rx| System { executor, rx }))
-                .unwrap();
+                .unwrap(); */
             let data: SystemsData = SystemsData {
                 delta_time,
                 event: MSFSEvent::PreUpdate,
