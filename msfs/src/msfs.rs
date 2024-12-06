@@ -43,7 +43,7 @@ pub struct sSystemInstallData {
 }
  */
 pub struct SystemsData {
-    pub delta_time: f64,
+    pub delta_time: f32,
     pub event: MSFSEvent<'static>,
 }
 
@@ -89,7 +89,7 @@ impl SystemExecutor {
     pub fn handle_systems(
         &mut self,
         ctx: sys::FsContext,
-        delta_time: f64
+        delta_time: f32
     ) -> bool {
         
            
