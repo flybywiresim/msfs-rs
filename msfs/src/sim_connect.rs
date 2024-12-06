@@ -105,6 +105,12 @@ impl<'a> SimConnect<'a> {
         }
     }
 
+    pub fn drop(&mut self) {
+        unsafe {
+            map_err(sys::SimConnect_Close(self.handle)).expect("SimConnect_Close");
+        }
+    }
+
     fn get_define_id<T: DataDefinition>(&mut self) -> Result<sys::SIMCONNECT_DATA_DEFINITION_ID> {
         let handle = self.handle;
         SimConnect::get_id::<T, _, _>(
