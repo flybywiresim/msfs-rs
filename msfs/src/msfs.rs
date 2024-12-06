@@ -73,7 +73,7 @@ impl System {
             };
             executor
                 .executor
-                .send(Some(data))
+                .send(None)
                 .unwrap();
         })?;
         Ok(sim)
