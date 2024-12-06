@@ -34,11 +34,12 @@ impl<I, T> Executor<I, T> {
             Poll::Ready(v) => v,
         } {
             Ok(()) => {
+                eprintln!("ERROR1: {:?}", f);
                 self.future = Some(f);
                 Ok(())
             }
             e => {
-                println!("ERROR: {:?}", e);
+                eprintln!("ERROR: {:?}", e);
                 e},
         }
     }
