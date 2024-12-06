@@ -108,6 +108,41 @@ impl NamedVariable {
     }
 }
 
+pub struct NamedVariableApi(sys::FsNamedVarId, sys::FsUnitId);
+impl NamedVariableApi {
+    pub fn from(name: &str, units: &str) -> Self {
+        let name = std::ffi::CString::new(name).unwrap();
+        let units = std::ffi::CString::new(units).unwrap();
+        let var = unsafe { sys::fsVarsRegisterNamedVar(name.as_ptr()) };
+        let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
+        Self(var, unit)
+    }
+
+    pub fn get<T: SimVarF64>(&self) -> T {
+        let mut v = 0.0;
+        unsafe { sys::fsVarsNamedVarGet(self.0, self.1, &mut v) };
+        T::from(v)
+    }
+
+    pub fn set(&self, v: impl SimVarF64) {
+        let v = v.to();
+        unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
+    }
+}
+
+/* extern "C" {
+    pub fn fsVarsGetRegisteredNamedVarId(name: *const ::std::os::raw::c_char) -> FsNamedVarId;
+}
+extern "C" {
+    pub fn fsVarsRegisterNamedVar(name: *const ::std::os::raw::c_char) -> FsNamedVarId;
+}
+extern "C" {
+    pub fn fsVarsNamedVarGet(var: FsNamedVarId, unit: FsUnitId, result: *mut f64);
+}
+extern "C" {
+    pub fn fsVarsNamedVarSet(var: FsNamedVarId, unit: FsUnitId, value: f64);
+} */
+
 /// trigger_key_event
 pub fn trigger_key_event(event_id: sys::ID32, value: sys::UINT32) {
     unsafe {
