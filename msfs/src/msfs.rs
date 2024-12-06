@@ -71,10 +71,10 @@ impl System {
                 delta_time: 0.,
                 event: MSFSEvent::SimConnect(recv),
             };
-            executor
+           /*  executor
                 .executor
                 .send(Some(data))
-                .unwrap();
+                .unwrap(); */
         })?;
         Ok(sim)
     } 
