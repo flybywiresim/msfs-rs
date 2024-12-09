@@ -120,7 +120,9 @@ impl NamedVariableApi {
 
     pub fn get<T: SimVarF64>(&self) -> T {
         let mut v = 0.0;
-        unsafe { sys::fsVarsNamedVarGet(self.0, self.1, &mut v) };
+        let p1 = &mut v as *mut f64;
+        unsafe { sys::fsVarsNamedVarGet(self.0, self.1, p1) };
+        println!("v: {}", v);
         T::from(v)
     }
 
