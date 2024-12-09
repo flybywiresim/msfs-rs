@@ -36,7 +36,7 @@ fn main() {
             .blocklist_function("nvgFillPaint")
             .blocklist_function("nvgStrokeColor")
             .blocklist_function("nvgStrokePaint")
-            .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+            .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
             .rustified_enum("SIMCONNECT_EXCEPTION")
             .impl_debug(false);
 
