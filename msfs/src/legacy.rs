@@ -86,7 +86,7 @@ impl AircraftVariable {
 
 pub fn fs_events_trigger_key_event(event_id: sys::FsEventId, value: sys::FsVarParamArray) {
     unsafe {
-        sys::fs_events_trigger_key_event(event_id, value);
+        sys::fsEventsTriggerKeyEvent(event_id, value);
     }
 } 
 
