@@ -83,6 +83,13 @@ impl AircraftVariable {
     }
 }
 
+
+pub fn fs_events_trigger_key_event(event_id: sys::FsEventId, value: sys::FsVarParamArray) {
+    unsafe {
+        sys::fs_events_trigger_key_event(event_id, value);
+    }
+} 
+
 /// register_named_variable
 /// set_named_variable_typed_value
 /// get_named_variable_value
