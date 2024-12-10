@@ -9,4 +9,4 @@
 #include <SimConnect.h>
 #include <MSFS/MSFS_Vars.h>
 #include <MSFS/MSFS_SystemContext.h>
-
+#include <MSFS/MSFS_Events.h>
