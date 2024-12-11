@@ -144,7 +144,13 @@ impl AircraftVariableApi {
         let units = std::ffi::CString::new(units).unwrap();
         let var = unsafe { sys::fsVarsGetAircraftVarId(name.as_ptr()) };
         let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
-        Self(var, unit, param)
+
+        Ok(Self {
+            simvar,
+            units,
+            param,
+        })
+
     }
 
     pub fn get<T: SimVarF64>(&self) -> T {
