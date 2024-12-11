@@ -137,27 +137,40 @@ impl NamedVariableApi {
     }
 }
 
-pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, params: sys::FsVarParamArray}
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32}
 impl AircraftVariableApi {
-    pub fn from(name: &str, units: &str, param: sys::FsVarParamArray) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
         let units = std::ffi::CString::new(units).unwrap();
         let var = unsafe { sys::fsVarsGetAircraftVarId(name.as_ptr()) };
         let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
 
+      // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
         Ok(Self {
             simvar: var,
             units: unit,
-            params: param,
+            index: index,
         })
 
     }
 
     pub fn get<T: SimVarF64>(&self) -> T {
         let mut v = 0.0;
-        unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
-        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, self.params , &mut v) };
+     //   unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
+
+        let param1 = FsVarParamVariant {
+            type_: 0,
+            __bindgen_anon_1: FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
+        };
+
+        let mut paramsArray = [param1];
+        let params = FsVarParamArray {
+            size: 1 as u32,
+            array: paramsArray.as_mut_ptr(),
+        };
+        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, params , &mut v) };
+        std::mem::forget(params);
         T::from(v)
     }
 
