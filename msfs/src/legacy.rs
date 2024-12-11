@@ -155,7 +155,7 @@ impl AircraftVariableApi {
 
     pub fn get<T: SimVarF64>(&self) -> T {
         let mut v = 0.0;
-        unsafe { println!("var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
+        unsafe { println!("var: {}, unit: {} param {}", self.simvars, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
         unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, self.params , &mut v) };
         T::from(v)
