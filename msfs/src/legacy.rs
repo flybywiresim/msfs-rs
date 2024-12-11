@@ -137,7 +137,7 @@ impl NamedVariableApi {
     }
 }
 
-pub struct AircraftVariableApi(sys::FsSimVarId , sys::FsUnitId, sys::FsVarParamArray);
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, params: sys::FsVarParamArray}
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, param: sys::FsVarParamArray) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
@@ -146,7 +146,7 @@ impl AircraftVariableApi {
         let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
 
         Ok(Self {
-            simvar,
+            var,
             units,
             param,
         })
