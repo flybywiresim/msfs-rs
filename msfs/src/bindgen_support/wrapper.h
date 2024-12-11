@@ -10,3 +10,5 @@
 #include <MSFS/MSFS_Vars.h>
 #include <MSFS/MSFS_SystemContext.h>
 #include <MSFS/MSFS_Events.h>
+#include <MSFS/Types/MSFS_EventsEnum.h>
+#include <MSFS/Utils/SimParamArrayHelper.h>
