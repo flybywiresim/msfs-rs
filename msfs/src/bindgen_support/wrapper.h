@@ -11,4 +11,3 @@
 #include <MSFS/MSFS_SystemContext.h>
 #include <MSFS/MSFS_Events.h>
 #include <MSFS/Types/MSFS_EventsEnum.h>
-#include <MSFS/Utils/SimParamArrayHelper.h>
