@@ -146,9 +146,9 @@ impl AircraftVariableApi {
         let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
 
         Ok(Self {
-            var,
-            units,
-            param,
+            simvar: var,
+            unit: unit,
+            params: param,
         })
 
     }
