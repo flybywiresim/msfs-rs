@@ -161,11 +161,11 @@ impl AircraftVariableApi {
 
         let param1 = FsVarParamVariant {
             type_: 0,
-            __bindgen_anon_1: FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
         };
 
         let mut paramsArray = [param1];
-        let params = FsVarParamArray {
+        let params = sys::FsVarParamArray {
             size: 1 as u32,
             array: paramsArray.as_mut_ptr(),
         };
