@@ -134,7 +134,7 @@ impl<'a> SimConnect<'a> {
                             datum_name.as_ptr(),
                             units_type.as_ptr(),
                             *datatype,
-                            0,
+                            0.,
                             sys::SIMCONNECT_UNUSED,
                         ))?;
                     }
