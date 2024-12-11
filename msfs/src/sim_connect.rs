@@ -126,13 +126,15 @@ impl<'a> SimConnect<'a> {
                     let datum_name = std::ffi::CString::new(*datum_name).unwrap();
                     let units_type = std::ffi::CString::new(*units_type).unwrap();
                     unsafe {
+                        println!("Adding to data definition: {:?} with unit {:?} and dataType {:?} ", datum_name, units_type, *datatype);
+
                         map_err(sys::SimConnect_AddToDataDefinition(
                             handle,
                             define_id,
                             datum_name.as_ptr(),
                             units_type.as_ptr(),
                             *datatype,
-                            *epsilon,
+                            0,
                             sys::SIMCONNECT_UNUSED,
                         ))?;
                     }
