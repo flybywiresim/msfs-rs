@@ -117,7 +117,7 @@ impl NamedVariable {
 
 pub struct NamedVariableApi(sys::FsNamedVarId, sys::FsUnitId);
 impl NamedVariableApi {
-    pub fn from(name: &str, units: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from(name: &str, units: &str) -> Self {
         let name = std::ffi::CString::new(name).unwrap();
         let units = std::ffi::CString::new(units).unwrap();
         let var = unsafe { sys::fsVarsRegisterNamedVar(name.as_ptr()) };
@@ -139,7 +139,7 @@ impl NamedVariableApi {
 
 pub struct AircraftVariableApi(sys::FsSimVarId , sys::FsUnitId, sys::FsVarParamArray);
 impl AircraftVariableApi {
-    pub fn from(name: &str, units: &str, param: sys::FsVarParamArray) -> Self {
+    pub fn from(name: &str, units: &str, param: sys::FsVarParamArray) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
         let units = std::ffi::CString::new(units).unwrap();
         let var = unsafe { sys::fsVarsGetAircraftVarId(name.as_ptr()) };
