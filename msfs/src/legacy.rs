@@ -159,7 +159,7 @@ impl AircraftVariableApi {
 
      //   unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
-        let param1 = FsVarParamVariant {
+        let param1 = sys::FsVarParamVariant {
             type_: 0,
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
         };
