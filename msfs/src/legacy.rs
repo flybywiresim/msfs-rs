@@ -147,7 +147,7 @@ impl AircraftVariableApi {
 
         Ok(Self {
             simvar: var,
-            unit: unit,
+            units: unit,
             params: param,
         })
 
