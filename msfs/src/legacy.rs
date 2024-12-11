@@ -117,7 +117,7 @@ impl NamedVariable {
 
 pub struct NamedVariableApi(sys::FsNamedVarId, sys::FsUnitId);
 impl NamedVariableApi {
-    pub fn from(name: &str, units: &str) -> Self {
+    pub fn from(name: &str, units: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
         let units = std::ffi::CString::new(units).unwrap();
         let var = unsafe { sys::fsVarsRegisterNamedVar(name.as_ptr()) };
