@@ -173,11 +173,31 @@ impl AircraftVariableApi {
         std::mem::forget(params);
         T::from(v)
     }
+/* 
+    extern "C" {
+        pub fn fsVarsAircraftVarSet(
+            simvar: FsSimVarId,
+            unit: FsUnitId,
+            param: FsVarParamArray,
+            value: f64,
+        ) -> FsVarError; */
 
-   /*  pub fn set(&self, v: impl SimVarF64) {
+     pub fn set(&self, value: f64) {
+
+        let param1 = sys::FsVarParamVariant {
+            type_: 0,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
+        };
+
+        let mut paramsArray = [param1];
+        let params = sys::FsVarParamArray {
+            size: 1 as u32,
+            array: paramsArray.as_mut_ptr(),
+        };
+        
         let v = v.to();
-        unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
-    } */
+        unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, v) };
+    } 
 }
 
 /* extern "C" {
