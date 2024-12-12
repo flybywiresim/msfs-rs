@@ -195,8 +195,7 @@ impl AircraftVariableApi {
             array: paramsArray.as_mut_ptr(),
         };
         
-        let v = v.to();
-        unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, v) };
+        unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value) };
     } 
 }
 
