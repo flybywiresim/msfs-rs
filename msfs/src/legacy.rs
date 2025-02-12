@@ -170,7 +170,6 @@ impl AircraftVariableApi {
             array: paramsArray.as_mut_ptr(),
         };
         unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, params , &mut v) };
-        std::mem::forget(params);
         T::from(v)
     }
 /* 
@@ -196,7 +195,6 @@ impl AircraftVariableApi {
         };
         
         unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value) };
-        std::mem::forget(params);
     } 
 }
 
