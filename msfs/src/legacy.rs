@@ -194,9 +194,9 @@ impl AircraftVariableApi {
        // let paramsArray = [param1];
        // let boxParam = Box::new(paramsArray);
        // let ptr = Box::into_raw(boxParam) as *mut sys::FsVarParamVariant;
-       let variant = unsafe { &mut *array.add(i) };
+       let variant = unsafe { &mut *array.add(0) };
        variant.type_ = 0;
-       variant.__bindgen_anon_1 = sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
+       variant.__bindgen_anon_1 = sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index};
 
 
        
