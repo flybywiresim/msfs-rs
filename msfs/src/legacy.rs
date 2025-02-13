@@ -188,20 +188,31 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
         };
 
-        let paramsArray = [param1];
-        let boxParam = Box::new(paramsArray);
-        let ptr = Box::into_raw(boxParam) as *mut sys::FsVarParamVariant;
+        let mut array = Vec::with_capacity(1);
+        array.push(param1);
+       // let paramsArray = [param1];
+       // let boxParam = Box::new(paramsArray);
+       // let ptr = Box::into_raw(boxParam) as *mut sys::FsVarParamVariant;
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: ptr,
+            array: array.as_mut_ptr(),
         };
+        std::mem::forget(array);
+
 
         unsafe { 
             sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value);
-            drop(Box::from_raw(ptr)); 
+            if(!value.is_finite()) {
+                println!("Value is not finite, wtf unsafe");
+            
+            } 
+         //   drop(Box::from_raw(ptr)); 
         };
 
- 
+        if(!value.is_finite()) {
+            println!("Value is not finite, wtf");
+        
+        } 
         
     } 
 }
