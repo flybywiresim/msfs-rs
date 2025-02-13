@@ -169,7 +169,7 @@ impl AircraftVariableApi {
             size: 1 as u32,
             array: paramsArray.as_mut_ptr(),
         };
-        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, params , &mut v) };
+        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, params, &mut v) };
         T::from(v)
     }
 /* 
@@ -198,7 +198,7 @@ impl AircraftVariableApi {
 
         unsafe { 
             sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value);
-            drop(Box::from_raw(ptr)); 
+          //  drop(Box::from_raw(ptr)); 
         };
 
  
