@@ -188,13 +188,20 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
         };
 
-        let mut paramsArray = [param1];
+        let paramsArray = [param1];
+        let boxParam = Box::new(paramsArray);
+        let ptr = Box::into_raw(boxParam);
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: paramsArray.as_mut_ptr(),
+            array: ptr,
         };
-        
+
         unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value) };
+
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+        
     } 
 }
 
