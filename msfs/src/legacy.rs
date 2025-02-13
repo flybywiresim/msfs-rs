@@ -196,7 +196,8 @@ impl AircraftVariableApi {
             array: ptr,
         };
 
-        unsafe { sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value)
+        unsafe { 
+            sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value);
             drop(Box::from_raw(ptr)); 
         };
 
