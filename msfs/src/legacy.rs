@@ -140,7 +140,7 @@ impl NamedVariableApi {
     }
 }
 
-pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32}
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray}
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
@@ -148,11 +148,23 @@ impl AircraftVariableApi {
         let var = unsafe { sys::fsVarsGetAircraftVarId(name.as_ptr()) };
         let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
 
+        let param1 = sys::FsVarParamVariant {
+            type_: 0,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index},
+        };
+
+        let mut paramsArray = [param1];
+        let params = sys::FsVarParamArray {
+            size: 1 as u32,
+            array: paramsArray.as_mut_ptr(),
+        };
+
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
         Ok(Self {
             simvar: var,
             units: unit,
             index: index,
+            params
         })
 
     }
@@ -162,17 +174,8 @@ impl AircraftVariableApi {
 
      //   unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
-        let param1 = sys::FsVarParamVariant {
-            type_: 0,
-            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
-        };
-
-        let mut paramsArray = [param1];
-        let params = sys::FsVarParamArray {
-            size: 1 as u32,
-            array: paramsArray.as_mut_ptr(),
-        };
-        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, params, &mut v) };
+  
+        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, self.params, &mut v) };
         T::from(v)
     }
 /* 
@@ -186,18 +189,18 @@ impl AircraftVariableApi {
 
      pub fn set(&self, value: f64) {
 
-        let param1 = sys::FsVarParamVariant {
+   /*      let param1 = sys::FsVarParamVariant {
             type_: 0,
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
-        };
+        }; */
 
-        let layout = Layout::array::<sys::FsVarParamVariant>(1).unwrap();
+     //   let layout = Layout::array::<sys::FsVarParamVariant>(1).unwrap();
 
-        let array = unsafe { alloc(layout) as *mut sys::FsVarParamVariant };
+       // let array = unsafe { alloc(layout) as *mut sys::FsVarParamVariant };
        // let paramsArray = [param1];
        // let boxParam = Box::new(paramsArray);
        // let ptr = Box::into_raw(boxParam) as *mut sys::FsVarParamVariant;
-       let variant = unsafe { &mut *array.add(0) };
+   /*     let variant = unsafe { &mut *array.add(0) };
        variant.type_ = 0;
        variant.__bindgen_anon_1 = sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index};
 
@@ -206,26 +209,26 @@ impl AircraftVariableApi {
         let params = sys::FsVarParamArray {
             size: 1 as u32,
             array,
-        };
+        }; */
 
         //std::mem::forget(array);
 
 
         unsafe { 
-            sys::fsVarsAircraftVarSet(self.simvar, self.units, params, value);
-            if(!value.is_finite()) {
+            sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
+          /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
             
-            } 
+            }  */
          //   drop(Box::from_raw(ptr)); 
         };
 
-        if(!value.is_finite()) {
+    /*     if(!value.is_finite()) {
             println!("Value is not finite, wtf");
         
-        } 
+        }  */
 
-        unsafe { dealloc(array as *mut u8, layout) };
+      //  unsafe { dealloc(array as *mut u8, layout) };
         
     } 
 }
