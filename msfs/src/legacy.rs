@@ -1,6 +1,9 @@
 //! Bindings to the Legacy/gauges.h API
 
 use crate::sys;
+use std::alloc::dealloc;
+use std::alloc::alloc;
+use std::alloc::Layout;
 
 #[doc(hidden)]
 pub trait SimVarF64 {
