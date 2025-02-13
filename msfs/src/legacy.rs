@@ -222,7 +222,6 @@ impl AircraftVariableApi {
         
         } 
 
-        let layout = Layout::array::<sys::FsVarParamVariant>(1).unwrap();
         unsafe { dealloc(array as *mut u8, layout) };
         
     } 
