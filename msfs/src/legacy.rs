@@ -188,16 +188,24 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
         };
 
-        let mut array = Vec::with_capacity(1);
-        array.push(param1);
+        let layout = Layout::array::<sys::FsVarParamVariant>(1).unwrap();
+
+        let array = unsafe { alloc(layout) as *mut sys::FsVarParamVariant };
        // let paramsArray = [param1];
        // let boxParam = Box::new(paramsArray);
        // let ptr = Box::into_raw(boxParam) as *mut sys::FsVarParamVariant;
+       let variant = unsafe { &mut *array.add(i) };
+       variant.type_ = 0;
+       variant.__bindgen_anon_1 = sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index},
+
+
+       
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: array.as_mut_ptr(),
+            array,
         };
-        std::mem::forget(array);
+
+        //std::mem::forget(array);
 
 
         unsafe { 
@@ -213,6 +221,9 @@ impl AircraftVariableApi {
             println!("Value is not finite, wtf");
         
         } 
+
+        let layout = Layout::array::<sys::FsVarParamVariant>(1).unwrap();
+        unsafe { dealloc(array as *mut u8, layout) };
         
     } 
 }
