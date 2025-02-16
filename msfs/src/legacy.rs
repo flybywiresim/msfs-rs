@@ -137,7 +137,7 @@ impl NamedVariableApi {
     }
 }
 
-pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray}
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray, name: String}
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
         let name = std::ffi::CString::new(name).unwrap();
@@ -164,7 +164,8 @@ impl AircraftVariableApi {
             simvar: var,
             units: unit,
             index: index,
-            params
+            params,
+            name: name.to_string()
         })
 
     }
@@ -218,7 +219,7 @@ impl AircraftVariableApi {
             let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
 
             if (retval != 0) {
-                println!("Error setting aircraft var: {:?}", retval);
+                println!("Error setting aircraft var: {:?} for {:?}", retval, self.name);
             }
           /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
