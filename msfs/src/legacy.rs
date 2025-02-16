@@ -143,13 +143,13 @@ impl AircraftVariableApi {
         let name_cstr = std::ffi::CString::new(name).unwrap();
         let units_cstr = std::ffi::CString::new(units).unwrap();
         let var = unsafe { let varResult = sys::fsVarsGetAircraftVarId(name_cstr.as_ptr());
-            if (varResult == 0) {
+            if (varResult == -1) {
                 println!("Error getting aircraft var id for {} with error {}", name, varResult);
             }
             varResult
          };
         let unit = unsafe { let result = sys::fsVarsGetUnitId(units_cstr.as_ptr());
-            if (result == 0) {
+            if (result == -1) {
                 println!("Error getting unit id for {} with error {}", units, result);
             }
             result
