@@ -140,10 +140,10 @@ impl NamedVariableApi {
 pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray, name: String}
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
-        let name = std::ffi::CString::new(name).unwrap();
-        let units = std::ffi::CString::new(units).unwrap();
-        let var = unsafe { sys::fsVarsGetAircraftVarId(name.as_ptr()) };
-        let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
+        let name_cstr = std::ffi::CString::new(name).unwrap();
+        let units_cstr = std::ffi::CString::new(units).unwrap();
+        let var = unsafe { sys::fsVarsGetAircraftVarId(name_cstr.as_ptr()) };
+        let unit = unsafe { sys::fsVarsGetUnitId(units_cstr.as_ptr()) };
 
         let param1 = sys::FsVarParamVariant {
             type_: 0,
