@@ -142,8 +142,18 @@ impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
         let name_cstr = std::ffi::CString::new(name).unwrap();
         let units_cstr = std::ffi::CString::new(units).unwrap();
-        let var = unsafe { sys::fsVarsGetAircraftVarId(name_cstr.as_ptr()) };
-        let unit = unsafe { sys::fsVarsGetUnitId(units_cstr.as_ptr()) };
+        let var = unsafe { let varResult = sys::fsVarsGetAircraftVarId(name_cstr.as_ptr());
+            if (varResult == 0) {
+                println!("Error getting aircraft var id for {} with error", name, varResult);
+            }
+            varResult
+         };
+        let unit = unsafe { let result = sys::fsVarsGetUnitId(units_cstr.as_ptr());
+            if (result == 0) {
+                println!("Error getting unit id for {} with error", units, result);
+            }
+            result
+         };
 
         let param1 = sys::FsVarParamVariant {
             type_: 0,
