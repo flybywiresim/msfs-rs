@@ -1,9 +1,6 @@
 //! Bindings to the Legacy/gauges.h API
 
 use crate::sys;
-use std::alloc::dealloc;
-use std::alloc::alloc;
-use std::alloc::Layout;
 
 #[doc(hidden)]
 pub trait SimVarF64 {
@@ -158,6 +155,9 @@ impl AircraftVariableApi {
             size: 1 as u32,
             array: paramsArray.as_mut_ptr(),
         };
+
+        std::mem::forget(paramsArray);
+        
 
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
         Ok(Self {
