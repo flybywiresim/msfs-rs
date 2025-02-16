@@ -215,7 +215,11 @@ impl AircraftVariableApi {
 
 
         unsafe { 
-            sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
+            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
+
+            if (retval != 0) {
+                println!("Error setting aircraft var: {:?}", retval);
+            }
           /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
             
