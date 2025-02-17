@@ -169,7 +169,7 @@ impl AircraftVariableApi {
        // let leakedBox = Box::leak(paramsArrayP);
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: paramsArrayP.into_raw(),
+            array: Box::<[FsVarParamVariant]>::into_raw(paramsArrayP),
         };
 
        // std::mem::forget(paramsArrayP);
