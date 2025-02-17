@@ -161,14 +161,14 @@ impl AircraftVariableApi {
         };
 
         let mut paramsArray = Vec::<sys::FsVarParamVariant>::with_capacity(1);
-        //let mut paramsArray = (vec![0; 1]).into_boxed_slice();
+        let mut paramsArrayP = paramsArray.into_boxed_slice();
         paramsArray.push(param1);
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: paramsArray.as_mut_ptr(),
+            array: paramsArrayP.as_mut_ptr(),
         };
 
-        std::mem::forget(paramsArray);
+        std::mem::forget(paramsArrayP);
         
 
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
