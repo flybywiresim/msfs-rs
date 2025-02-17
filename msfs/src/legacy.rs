@@ -137,7 +137,9 @@ impl NamedVariableApi {
     }
 }
 
+
 pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray, name: String}
+
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
         let name_cstr = std::ffi::CString::new(name).unwrap();
@@ -164,12 +166,13 @@ impl AircraftVariableApi {
         paramsArray.push(param1);
 
         let mut paramsArrayP = paramsArray.into_boxed_slice();
+       // let leakedBox = Box::leak(paramsArrayP);
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: paramsArrayP.as_mut_ptr(),
+            array: paramsArrayP.into_raw(),
         };
 
-        std::mem::forget(paramsArrayP);
+       // std::mem::forget(paramsArrayP);
         
 
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
