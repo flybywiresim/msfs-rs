@@ -161,8 +161,9 @@ impl AircraftVariableApi {
         };
 
         let mut paramsArray = Vec::<sys::FsVarParamVariant>::with_capacity(1);
-        let mut paramsArrayP = paramsArray.into_boxed_slice();
         paramsArray.push(param1);
+
+        let mut paramsArrayP = paramsArray.into_boxed_slice();
         let params = sys::FsVarParamArray {
             size: 1 as u32,
             array: paramsArrayP.as_mut_ptr(),
