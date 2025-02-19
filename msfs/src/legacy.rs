@@ -162,7 +162,7 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index},
         };
 
-        let paramsArray = vec![param1; 1];;
+        let mut paramsArray = vec![param1; 1];;
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
