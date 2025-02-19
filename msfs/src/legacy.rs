@@ -172,7 +172,7 @@ impl AircraftVariableApi {
             array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
         };
 
-        std::mem::forget(paramsArray);
+       // std::mem::forget(paramsArray);
        
         
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
