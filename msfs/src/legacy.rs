@@ -162,17 +162,17 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index},
         };
 
-        let mut paramsArray = Vec::<sys::FsVarParamVariant>::with_capacity(1);
+        let paramsArray = Vec::<sys::FsVarParamVariant>::with_capacity(1);
         paramsArray.push(param1);
 
         let mut paramsArrayP = paramsArray.into_boxed_slice();
 
-        std::mem::forget(paramsArray);
-        
+
         let params = sys::FsVarParamArray {
             size: 1 as u32,
             array: paramsArrayP.as_mut_ptr(),
         };
+
 
         std::mem::forget(paramsArrayP);
        
