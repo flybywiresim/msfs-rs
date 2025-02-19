@@ -162,18 +162,17 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index},
         };
 
-        let mut paramsArray = vec![param1; 1];;
+        let mut paramsArray = vec![param1; 1].into_boxed_slice();
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
-        std::mem::forget(paramsArray);
-        
+
         let params = sys::FsVarParamArray {
             size: 1 as u32,
-            array: paramsArray.as_mut_ptr(),
+            array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
         };
 
-
+        std::mem::forget(paramsArray);
        
         
       // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
