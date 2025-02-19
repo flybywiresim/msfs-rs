@@ -168,7 +168,7 @@ impl AircraftVariableApi {
 
 
         let params = sys::FsVarParamArray {
-            size: 1 as u32,
+            size: 1 as usize,
             array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
         };
 
