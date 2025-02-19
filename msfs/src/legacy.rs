@@ -168,6 +168,7 @@ impl AircraftVariableApi {
         let mut paramsArrayP = paramsArray.into_boxed_slice();
 
         std::mem::forget(paramsArray);
+        
         let params = sys::FsVarParamArray {
             size: 1 as u32,
             array: paramsArrayP.as_mut_ptr(),
