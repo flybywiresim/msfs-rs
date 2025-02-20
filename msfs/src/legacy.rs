@@ -206,23 +206,18 @@ impl AircraftVariableApi {
   
         unsafe {
 
-            let my_arr: *mut sys::FsVarParamVariant = libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant;
-
-            let param1 = sys::FsVarParamVariant {
-                type_: eFsVarParamType_FsVarParamTypeInteger,
-                __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
-            };
-
-            *my_arr = param1;
-            
-            let paramsForGet = sys::FsVarParamArray {
+            let params_for_get = sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
-                array: my_arr,
+                array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
             };
-    
-             sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v);
 
-             libc::free(my_arr as *mut libc::c_void);
+            (params_for_get.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
+
+    
+             sys::fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+
+             libc::free(params_for_get.array as *mut libc::c_void);
         
                 // drop the mem
                 //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -277,13 +272,9 @@ impl AircraftVariableApi {
         unsafe { 
              
 
-            let param1 = sys::FsVarParamVariant {
-                type_: eFsVarParamType_FsVarParamTypeInteger,
-                __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
-            };
-
+   
             
-            let mut params_for_set = sys::FsVarParamArray {
+            let params_for_set = sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
                 array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
             };
