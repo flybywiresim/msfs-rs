@@ -276,36 +276,37 @@ impl AircraftVariableApi {
 
         unsafe { 
              
-            let my_arr: *mut sys::FsVarParamVariant = libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant;
 
             let param1 = sys::FsVarParamVariant {
                 type_: eFsVarParamType_FsVarParamTypeInteger,
                 __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
             };
 
-            *my_arr = param1;
             
-            let paramsForSet = sys::FsVarParamArray {
+            let mut params_for_set = sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
-                array: my_arr,
+                array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
             };
-    
 
-                let val = (*paramsForSet.array).__bindgen_anon_1.intValue;
+            (params_for_set.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
+
+
+            let val = (*params_for_set.array).__bindgen_anon_1.intValue;
+            
+            if  val > 18 {
+                println!("Value is not valid: {}", val);
+                println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).__bindgen_anon_1.intValue) 
+            };
+            
                 
-                if val < 0 || val > 18 {
-                    println!("Value is not valid: {}", val);
-                    println!("set MSFS var: {}, param {}", self.name, (*paramsForSet.array).__bindgen_anon_1.intValue) 
-                };
-                
-                
-            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, paramsForSet, value);
+            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
             }
 
-            libc::free(my_arr as *mut libc::c_void);
+            libc::free(params_for_set.array as *mut libc::c_void);
 
             // drop the mem
            // drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
