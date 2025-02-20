@@ -211,8 +211,8 @@ impl AircraftVariableApi {
         unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v) };
 
         // drop the mem
-        let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)) };
-        
+        let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)); };
+
         T::from(v)
     }
 /* 
@@ -285,7 +285,7 @@ impl AircraftVariableApi {
             }
 
             // drop the mem
-            let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)) };
+            let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)); };
           /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
             
