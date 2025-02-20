@@ -215,7 +215,7 @@ impl AircraftVariableApi {
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
-             sys::fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+             sys::fsVarsAircraftVarGet(self.simvar, self.units, params_for_get.clone(), &mut v);
 
              libc::free(params_for_get.array as *mut libc::c_void);
         
