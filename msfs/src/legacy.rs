@@ -189,10 +189,30 @@ impl AircraftVariableApi {
     pub fn get<T: SimVarF64>(&self) -> T {
         let mut v = 0.0;
 
+        let param1 = sys::FsVarParamVariant {
+            type_: 0 as ::std::os::raw::c_uchar,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
+        };
+
+        let mut paramsArray = vec![param1; 1].into_boxed_slice();
+
+        //let mut paramsArrayP = paramsArray.into_boxed_slice();
+
+
+        let paramsForGet = sys::FsVarParamArray {
+            size: 1 as ::std::os::raw::c_uint,
+            array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
+        };
+
+
      //   unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
   
-        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, self.params, &mut v) };
+        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v) };
+
+        // drop the mem
+        let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)) };
+        
         T::from(v)
     }
 /* 
@@ -230,23 +250,42 @@ impl AircraftVariableApi {
 
         //std::mem::forget(array);
 
+        
+        let param1 = sys::FsVarParamVariant {
+            type_: 0 as ::std::os::raw::c_uchar,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
+        };
+
+        let mut paramsArray = vec![param1; 1].into_boxed_slice();
+
+        //let mut paramsArrayP = paramsArray.into_boxed_slice();
+
+
+        let paramsForSet = sys::FsVarParamArray {
+            size: 1 as ::std::os::raw::c_uint,
+            array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
+        };
+
 
         unsafe { 
              
 
-                let val = (*self.params.array).__bindgen_anon_1.intValue;
+                let val = (*paramsForSet.array).__bindgen_anon_1.intValue;
                 
                 if(val < 0 || val > 18) {
                     println!("Value is not valid: {}", val);
-                    println!("set MSFS var: {}, param {}", self.name, (*self.params.array).__bindgen_anon_1.intValue) 
+                    println!("set MSFS var: {}, param {}", self.name, (*paramsForSet.array).__bindgen_anon_1.intValue) 
                 };
                 
                 
-            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
+            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, paramsForSet, value);
 
             if (retval != 0) {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
             }
+
+            // drop the mem
+            let _b: () = unsafe { Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)) };
           /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
             
