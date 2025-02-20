@@ -1,6 +1,6 @@
 //! Bindings to the Legacy/gauges.h API
 
-use crate::sys;
+use crate::sys::{self, eFsVarParamType_FsVarParamTypeInteger};
 use std::slice;
 
 #[doc(hidden)]
@@ -189,12 +189,12 @@ impl AircraftVariableApi {
     pub fn get<T: SimVarF64>(&self) -> T {
         let mut v = 0.0;
 
-        let param1 = sys::FsVarParamVariant {
-            type_: 0 as ::std::os::raw::c_uchar,
+      /*   let param1 = sys::FsVarParamVariant {
+            type_: eFsVarParamType_FsVarParamTypeInteger,
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
         };
 
-        let paramsArray = vec![param1; 1].into_boxed_slice();
+        let paramsArray = vec![param1; 1].into_boxed_slice(); */
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
@@ -205,16 +205,27 @@ impl AircraftVariableApi {
 
   
         unsafe {
+
+            let my_arr: *mut sys::FsVarParamVariant = libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant;
+
+            let param1 = sys::FsVarParamVariant {
+                type_: eFsVarParamType_FsVarParamTypeInteger,
+                __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
+            };
+
+            *my_arr = param1;
             
             let paramsForGet = sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
-                array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
+                array: my_arr,
             };
     
              sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v);
+
+             libc::free(my_arr as *mut libc::c_void);
         
                 // drop the mem
-                drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
+                //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
         };
 
 
@@ -257,12 +268,7 @@ impl AircraftVariableApi {
         //std::mem::forget(array);
 
         
-        let param1 = sys::FsVarParamVariant {
-            type_: 0 as ::std::os::raw::c_uchar,
-            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
-        };
-
-        let paramsArray = vec![param1; 1].into_boxed_slice();
+      
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
@@ -270,11 +276,20 @@ impl AircraftVariableApi {
 
         unsafe { 
              
-                let paramsForSet = sys::FsVarParamArray {
-                    size: 1 as ::std::os::raw::c_uint,
-                    array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
-                };
+            let my_arr: *mut sys::FsVarParamVariant = libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant;
 
+            let param1 = sys::FsVarParamVariant {
+                type_: eFsVarParamType_FsVarParamTypeInteger,
+                __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
+            };
+
+            *my_arr = param1;
+            
+            let paramsForSet = sys::FsVarParamArray {
+                size: 1 as ::std::os::raw::c_uint,
+                array: my_arr,
+            };
+    
 
                 let val = (*paramsForSet.array).__bindgen_anon_1.intValue;
                 
@@ -290,8 +305,10 @@ impl AircraftVariableApi {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
             }
 
+            libc::free(my_arr as *mut libc::c_void);
+
             // drop the mem
-            drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
+           // drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
           /*   if(!value.is_finite()) {
                 println!("Value is not finite, wtf unsafe");
             
