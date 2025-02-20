@@ -194,21 +194,24 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
         };
 
-        let mut paramsArray = vec![param1; 1].into_boxed_slice();
+        let paramsArray = vec![param1; 1].into_boxed_slice();
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
 
-        let paramsForGet = sys::FsVarParamArray {
-            size: 1 as ::std::os::raw::c_uint,
-            array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
-        };
-
+    
 
      //   unsafe { println!("var: {}, unit: {} param {}", self.simvar, self.units, (*self.params.array).__bindgen_anon_1.intValue) };
 
   
-        unsafe { sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v);
+        unsafe {
+            
+            let paramsForGet = sys::FsVarParamArray {
+                size: 1 as ::std::os::raw::c_uint,
+                array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
+            };
+    
+             sys::fsVarsAircraftVarGet(self.simvar, self.units, paramsForGet, &mut v);
         
                 // drop the mem
                 drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -259,19 +262,19 @@ impl AircraftVariableApi {
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: self.index as ::std::os::raw::c_uint},
         };
 
-        let mut paramsArray = vec![param1; 1].into_boxed_slice();
+        let paramsArray = vec![param1; 1].into_boxed_slice();
 
         //let mut paramsArrayP = paramsArray.into_boxed_slice();
 
 
-        let paramsForSet = sys::FsVarParamArray {
-            size: 1 as ::std::os::raw::c_uint,
-            array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
-        };
-
 
         unsafe { 
              
+                let paramsForSet = sys::FsVarParamArray {
+                    size: 1 as ::std::os::raw::c_uint,
+                    array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
+                };
+
 
                 let val = (*paramsForSet.array).__bindgen_anon_1.intValue;
                 
