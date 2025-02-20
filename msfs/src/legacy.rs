@@ -175,7 +175,7 @@ impl AircraftVariableApi {
        // std::mem::forget(paramsArray);
        
         
-      // unsafe { println!("INIT MSFS var: {}, unit: {} param {}", var, unit, (*param.array).__bindgen_anon_1.intValue) };
+      
         Ok(Self {
             simvar: var,
             units: unit,
@@ -232,6 +232,7 @@ impl AircraftVariableApi {
 
 
         unsafe { 
+             unsafe { println!("set MSFS var: {}, param {}", self.name, (*self.params.array).__bindgen_anon_1.intValue) };
             let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
 
             if (retval != 0) {
