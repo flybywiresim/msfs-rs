@@ -206,16 +206,16 @@ impl AircraftVariableApi {
   
         unsafe {
 
-            let params_for_get = sys::FsVarParamArray {
+            let params_for_get = Box::new(sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
                 array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
-            };
+            });
 
             (params_for_get.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
-             sys::fsVarsAircraftVarGet(self.simvar, self.units, params_for_get.clone(), &mut v);
+             sys::fsVarsAircraftVarGet(self.simvar, self.units, *params_for_get.as_ref(), &mut v);
 
              libc::free(params_for_get.array as *mut libc::c_void);
         
@@ -274,10 +274,10 @@ impl AircraftVariableApi {
 
    
             
-            let params_for_set = sys::FsVarParamArray {
+            let params_for_set = Box::new(sys::FsVarParamArray {
                 size: 1 as ::std::os::raw::c_uint,
                 array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
-            };
+            });
 
             (params_for_set.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
@@ -291,13 +291,16 @@ impl AircraftVariableApi {
             };
             
                 
-            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value);
+            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set.as_ref(), value);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
             }
 
+    
+
             libc::free(params_for_set.array as *mut libc::c_void);
+            std::mem::forget(params_for_set);
 
             // drop the mem
            // drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
