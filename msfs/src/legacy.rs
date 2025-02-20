@@ -289,6 +289,8 @@ impl AircraftVariableApi {
                 println!("Value is not valid: {}", val);
                 println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).__bindgen_anon_1.intValue) 
             };
+
+            println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).__bindgen_anon_1.intValue);
             
                 
             let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set.as_ref(), value);
