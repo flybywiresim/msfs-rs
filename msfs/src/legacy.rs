@@ -158,8 +158,8 @@ impl AircraftVariableApi {
          };
 
         let param1 = sys::FsVarParamVariant {
-            type_: 0,
-            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index},
+            type_: 0 as ::std::os::raw::c_uchar,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index as ::std::os::raw::c_uint},
         };
 
         let mut paramsArray = vec![param1; 100].into_boxed_slice();
@@ -168,7 +168,7 @@ impl AircraftVariableApi {
 
 
         let params = sys::FsVarParamArray {
-            size: 1 as usize,
+            size: 1 as ::std::os::raw::c_uint,
             array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
         };
 
