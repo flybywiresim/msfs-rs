@@ -232,7 +232,15 @@ impl AircraftVariableApi {
 
 
         unsafe { 
-             unsafe { println!("set MSFS var: {}, param {}", self.name, (*self.params.array).__bindgen_anon_1.intValue) };
+             unsafe { 
+
+                let val = (*self.params.array).__bindgen_anon_1.intValue;
+                
+                if(val.is_nan() || val < 0 || val > 18) {
+                    println!("Value is not valid: {}", val);
+                    println!("set MSFS var: {}, param {}", self.name, (*self.params.array).__bindgen_anon_1.intValue) };
+                }
+                
             let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, self.params, value);
 
             if (retval != 0) {
