@@ -137,7 +137,44 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub union VariantValue {
+    pub intValue: ::std::os::raw::c_uint,
+    pub stringValue: *const ::std::os::raw::c_char,
+    pub CRCValue: sys::FsCRC,
+}
 
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct FsVarParamVariantCustom {
+    pub type_: sys::eFsVarParamType,
+    pub value: VariantValue,
+}
+
+extern "C" {
+    pub fn fsVarsAircraftVarGet(
+        simvar: sys::FsSimVarId,
+        unit: sys::FsUnitId,
+        param: FsVarParamArrayCustom,
+        result: *mut f64,
+    ) -> sys::FsVarError;
+}
+extern "C" {
+    pub fn fsVarsAircraftVarSet(
+        simvar: sys::FsSimVarId,
+        unit: sys::FsUnitId,
+        param: FsVarParamArrayCustom,
+        value: f64,
+    ) -> sys::FsVarError;
+}
+
+#[repr(C, packed(4))]
+#[derive(Debug, Copy, Clone)]
+pub struct FsVarParamArrayCustom {
+    pub size: ::std::os::raw::c_uint,
+    pub array: *mut FsVarParamVariantCustom,
+}
 
 pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, name: String}
 
@@ -206,16 +243,16 @@ impl AircraftVariableApi {
   
         unsafe {
 
-            let params_for_get = Box::new(sys::FsVarParamArray {
+            let params_for_get = Box::new(FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
+                array: libc::malloc(std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom,
             });
 
-            (params_for_get.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index as ::std::os::raw::c_uint;
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
-             sys::fsVarsAircraftVarGet(self.simvar, self.units, *params_for_get.as_ref(), &mut v);
+             fsVarsAircraftVarGet(self.simvar, self.units, *params_for_get.as_ref(), &mut v);
 
              libc::free(params_for_get.array as *mut libc::c_void);
         
@@ -274,26 +311,26 @@ impl AircraftVariableApi {
 
    
             
-            let params_for_set = Box::new(sys::FsVarParamArray {
+            let params_for_set = Box::new(FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: libc::malloc(std::mem::size_of::<sys::FsVarParamVariant>() as libc::size_t) as *mut sys::FsVarParamVariant,
+                array: libc::malloc(std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom,
             });
 
-            (params_for_set.array.add(0).as_mut().unwrap()).__bindgen_anon_1.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index as ::std::os::raw::c_uint;
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
 
-            let val = (*params_for_set.array).__bindgen_anon_1.intValue;
+            let val = (*params_for_set.array).value.intValue;
             
             if  val > 18 {
                 println!("Value is not valid: {}", val);
-                println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).__bindgen_anon_1.intValue) 
+                println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue) 
             };
 
-            println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).__bindgen_anon_1.intValue);
+            println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set.as_ref(), value);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set.as_ref(), value);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
@@ -302,7 +339,7 @@ impl AircraftVariableApi {
     
 
             libc::free(params_for_set.array as *mut libc::c_void);
-            std::mem::forget(params_for_set);
+           // std::mem::forget(params_for_set);
 
             // drop the mem
            // drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
