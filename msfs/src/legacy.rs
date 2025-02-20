@@ -138,7 +138,7 @@ impl NamedVariableApi {
 }
 
 
-pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, params: sys::FsVarParamArray, name: String}
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, name: String}
 
 impl AircraftVariableApi {
     pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
@@ -157,7 +157,7 @@ impl AircraftVariableApi {
             result
          };
 
-        let param1 = sys::FsVarParamVariant {
+      /*   let param1 = sys::FsVarParamVariant {
             type_: 0 as ::std::os::raw::c_uchar,
             __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 { intValue: index as ::std::os::raw::c_uint},
         };
@@ -171,7 +171,7 @@ impl AircraftVariableApi {
             size: 1 as ::std::os::raw::c_uint,
             array: Box::into_raw(paramsArray) as *mut sys::FsVarParamVariant,
         };
-
+ */
        // std::mem::forget(paramsArray);
        
         
@@ -180,7 +180,6 @@ impl AircraftVariableApi {
             simvar: var,
             units: unit,
             index: index,
-            params,
             name: name.to_string()
         })
 
