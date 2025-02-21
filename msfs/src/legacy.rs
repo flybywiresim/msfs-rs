@@ -253,7 +253,7 @@ impl AircraftVariableApi {
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
-            // fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+             fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
 
              libc::free(ptr as *mut libc::c_void);
         
@@ -320,18 +320,18 @@ impl AircraftVariableApi {
             (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index as ::std::os::raw::c_uint;
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
-
+/* 
             let val = (*params_for_set.array).value.intValue;
             
             if  val > 18 {
                 println!("Value is not valid: {}", val);
                 println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue) 
-            };
+            }; */
 
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, 10./0.);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
