@@ -253,9 +253,9 @@ impl AircraftVariableApi {
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
-             fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+            // fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
 
-             //libc::free(ptr as *mut libc::c_void);
+             libc::free(ptr as *mut libc::c_void);
         
                 // drop the mem
                 //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -337,9 +337,10 @@ impl AircraftVariableApi {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
             }
 
+            
     
 
-          //  libc::free(ptr as *mut libc::c_void);
+            libc::free(ptr as *mut libc::c_void);
            // std::mem::forget(params_for_set);
 
             // drop the mem
