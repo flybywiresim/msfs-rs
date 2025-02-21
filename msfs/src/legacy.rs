@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
-#[repr(C)]
+#[repr(C, packed(4))]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
@@ -255,7 +255,7 @@ impl AircraftVariableApi {
     
              fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
 
-             libc::free(ptr as *mut libc::c_void);
+             //libc::free(ptr as *mut libc::c_void);
         
                 // drop the mem
                 //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -339,7 +339,7 @@ impl AircraftVariableApi {
 
     
 
-            libc::free(ptr as *mut libc::c_void);
+          //  libc::free(ptr as *mut libc::c_void);
            // std::mem::forget(params_for_set);
 
             // drop the mem
