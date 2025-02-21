@@ -327,7 +327,7 @@ impl AircraftVariableApi {
                 println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue) 
             };
 
-            println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
+            //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
             let retval = fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set.as_ref(), value);
