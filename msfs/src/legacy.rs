@@ -168,7 +168,7 @@ impl TestUnion {
      FsVarParamTypeString,
      FsVarParamTypeCRC,
  }
-#[repr(C)]
+#[repr(C, packed(4))]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
     pub value: VariantValue,
@@ -281,11 +281,11 @@ impl AircraftVariableApi {
                 array: Box::into_raw(variant_box),
             });
 
-            let val =  &mut (*(params_for_get).array).value;
-            let arrayType = &mut (*(params_for_get).array).type_;
+          /*   let val =  &mut (*(params_for_get).array).value;
+            let arrayType = &mut (*(params_for_get).array).type_; */
 
-            val.intValue = self.index;
-            *arrayType = eFsVarParamType::FsVarParamTypeInteger;
+        /*     val.intValue = self.index;
+            *arrayType = eFsVarParamType::FsVarParamTypeInteger; */
             
 
             let raw_param_array = Box::into_raw(params_for_get);
@@ -362,16 +362,16 @@ impl AircraftVariableApi {
                 },
             });
             
-            let mut params_for_set = Box::new(FsVarParamArrayCustom {
+            let params_for_set = Box::new(FsVarParamArrayCustom {
                 size: 1,
                 array: Box::into_raw(variant_box),
             });
 
-            let val =  &mut (*(params_for_set).array).value;;
+           /*  let val =  &mut (*(params_for_set).array).value;;
             let arrayType = &mut (*(params_for_set).array).type_;
 
             val.intValue = self.index;
-            *arrayType = eFsVarParamType::FsVarParamTypeInteger;
+            *arrayType = eFsVarParamType::FsVarParamTypeInteger; */
             
 
             let raw_param_array = Box::into_raw(params_for_set);
