@@ -146,6 +146,19 @@ pub union VariantValue {
 }
 
 
+#[repr(C, packed(4))]
+struct TestUnion{
+    data: [u8; 64]
+}
+
+impl TestUnion {
+    unsafe fn as_uint32(&mut self) -> &mut u32 {
+        let p = self as *mut _ as *mut u32;
+        &mut *p
+    }
+  
+}
+
  #[repr(u8)]
  #[derive(Clone, Copy)]
  enum eFsVarParamType
@@ -158,7 +171,7 @@ pub union VariantValue {
 #[repr(C)]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
-    pub value: VariantValue,
+    pub value: TestUnion,
 }
 
 extern "C" {
@@ -262,12 +275,16 @@ impl AircraftVariableApi {
                 array: ptr.as_mut().unwrap()
             });
 
+            let val =  (*(params_for_get).array).value.as_uint32();
+            let arrayType = &mut (*(params_for_get).array).type_;
+
+            *val = self.index;
+            *arrayType = eFsVarParamType::FsVarParamTypeInteger;
+            
+
             let raw_param_array = Box::into_raw(params_for_get);
 
-            (*raw_param_array.as_mut().unwrap().array).value.intValue = self.index.clone();
-            (*raw_param_array.as_mut().unwrap().array).type_ = eFsVarParamType::FsVarParamTypeInteger;
-
-    
+          
              fsVarsAircraftVarGet(self.simvar, self.units, *raw_param_array, &mut v);
 
              libc::free(ptr as *mut libc::c_void);
@@ -337,10 +354,14 @@ impl AircraftVariableApi {
                 array: libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *const _ as *mut FsVarParamVariantCustom,
             });
 
-            let raw_param_array = Box::into_raw(params_for_set);
+            let val =  (*(params_for_set).array).value.as_uint32();
+            let arrayType = &mut (*(params_for_set).array).type_;
 
-            (*raw_param_array.as_mut().unwrap().array).value.intValue = self.index.clone();
-            (*raw_param_array.as_mut().unwrap().array).type_ = eFsVarParamType::FsVarParamTypeInteger;
+            *val = self.index;
+            *arrayType = eFsVarParamType::FsVarParamTypeInteger;
+            
+
+            let raw_param_array = Box::into_raw(params_for_set);
 
 
 /* 
