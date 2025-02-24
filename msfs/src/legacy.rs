@@ -259,7 +259,7 @@ impl AircraftVariableApi {
 
             let params_for_get = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: ptr,
+                array: ptr.as_mut().unwrap()
             };
 
             (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
@@ -327,7 +327,7 @@ impl AircraftVariableApi {
             
             let  params_for_set: FsVarParamArrayCustom  = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: ptr
+                array: ptr.as_mut().unwrap()
             };
 
             (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
