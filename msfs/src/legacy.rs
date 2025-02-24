@@ -1,7 +1,7 @@
 //! Bindings to the Legacy/gauges.h API
 
 use crate::sys::{self, eFsVarParamType_FsVarParamTypeInteger};
-use std::slice;
+use std::{mem::ManuallyDrop, slice};
 
 #[doc(hidden)]
 pub trait SimVarF64 {
@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
- #[repr(C)]
+ #[repr(C, packed(4))]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
@@ -175,7 +175,7 @@ extern "C" {
     ) -> sys::FsVarError;
 }
 
-#[repr(C)]
+#[repr(C, packed(4))]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
     pub array: *mut FsVarParamVariantCustom,
@@ -257,7 +257,7 @@ impl AircraftVariableApi {
                 array: ptr,
             };
 
-            (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index;
+            (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
     
@@ -322,10 +322,10 @@ impl AircraftVariableApi {
             
             let params_for_set = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: ptr,
+                array: ptr.as_mut().unwrap(),
             };
 
-            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index;
+            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
 /* 
@@ -339,7 +339,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, std::mem::transmute(params_for_set), value);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
@@ -348,7 +348,7 @@ impl AircraftVariableApi {
             
     
 
-           // libc::free(ptr as *mut libc::c_void);
+           libc::free(ptr as *mut libc::c_void);
            // std::mem::forget(params_for_set);
 
             // drop the mem
