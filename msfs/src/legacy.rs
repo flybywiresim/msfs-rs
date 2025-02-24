@@ -137,17 +137,17 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
-#[repr(C, packed(4))]
+/* #[repr(C, packed(4))]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
     pub CRCValue: sys::FsCRC,
 }
-
+ */
 #[repr(C, packed(4))]
 pub struct FsVarParamVariantCustom {
     pub type_: sys::eFsVarParamType,
-    pub value: VariantValue,
+    pub value: sys::FsCRC,
 }
 
 extern "C" {
@@ -249,13 +249,13 @@ impl AircraftVariableApi {
                 array: ptr,
             };
 
-            (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_get.array.add(0).as_mut().unwrap()).value = self.index.into();
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
     
              fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
 
-             libc::free(ptr as *mut libc::c_void);
+             //libc::free(ptr as *mut libc::c_void);
         
                 // drop the mem
                 //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -317,7 +317,7 @@ impl AircraftVariableApi {
                 array: ptr,
             };
 
-            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index as ::std::os::raw::c_uint;
+            (params_for_set.array.add(0).as_mut().unwrap()).value = self.index.into();
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
 
 /* 
@@ -340,7 +340,7 @@ impl AircraftVariableApi {
             
     
 
-            libc::free(ptr as *mut libc::c_void);
+           // libc::free(ptr as *mut libc::c_void);
            // std::mem::forget(params_for_set);
 
             // drop the mem
