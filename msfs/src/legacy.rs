@@ -171,7 +171,7 @@ impl TestUnion {
 #[repr(C)]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
-    pub value: TestUnion,
+    pub value: VariantValue,
 }
 
 extern "C" {
@@ -275,10 +275,10 @@ impl AircraftVariableApi {
                 array: ptr.as_mut().unwrap()
             });
 
-            let val =  (*(params_for_get).array).value.as_uint32();
+            let val =  &mut (*(params_for_get).array).value;
             let arrayType = &mut (*(params_for_get).array).type_;
 
-            *val = self.index;
+            val.intValue = self.index;
             *arrayType = eFsVarParamType::FsVarParamTypeInteger;
             
 
@@ -354,10 +354,10 @@ impl AircraftVariableApi {
                 array: libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *const _ as *mut FsVarParamVariantCustom,
             });
 
-            let val =  (*(params_for_set).array).value.as_uint32();
+            let val =  &mut (*(params_for_set).array).value;;
             let arrayType = &mut (*(params_for_set).array).type_;
 
-            *val = self.index;
+            val.intValue = self.index;
             *arrayType = eFsVarParamType::FsVarParamTypeInteger;
             
 
