@@ -282,7 +282,7 @@ impl AircraftVariableApi {
             
             let params_for_get = FsVarParamArrayCustom {
                 size: 1,
-                array: array.into_boxed_slice().as_mut_ptr() as *mut FsVarParamVariantCustom,
+                array: Box::into_raw(array.into_boxed_slice()) as *mut FsVarParamVariantCustom,
             };
 
           /*   let val =  &mut (*(params_for_get).array).value;
@@ -300,7 +300,7 @@ impl AircraftVariableApi {
              //libc::free(ptr as *mut libc::c_void);
 
                 // drop the mem
-           // drop(Box::from_raw(rawArray));
+            drop(Box::from_raw(params_for_get.array));
         };
 
 
@@ -376,7 +376,7 @@ impl AircraftVariableApi {
             
             let params_for_set = FsVarParamArrayCustom {
                 size: 1,
-                array: array.into_boxed_slice().as_mut_ptr() as *mut FsVarParamVariantCustom,
+                array: Box::into_raw(array.into_boxed_slice()) as *mut FsVarParamVariantCustom,
             };
 
            /*  let val =  &mut (*(params_for_set).array).value;;
@@ -405,6 +405,9 @@ impl AircraftVariableApi {
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, v);
             }
+
+            drop(Box::from_raw(params_for_set.array));
+
 
             
     
