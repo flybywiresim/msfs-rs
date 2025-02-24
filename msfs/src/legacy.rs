@@ -355,17 +355,21 @@ impl AircraftVariableApi {
 
             //let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
 
-            let variant_box = Box::new(FsVarParamVariantCustom {
+            let variant_box = FsVarParamVariantCustom {
                 type_: eFsVarParamType::FsVarParamTypeInteger,
                 value: VariantValue {
                     intValue: self.index,
                 },
-            });
+            };
+
+            let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
+
+            let rawArray = Box::into_raw(array.into_boxed_slice());
             
-            let params_for_set = Box::new(FsVarParamArrayCustom {
+            let params_for_set = FsVarParamArrayCustom {
                 size: 1,
-                array: Box::into_raw(variant_box),
-            });
+                array: rawArray as *mut FsVarParamVariantCustom,
+            };
 
            /*  let val =  &mut (*(params_for_set).array).value;;
             let arrayType = &mut (*(params_for_set).array).type_;
@@ -374,7 +378,7 @@ impl AircraftVariableApi {
             *arrayType = eFsVarParamType::FsVarParamTypeInteger; */
             
 
-            let raw_param_array = Box::into_raw(params_for_set);
+          //  let raw_param_array = Box::into_raw(params_for_set);
 
 
 /* 
@@ -388,7 +392,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, *raw_param_array, v);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, v);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, v);
@@ -398,8 +402,8 @@ impl AircraftVariableApi {
     
 
            //libc::free(raw_param_array.as_mut().unwrap().array as *mut libc::c_void);
-           let mut param_array = Box::from_raw(raw_param_array);
-           let _variant = Box::from_raw(param_array.array);
+           let mut param_array = Box::from_raw(rawArray);
+          
 
          //   std::mem::forget(params_for_set);
 
