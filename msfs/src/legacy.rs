@@ -176,6 +176,7 @@ extern "C" {
 }
 
 #[repr(C, packed(4))]
+#[derive(Clone)]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
     pub array: *mut FsVarParamVariantCustom,
@@ -261,9 +262,9 @@ impl AircraftVariableApi {
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
     
-             fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+             fsVarsAircraftVarGet(self.simvar, self.units, params_for_get.clone(), &mut v);
 
-             //libc::free(ptr as *mut libc::c_void);
+             libc::free(ptr as *mut libc::c_void);
         
                 // drop the mem
                 //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
@@ -320,7 +321,7 @@ impl AircraftVariableApi {
 
             let ptr = libc::malloc(2 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
             
-            let params_for_set = FsVarParamArrayCustom {
+            let  params_for_set: FsVarParamArrayCustom  = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
                 array: ptr.as_mut().unwrap(),
             };
@@ -339,7 +340,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, std::mem::transmute(params_for_set), value);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set.clone(), value.clone());
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
@@ -349,7 +350,7 @@ impl AircraftVariableApi {
     
 
            libc::free(ptr as *mut libc::c_void);
-           // std::mem::forget(params_for_set);
+         //   std::mem::forget(params_for_set);
 
             // drop the mem
            // drop(Box::from_raw(slice::from_raw_parts_mut(paramsForSet.array, 1)));
