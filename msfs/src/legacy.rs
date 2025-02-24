@@ -144,7 +144,15 @@ pub union VariantValue {
     pub CRCValue: sys::FsCRC,
 }
  */
-#[repr(C, packed(4))]
+
+ #[repr(C, u8)]
+ enum eFsVarParamType
+ {
+     FsVarParamTypeInteger,
+     FsVarParamTypeString,
+     FsVarParamTypeCRC,
+ }
+#[repr(C)]
 pub struct FsVarParamVariantCustom {
     pub type_: sys::eFsVarParamType,
     pub value: sys::FsCRC,
