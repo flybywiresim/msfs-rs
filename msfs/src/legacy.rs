@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
- #[repr(C, packed(4))]
+ #[repr(C, packed(8))]
  #[derive(Clone, Copy)]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
@@ -146,7 +146,7 @@ pub union VariantValue {
 }
 
 
-#[repr(C, packed(4))]
+#[repr(C, packed(8))]
 struct TestUnion{
     data: [u8; 64]
 }
@@ -168,7 +168,7 @@ impl TestUnion {
      FsVarParamTypeString,
      FsVarParamTypeCRC,
  }
-#[repr(C, packed(4))]
+#[repr(C, packed(8))]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
     pub value: VariantValue,
@@ -191,7 +191,7 @@ extern "C" {
     ) -> sys::FsVarError;
 }
 
-#[repr(C, packed(4))]
+#[repr(C, packed(8))]
 #[derive(Clone, Copy)]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
@@ -269,17 +269,14 @@ impl AircraftVariableApi {
         unsafe {
 
 
-            let variant_box = Box::new(FsVarParamVariantCustom {
-                type_: eFsVarParamType::FsVarParamTypeInteger,
-                value: VariantValue {
-                    intValue: self.index,
-                },
-            });
+            let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
 
-            let params_for_get = Box::new(FsVarParamArrayCustom {
-                size: 1 as ::std::os::raw::c_uint,
-                array: Box::into_raw(variant_box),
-            });
+            let rawArray = Box::into_raw(array.into_boxed_slice());
+            
+            let params_for_get = FsVarParamArrayCustom {
+                size: 1,
+                array: rawArray as *mut FsVarParamVariantCustom,
+            };
 
           /*   let val =  &mut (*(params_for_get).array).value;
             let arrayType = &mut (*(params_for_get).array).type_; */
@@ -288,18 +285,15 @@ impl AircraftVariableApi {
             *arrayType = eFsVarParamType::FsVarParamTypeInteger; */
             
 
-            let raw_param_array = Box::into_raw(params_for_get);
+        
 
           
-             fsVarsAircraftVarGet(self.simvar, self.units, *raw_param_array, &mut v);
+             fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
 
              //libc::free(ptr as *mut libc::c_void);
 
-             let mut param_array = Box::from_raw(raw_param_array);
-             let _variant = Box::from_raw(param_array.array);
-        
                 // drop the mem
-                //drop(Box::from_raw(slice::from_raw_parts_mut(paramsForGet.array, 1)));
+            drop(Box::from_raw(rawArray));
         };
 
 
@@ -402,7 +396,10 @@ impl AircraftVariableApi {
     
 
            //libc::free(raw_param_array.as_mut().unwrap().array as *mut libc::c_void);
-           let mut param_array = Box::from_raw(rawArray);
+         //  let mut param_array = Box::from_raw(rawArray);
+
+           drop(Box::from_raw(rawArray));
+
           
 
          //   std::mem::forget(params_for_set);
