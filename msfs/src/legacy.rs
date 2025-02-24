@@ -271,9 +271,14 @@ impl AircraftVariableApi {
 
    
             let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
+            array.push(FsVarParamVariantCustom {
+                type_: eFsVarParamType::FsVarParamTypeInteger,
+                value: VariantValue {
+                    intValue: self.index,
+                },
+            });
 
-            array[0].type_ = eFsVarParamType::FsVarParamTypeInteger;
-            array[0].value.intValue = self.index;
+        
             
             let params_for_get = FsVarParamArrayCustom {
                 size: 1,
@@ -351,17 +356,21 @@ impl AircraftVariableApi {
 
             //let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
 
-            let variant_box = FsVarParamVariantCustom {
+   /*          let variant_box = FsVarParamVariantCustom {
                 type_: eFsVarParamType::FsVarParamTypeInteger,
                 value: VariantValue {
                     intValue: self.index,
                 },
-            };
+            }; */
 
             let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
 
-            array[0].type_ = eFsVarParamType::FsVarParamTypeInteger;
-            array[0].value.intValue = self.index;
+            array.push(FsVarParamVariantCustom {
+                type_: eFsVarParamType::FsVarParamTypeInteger,
+                value: VariantValue {
+                    intValue: self.index,
+                },
+            });
 
             
             
