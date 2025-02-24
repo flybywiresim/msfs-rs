@@ -156,7 +156,6 @@ pub union VariantValue {
      FsVarParamTypeCRC,
  }
 #[repr(C)]
-#[derive(Clone, Copy)]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
     pub value: VariantValue,
@@ -323,15 +322,16 @@ impl AircraftVariableApi {
         unsafe { 
              
 
-            let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
+            //let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
             
-            let  params_for_set: FsVarParamArrayCustom  = FsVarParamArrayCustom {
-                size: 1 as ::std::os::raw::c_uint,
-                array: ptr.as_mut().unwrap()
+            let mut params_for_set = FsVarParamArrayCustom {
+                size: 1,
+                array: libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom,
             };
+      
 
-            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
-            (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
+            (*params_for_set.array).value.intValue = self.index.clone();
+            (*params_for_set.array).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
 /* 
             let val = (*params_for_set.array).value.intValue;
@@ -344,7 +344,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set.clone(), value.clone());
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value.clone());
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
@@ -353,7 +353,7 @@ impl AircraftVariableApi {
             
     
 
-           libc::free(ptr as *mut libc::c_void);
+           libc::free(params_for_set.array as *mut libc::c_void);
          //   std::mem::forget(params_for_set);
 
             // drop the mem
