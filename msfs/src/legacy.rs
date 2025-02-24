@@ -185,6 +185,7 @@ pub struct FsVarParamArrayCustom {
     pub array: *mut FsVarParamVariantCustom,
 }
 
+
 pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, name: String}
 
 impl AircraftVariableApi {
@@ -286,7 +287,9 @@ impl AircraftVariableApi {
             value: f64,
         ) -> FsVarError; */
 
-     pub fn set(&self, value: f64) {
+     pub fn set(&self, value: impl SimVarF64) {
+
+        let v: f64 = value.to();
 
    /*      let param1 = sys::FsVarParamVariant {
             type_: 0,
@@ -344,16 +347,16 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value.clone());
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set.clone(), v);
 
             if retval != 0 {
-                println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
+                println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, v);
             }
 
             
     
 
-           libc::free(params_for_set.array as *mut libc::c_void);
+           libc::free(params_for_set.clone().array as *mut libc::c_void);
          //   std::mem::forget(params_for_set);
 
             // drop the mem
