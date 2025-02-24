@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
- #[repr(C, packed(8))]
+ #[repr(C, packed(4))]
  #[derive(Clone, Copy)]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
@@ -168,7 +168,7 @@ impl TestUnion {
      FsVarParamTypeString,
      FsVarParamTypeCRC,
  }
-#[repr(C, packed(8))]
+#[repr(C, packed(4))]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
     pub value: VariantValue,
@@ -191,7 +191,7 @@ extern "C" {
     ) -> sys::FsVarError;
 }
 
-#[repr(C, packed(8))]
+#[repr(C, packed(4))]
 #[derive(Clone, Copy)]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
@@ -269,13 +269,15 @@ impl AircraftVariableApi {
         unsafe {
 
 
+   
             let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
 
-            let rawArray = Box::into_raw(array.into_boxed_slice());
+            array[0].type_ = eFsVarParamType::FsVarParamTypeInteger;
+            array[0].value.intValue = self.index;
             
             let params_for_get = FsVarParamArrayCustom {
                 size: 1,
-                array: rawArray as *mut FsVarParamVariantCustom,
+                array: array.into_boxed_slice().as_mut_ptr() as *mut FsVarParamVariantCustom,
             };
 
           /*   let val =  &mut (*(params_for_get).array).value;
@@ -293,7 +295,7 @@ impl AircraftVariableApi {
              //libc::free(ptr as *mut libc::c_void);
 
                 // drop the mem
-            drop(Box::from_raw(rawArray));
+           // drop(Box::from_raw(rawArray));
         };
 
 
@@ -358,11 +360,14 @@ impl AircraftVariableApi {
 
             let mut array = Vec::<FsVarParamVariantCustom>::with_capacity(1);
 
-            let rawArray = Box::into_raw(array.into_boxed_slice());
+            array[0].type_ = eFsVarParamType::FsVarParamTypeInteger;
+            array[0].value.intValue = self.index;
+
+            
             
             let params_for_set = FsVarParamArrayCustom {
                 size: 1,
-                array: rawArray as *mut FsVarParamVariantCustom,
+                array: array.into_boxed_slice().as_mut_ptr() as *mut FsVarParamVariantCustom,
             };
 
            /*  let val =  &mut (*(params_for_set).array).value;;
@@ -398,7 +403,7 @@ impl AircraftVariableApi {
            //libc::free(raw_param_array.as_mut().unwrap().array as *mut libc::c_void);
          //  let mut param_array = Box::from_raw(rawArray);
 
-           drop(Box::from_raw(rawArray));
+           //drop(Box::from_raw(rawArray));
 
           
 
