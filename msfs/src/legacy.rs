@@ -138,6 +138,7 @@ impl NamedVariableApi {
     }
 }
  #[repr(C, packed(4))]
+ #[derive(Clone, Copy)]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
@@ -146,13 +147,16 @@ pub union VariantValue {
 
 
  #[repr(u8)]
+ #[derive(Clone, Copy)]
  enum eFsVarParamType
+ 
  {
      FsVarParamTypeInteger,
      FsVarParamTypeString,
      FsVarParamTypeCRC,
  }
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
     pub value: VariantValue,
@@ -176,7 +180,7 @@ extern "C" {
 }
 
 #[repr(C, packed(4))]
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
     pub array: *mut FsVarParamVariantCustom,
@@ -319,11 +323,11 @@ impl AircraftVariableApi {
         unsafe { 
              
 
-            let ptr = libc::malloc(2 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
+            let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
             
             let  params_for_set: FsVarParamArrayCustom  = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
-                array: ptr.as_mut().unwrap(),
+                array: ptr
             };
 
             (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index.clone();
