@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
- #[repr(C, packed(4))]
+ #[repr(C)]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
@@ -145,7 +145,7 @@ pub union VariantValue {
 }
 
 
- #[repr(C, u8)]
+ #[repr(u8)]
  enum eFsVarParamType
  {
      FsVarParamTypeInteger,
@@ -175,7 +175,7 @@ extern "C" {
     ) -> sys::FsVarError;
 }
 
-#[repr(C, packed(4))]
+#[repr(C)]
 pub struct FsVarParamArrayCustom {
     pub size: ::std::os::raw::c_uint,
     pub array: *mut FsVarParamVariantCustom,
