@@ -327,10 +327,10 @@ impl AircraftVariableApi {
 
             //let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
             
-            let mut params_for_set = FsVarParamArrayCustom {
+            let mut params_for_set = Box::pin(FsVarParamArrayCustom {
                 size: 1,
-                array: libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom,
-            };
+                array: libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *const _ as *mut FsVarParamVariantCustom,
+            });
       
 
             (*params_for_set.array).value.intValue = self.index.clone();
@@ -347,7 +347,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set.clone(), v);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, *params_for_set, v);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, v);
@@ -356,7 +356,7 @@ impl AircraftVariableApi {
             
     
 
-           libc::free(params_for_set.clone().array as *mut libc::c_void);
+           libc::free(params_for_set.array as *mut libc::c_void);
          //   std::mem::forget(params_for_set);
 
             // drop the mem
