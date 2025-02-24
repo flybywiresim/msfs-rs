@@ -154,7 +154,7 @@ pub union VariantValue {
  }
 #[repr(C)]
 pub struct FsVarParamVariantCustom {
-    pub type_: sys::eFsVarParamType,
+    pub type_: eFsVarParamType,
     pub value: sys::FsCRC,
 }
 
@@ -258,7 +258,7 @@ impl AircraftVariableApi {
             };
 
             (params_for_get.array.add(0).as_mut().unwrap()).value = self.index.into();
-            (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
+            (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
     
              fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
@@ -326,7 +326,7 @@ impl AircraftVariableApi {
             };
 
             (params_for_set.array.add(0).as_mut().unwrap()).value = self.index.into();
-            (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType_FsVarParamTypeInteger;
+            (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
 /* 
             let val = (*params_for_set.array).value.intValue;
