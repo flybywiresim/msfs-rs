@@ -137,13 +137,13 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
-/* #[repr(C, packed(4))]
+ #[repr(C, packed(4))]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
     pub stringValue: *const ::std::os::raw::c_char,
     pub CRCValue: sys::FsCRC,
 }
- */
+
 
  #[repr(C, u8)]
  enum eFsVarParamType
@@ -155,7 +155,7 @@ pub union VariantValue {
 #[repr(C)]
 pub struct FsVarParamVariantCustom {
     pub type_: eFsVarParamType,
-    pub value: sys::FsCRC,
+    pub value: VariantValue,
 }
 
 extern "C" {
@@ -257,7 +257,7 @@ impl AircraftVariableApi {
                 array: ptr,
             };
 
-            (params_for_get.array.add(0).as_mut().unwrap()).value = self.index.into();
+            (params_for_get.array.add(0).as_mut().unwrap()).value.intValue = self.index;
             (params_for_get.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
     
@@ -325,7 +325,7 @@ impl AircraftVariableApi {
                 array: ptr,
             };
 
-            (params_for_set.array.add(0).as_mut().unwrap()).value = self.index.into();
+            (params_for_set.array.add(0).as_mut().unwrap()).value.intValue = self.index;
             (params_for_set.array.add(0).as_mut().unwrap()).type_ = eFsVarParamType::FsVarParamTypeInteger;
 
 /* 
