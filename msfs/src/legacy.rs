@@ -192,7 +192,7 @@ impl AircraftVariableApi {
             result
          };
 
-         println!("WASM: FsVarParamVariantCustom size: {}", std::mem::size_of::<FsVarParamVariantCustom>());
+       //  println!("WASM: FsVarParamVariantCustom size: {}", std::mem::size_of::<FsVarParamVariantCustom>());
 
       /*   let param1 = sys::FsVarParamVariant {
             type_: 0 as ::std::os::raw::c_uchar,
@@ -331,7 +331,7 @@ impl AircraftVariableApi {
             //println!("set MSFS var: {}, param {}", self.name, (*params_for_set.array).value.intValue);
             
                 
-            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, 10./0.);
+            let retval = fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, value);
 
             if retval != 0 {
                 println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, value);
