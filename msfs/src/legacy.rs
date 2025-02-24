@@ -255,7 +255,7 @@ impl AircraftVariableApi {
   
         unsafe {
 
-            let ptr = libc::malloc(2 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
+            let ptr = libc::malloc(1 * std::mem::size_of::<FsVarParamVariantCustom>() as libc::size_t) as *mut FsVarParamVariantCustom;
 
             let params_for_get = FsVarParamArrayCustom {
                 size: 1 as ::std::os::raw::c_uint,
