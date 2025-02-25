@@ -372,7 +372,7 @@ impl AircraftVariableApi {
                 },
             });
 
-            println!("Setting {} with index {}", self.name, self.index);
+          //  println!("Setting {} with index {}", self.name, self.index);
             
             let params_for_set = FsVarParamArrayCustom {
                 size: 1,
