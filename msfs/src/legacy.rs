@@ -137,7 +137,7 @@ impl NamedVariableApi {
         unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
     }
 }
- #[repr(C, packed(4))]
+ #[repr(C)]
  #[derive(Clone, Copy)]
 pub union VariantValue {
     pub intValue: ::std::os::raw::c_uint,
@@ -174,7 +174,7 @@ pub struct FsVarParamVariantCustom {
     pub value: VariantValue,
 }
 
-extern "C" {
+unsafe extern "C" {
     pub fn fsVarsAircraftVarGet(
         simvar: sys::FsSimVarId,
         unit: sys::FsUnitId,
@@ -182,7 +182,7 @@ extern "C" {
         result: *mut f64,
     ) -> sys::FsVarError;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fsVarsAircraftVarSet(
         simvar: sys::FsSimVarId,
         unit: sys::FsUnitId,
