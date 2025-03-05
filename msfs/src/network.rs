@@ -2,7 +2,8 @@
 
 use crate::sys;
 use std::{
-    ffi::{self, CStr, CString}, ptr, slice
+    ffi::{self, CStr, CString},
+    ptr, slice,
 };
 
 type NetworkCallback = Box<dyn FnOnce(NetworkRequest, i32)>;
@@ -71,8 +72,9 @@ impl<'a> NetworkRequestBuilder<'a> {
         ) -> sys::FsNetworkRequestId,
     ) -> Option<NetworkRequest> {
         // SAFETY: we need a *mut i8 for the FsNetworkHttpRequestParam struct but this should be fine.
-        let raw_post_field =
-            post_field.map_or(ptr::null_mut(), |f| f.into_raw());
+        let raw_post_field = post_field
+            .as_ref()
+            .map_or(ptr::null_mut(), |f| f.as_c_str().as_ptr() as *mut i8);
 
         // SAFETY: Because the struct in the C code is not defined as const char* we need to cast
         // the *const into *mut which should be safe because the function should not change it anyway
@@ -101,9 +103,6 @@ impl<'a> NetworkRequestBuilder<'a> {
                 callback_data,
             )
         };
-
-        // This frees the memory of the string pointer, do NOT remove this
-        let _ = unsafe { CString::from_raw(raw_post_field) };
 
         if request_id == 0 {
             // Free the callback
