@@ -181,18 +181,21 @@ fn parse_struct_fields(
 
         let mut attrs = Vec::new();
         for a in &field.attrs {
-            let simish = if let Some(i) = a.path.get_ident() {
+            let simish = if let Some(i) = a.path().get_ident() {
                 attributes.contains(&i.to_string().as_str())
             } else {
                 false
             };
             if simish {
-                let (name, value) = match a.parse_meta().unwrap() {
+                let (name, value) = match &a.meta {
                     Meta::NameValue(mnv) => {
                         let name = mnv.path.get_ident().unwrap().to_string();
-                        let value = match mnv.lit {
-                            Lit::Str(s) => s.value(),
-                            Lit::Float(f) => f.base10_digits().to_string(),
+                        let value = match &mnv.value {
+                            Expr::Lit(l) => match &l.lit {
+                                Lit::Str(s) => s.value(),
+                                Lit::Float(f) => f.base10_digits().to_string(),
+                                _ => panic!("argument must be a string or float"),
+                            },
                             _ => panic!("argument must be a string or float"),
                         };
                         (name, value)
