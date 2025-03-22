@@ -8,7 +8,7 @@ fn main() {
         std::env::set_var("AR", "llvm-ar");
         cc::Build::new()
             .compiler("clang")
-            .flag(&format!("--sysroot={msfs_sdk}/WASM/wasi-sysroot"))
+            .flag(format!("--sysroot={msfs_sdk}/WASM/wasi-sysroot"))
             .flag("-fms-extensions") // intended to be used with msvc
             .flag("-D__INTELLISENSE__") // get rid of incorrect __attribute__'s from asobo
             .flag("-Wno-unused-parameter") // warning in nanovg
