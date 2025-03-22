@@ -58,7 +58,7 @@ pub struct SimConnect<'a> {
     client_data_id_counter: sys::DWORD,
 }
 
-impl<'a> std::fmt::Debug for SimConnect<'a> {
+impl std::fmt::Debug for SimConnect<'_> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         fmt.debug_struct("SimConnect").finish()
     }
@@ -536,7 +536,7 @@ impl<'a> SimConnect<'a> {
     }
 }
 
-impl<'a> Drop for SimConnect<'a> {
+impl Drop for SimConnect<'_> {
     fn drop(&mut self) {
         unsafe {
             map_err(sys::SimConnect_Close(self.handle)).expect("SimConnect_Close");
