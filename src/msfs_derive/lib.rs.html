@@ -327,7 +327,10 @@
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a></pre></div><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a></pre></div><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
 <span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>quote::{format_ident, quote};
 <span class="kw">use </span>std::collections::HashMap;
@@ -510,18 +513,21 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>attrs = Vec::new();
         <span class="kw">for </span>a <span class="kw">in </span><span class="kw-2">&amp;</span>field.attrs {
-            <span class="kw">let </span>simish = <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = a.path.get_ident() {
+            <span class="kw">let </span>simish = <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = a.path().get_ident() {
                 attributes.contains(<span class="kw-2">&amp;</span>i.to_string().as_str())
             } <span class="kw">else </span>{
                 <span class="bool-val">false
             </span>};
             <span class="kw">if </span>simish {
-                <span class="kw">let </span>(name, value) = <span class="kw">match </span>a.parse_meta().unwrap() {
+                <span class="kw">let </span>(name, value) = <span class="kw">match </span><span class="kw-2">&amp;</span>a.meta {
                     Meta::NameValue(mnv) =&gt; {
                         <span class="kw">let </span>name = mnv.path.get_ident().unwrap().to_string();
-                        <span class="kw">let </span>value = <span class="kw">match </span>mnv.lit {
-                            Lit::Str(s) =&gt; s.value(),
-                            Lit::Float(f) =&gt; f.base10_digits().to_string(),
+                        <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>mnv.value {
+                            Expr::Lit(l) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>l.lit {
+                                Lit::Str(s) =&gt; s.value(),
+                                Lit::Float(f) =&gt; f.base10_digits().to_string(),
+                                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"argument must be a string or float"</span>),
+                            },
                             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"argument must be a string or float"</span>),
                         };
                         (name, value)
