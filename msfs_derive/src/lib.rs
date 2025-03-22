@@ -195,7 +195,7 @@ fn parse_struct_fields(
                                 Lit::Str(s) => s.value(),
                                 Lit::Float(f) => f.base10_digits().to_string(),
                                 _ => panic!("argument must be a string or float"),
-                            }
+                            },
                             _ => panic!("argument must be a string or float"),
                         };
                         (name, value)
