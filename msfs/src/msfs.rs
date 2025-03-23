@@ -35,6 +35,14 @@ pub enum MSFSEvent<'a> {
     SimConnect(SimConnectRecv<'a>),
 }
 
+/// Internal helper function to allow usage of mutable globals.
+/// # Safety
+/// Only call this function if you know what you're doing! This function is only safe
+/// to be used if one is **absolutely sure** that there is only 1 reference to it at all times!
+pub unsafe fn wrap_executor<E, T>(executor: *mut E, handle: impl FnOnce(&mut E) -> T) -> T {
+    handle(&mut *executor)
+}
+
 /// Gauge
 pub struct Gauge {
     executor: *mut GaugeExecutor,
