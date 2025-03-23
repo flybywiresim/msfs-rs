@@ -330,7 +330,11 @@
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a></pre></div><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a></pre></div><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
 <span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>quote::{format_ident, quote};
 <span class="kw">use </span>std::collections::HashMap;
@@ -361,7 +365,9 @@
     <span class="kw">let </span>output = <span class="macro">quote!</span> {
         #input
 
-        <span class="attr">#[allow(non_upper_case_globals)]
+        <span class="comment">// SAFETY: it is safe to create references of this static since all WASM modules are single threaded
+        // and there is only 1 reference in use at all times
+        </span><span class="attr">#[allow(non_upper_case_globals)]
         </span><span class="kw">static </span><span class="kw-2">mut </span>#executor_name: ::msfs::StandaloneModuleExecutor = ::msfs::StandaloneModuleExecutor {
             executor: ::msfs::executor::Executor {
                 handle: |m| std::boxed::Box::pin(#rusty_name(m)),
@@ -373,14 +379,14 @@
         <span class="attr">#[no_mangle]
         </span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>module_init() {
             <span class="kw">unsafe </span>{
-                #executor_name.handle_init();
+                ::msfs::wrap_executor(<span class="kw-2">&amp;</span>raw <span class="kw-2">mut </span>#executor_name, |e| e.handle_init());
             }
         }
 
         <span class="attr">#[no_mangle]
         </span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>module_deinit() {
             <span class="kw">unsafe </span>{
-                #executor_name.handle_deinit();
+                ::msfs::wrap_executor(<span class="kw-2">&amp;</span>raw <span class="kw-2">mut </span>#executor_name, |e| e.handle_deinit());
             }
         }
     };
@@ -442,7 +448,9 @@
     <span class="kw">let </span>output = <span class="macro">quote!</span> {
         #input
 
-        <span class="attr">#[allow(non_upper_case_globals)]
+        <span class="comment">// SAFETY: it is safe to create references of this static since all WASM modules are single threaded
+        // and there is only 1 reference in use at all times
+        </span><span class="attr">#[allow(non_upper_case_globals)]
         </span><span class="kw">static </span><span class="kw-2">mut </span>#executor_name: ::msfs::GaugeExecutor = ::msfs::GaugeExecutor {
             fs_ctx: <span class="prelude-val">None</span>,
             executor: ::msfs::executor::Executor {
@@ -460,7 +468,7 @@
             p_data: <span class="kw-2">*mut </span>std::os::raw::c_void,
         ) -&gt; bool {
             <span class="kw">unsafe </span>{
-                #executor_name.handle_gauge(ctx, service_id, p_data)
+                ::msfs::wrap_executor(<span class="kw-2">&amp;</span>raw <span class="kw-2">mut </span>#executor_name, |e| e.handle_gauge(ctx, service_id, p_data))
             }
         }
 
@@ -471,9 +479,9 @@
             fy: std::os::raw::c_float,
             i_flags: std::os::raw::c_uint,
         ) {
-             <span class="kw">unsafe </span>{
-                #executor_name.handle_mouse(fx, fy, i_flags);
-             }
+            <span class="kw">unsafe </span>{
+                ::msfs::wrap_executor(<span class="kw-2">&amp;</span>raw <span class="kw-2">mut </span>#executor_name, |e| e.handle_mouse(fx, fy, i_flags));
+            }
          }
     };
 

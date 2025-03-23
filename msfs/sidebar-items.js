@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":["gauge","standalone_module"],"enum":["MSFSEvent"],"mod":["commbus","legacy","network","nvg","sim_connect","sys"],"struct":["Gauge","StandaloneModule"]};
+window.SIDEBAR_ITEMS = {"attr":["gauge","standalone_module"],"enum":["MSFSEvent"],"fn":["wrap_executor"],"mod":["commbus","legacy","network","nvg","sim_connect","sys"],"struct":["Gauge","StandaloneModule"]};
