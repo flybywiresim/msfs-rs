@@ -132,7 +132,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
             p_data: *mut std::os::raw::c_void,
         ) -> bool {
             unsafe {
-                ::msfs::wrap_executor(&raw mut #executor_name, |e|.handle_gauge(ctx, service_id, p_data))
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge(ctx, service_id, p_data))
             }
         }
 
