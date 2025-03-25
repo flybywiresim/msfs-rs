@@ -29,6 +29,8 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
     let output = quote! {
         #input
 
+        // SAFETY: it is safe to create references of this static since all WASM modules are single threaded
+        // and there is only 1 reference in use at all times
         #[allow(non_upper_case_globals)]
         static mut #executor_name: ::msfs::StandaloneModuleExecutor = ::msfs::StandaloneModuleExecutor {
             executor: ::msfs::executor::Executor {
@@ -41,14 +43,14 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
         #[no_mangle]
         pub extern "C" fn module_init() {
             unsafe {
-                #executor_name.handle_init();
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_init());
             }
         }
 
         #[no_mangle]
         pub extern "C" fn module_deinit() {
             unsafe {
-                #executor_name.handle_deinit();
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_deinit());
             }
         }
     };
@@ -110,6 +112,8 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
     let output = quote! {
         #input
 
+        // SAFETY: it is safe to create references of this static since all WASM modules are single threaded
+        // and there is only 1 reference in use at all times
         #[allow(non_upper_case_globals)]
         static mut #executor_name: ::msfs::GaugeExecutor = ::msfs::GaugeExecutor {
             fs_ctx: None,
@@ -128,7 +132,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
             p_data: *mut std::os::raw::c_void,
         ) -> bool {
             unsafe {
-                #executor_name.handle_gauge(ctx, service_id, p_data)
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge(ctx, service_id, p_data))
             }
         }
 
@@ -139,9 +143,9 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
             fy: std::os::raw::c_float,
             i_flags: std::os::raw::c_uint,
         ) {
-             unsafe {
-                #executor_name.handle_mouse(fx, fy, i_flags);
-             }
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_mouse(fx, fy, i_flags));
+            }
          }
     };
 
@@ -181,18 +185,21 @@ fn parse_struct_fields(
 
         let mut attrs = Vec::new();
         for a in &field.attrs {
-            let simish = if let Some(i) = a.path.get_ident() {
+            let simish = if let Some(i) = a.path().get_ident() {
                 attributes.contains(&i.to_string().as_str())
             } else {
                 false
             };
             if simish {
-                let (name, value) = match a.parse_meta().unwrap() {
+                let (name, value) = match &a.meta {
                     Meta::NameValue(mnv) => {
                         let name = mnv.path.get_ident().unwrap().to_string();
-                        let value = match mnv.lit {
-                            Lit::Str(s) => s.value(),
-                            Lit::Float(f) => f.base10_digits().to_string(),
+                        let value = match &mnv.value {
+                            Expr::Lit(l) => match &l.lit {
+                                Lit::Str(s) => s.value(),
+                                Lit::Float(f) => f.base10_digits().to_string(),
+                                _ => panic!("argument must be a string or float"),
+                            },
                             _ => panic!("argument must be a string or float"),
                         };
                         (name, value)
