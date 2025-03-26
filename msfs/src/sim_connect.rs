@@ -563,8 +563,8 @@ impl<'a> SimConnect<'a> {
             map_err(sys::SimConnect_FlightSave(
                 self.handle,
                 flight_file_path.as_ptr(),
-                title.map(|x| x.as_ptr()).unwrap_or(std::ptr::null()),
-                description.map(|x| x.as_ptr()).unwrap_or(std::ptr::null()),
+                title.as_ref().map(|x| x.as_ptr()).unwrap_or(std::ptr::null()),
+                description.as_ref().map(|x| x.as_ptr()).unwrap_or(std::ptr::null()),
                 0,
             ))?;
         }
