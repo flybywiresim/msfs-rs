@@ -76,6 +76,75 @@ impl Parse for GaugeArgs {
     }
 }
 
+#[proc_macro_attribute]
+pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(args as GaugeArgs);
+    let input = parse_macro_input!(item as ItemFn);
+
+    let rusty_name = input.sig.ident.clone();
+    let executor_name = format_ident!(
+        "{}_executor_do_not_use_or_you_will_be_fired",
+        input.sig.ident
+    );
+
+    let extern_name = args.name.unwrap_or_else(|| input.sig.ident.to_string());
+    let extern_system_name_init = format_ident!("{}_system_init", extern_name);
+    let extern_system_name_update = format_ident!("{}_system_update", extern_name);
+    let extern_system_name_kill = format_ident!("{}_system_kill", extern_name);
+
+
+
+    let output = quote! {
+        #input
+
+        #[allow(non_upper_case_globals)]
+        static mut #executor_name: ::msfs::SystemExecutor = ::msfs::SystemExecutor {
+            fs_ctx: None,
+            executor: ::msfs::executor::Executor {
+                handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+                tx: None,
+                future: None,
+            },
+        };
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_update(
+            ctx: ::msfs::sys::FsContext,
+            dTime: std::os::raw::c_float,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_systems(ctx, dTime.into()))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_init(
+            ctx: ::msfs::sys::FsContext,
+            pInstallData: ::msfs::sys::sSystemInstallData,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_systems_init(ctx, pInstallData))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_system_name_kill(
+            ctx: ::msfs::sys::FsContext,
+            pInstallData: ::msfs::sys::sSystemInstallData,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_systems_kill())
+            }
+        }
+         
+    };
+
+    TokenStream::from(output)
+}
+
 /// Declare a gauge callback. It will be automatically exported with the name
 /// `NAME_gauge_callback`, where `NAME` is the name of the decorated function.
 /// ```rs
@@ -143,9 +212,9 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
             fy: std::os::raw::c_float,
             i_flags: std::os::raw::c_uint,
         ) {
-            unsafe {
+             unsafe {
                 ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_mouse(fx, fy, i_flags));
-            }
+             }
          }
     };
 
@@ -196,8 +265,8 @@ fn parse_struct_fields(
                         let name = mnv.path.get_ident().unwrap().to_string();
                         let value = match &mnv.value {
                             Expr::Lit(l) => match &l.lit {
-                                Lit::Str(s) => s.value(),
-                                Lit::Float(f) => f.base10_digits().to_string(),
+                            Lit::Str(s) => s.value(),
+                            Lit::Float(f) => f.base10_digits().to_string(),
                                 _ => panic!("argument must be a string or float"),
                             },
                             _ => panic!("argument must be a string or float"),
