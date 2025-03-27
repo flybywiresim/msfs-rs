@@ -83,6 +83,13 @@ impl AircraftVariable {
     }
 }
 
+
+pub fn fs_events_trigger_key_event(event_id: sys::FsEventId, value: sys::FsVarParamArray) {
+    unsafe {
+        sys::fsEventsTriggerKeyEvent(event_id, value);
+    }
+} 
+
 /// register_named_variable
 /// set_named_variable_typed_value
 /// get_named_variable_value
@@ -106,6 +113,119 @@ impl NamedVariable {
         let v = v.to();
         unsafe { sys::set_named_variable_value(self.0, v) }
     }
+}
+
+pub struct NamedVariableApi(sys::FsNamedVarId, sys::FsUnitId);
+impl NamedVariableApi {
+    pub fn from(name: &str, units: &str) -> Self {
+        let name = std::ffi::CString::new(name).unwrap();
+        let units = std::ffi::CString::new(units).unwrap();
+        let var = unsafe { sys::fsVarsRegisterNamedVar(name.as_ptr()) };
+        let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
+        Self(var, unit)
+    }
+
+    pub fn get<T: SimVarF64>(&self) -> T {
+        let mut v = 0.0;
+        unsafe { sys::fsVarsNamedVarGet(self.0, self.1, &mut v) };
+        T::from(v)
+    }
+
+    pub fn set(&self, v: impl SimVarF64) {
+        let v = v.to();
+        unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
+    }
+}
+
+pub struct AircraftVariableApi {simvar: sys::FsSimVarId , units: sys::FsUnitId, index: u32, name: String}
+
+impl AircraftVariableApi {
+    pub fn from(name: &str, units: &str, index: u32) -> Result<Self, Box<dyn std::error::Error>> {
+        let name_cstr = std::ffi::CString::new(name).unwrap();
+        let units_cstr = std::ffi::CString::new(units).unwrap();
+        let var = unsafe { let result = sys::fsVarsGetAircraftVarId(name_cstr.as_ptr());
+            if result == -1 {
+                println!("Error getting aircraft var id for {} with error {}", name, result);
+            }
+            result
+         };
+        let unit = unsafe { let result = sys::fsVarsGetUnitId(units_cstr.as_ptr());
+            if result == -1 {
+                println!("Error getting unit id for {} with error {}", units, result);
+            }
+            result
+         }; 
+      
+        Ok(Self {
+            simvar: var,
+            units: unit,
+            index: index,
+            name: name.to_string()
+        })
+
+    }
+
+    pub fn get<T: SimVarF64>(&self) -> T {
+        let mut v = 0.0;
+
+        let mut array = Vec::<sys::FsVarParamVariant>::with_capacity(1);
+        array.push(sys::FsVarParamVariant {
+            type_: sys::eFsVarParamType_FsVarParamTypeInteger,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 {
+                intValue: self.index,
+            },
+        });
+
+        let params_for_get = sys::FsVarParamArray {
+            size: 1,
+            array: Box::into_raw(array.into_boxed_slice()) as *mut sys::FsVarParamVariant,
+        };
+  
+        unsafe {
+          
+            sys::fsVarsAircraftVarGet(self.simvar, self.units, params_for_get, &mut v);
+
+            // drop the mem
+            drop(Box::from_raw(params_for_get.array));
+        };
+
+
+
+        T::from(v)
+    }
+
+     pub fn set(&self, value: impl SimVarF64) {
+
+        let v: f64 = value.to();
+
+        let mut array = Vec::<sys::FsVarParamVariant>::with_capacity(1);
+
+        array.push(sys::FsVarParamVariant {
+            type_: sys::eFsVarParamType_FsVarParamTypeInteger,
+            __bindgen_anon_1: sys::FsVarParamVariant__bindgen_ty_1 {
+                intValue: self.index,
+            },
+        });
+
+        let params_for_set = sys::FsVarParamArray {
+            size: 1,
+            array: Box::into_raw(array.into_boxed_slice()) as *mut sys::FsVarParamVariant,
+        };
+
+        unsafe { 
+                
+            let retval = sys::fsVarsAircraftVarSet(self.simvar, self.units, params_for_set, v);
+
+            if retval != 0 {
+                println!("Error setting aircraft var: {:?} for {:?} : {:?}, value {:?}", retval, self.name, self.index, v);
+            }
+
+            drop(Box::from_raw(params_for_set.array));
+            
+        };
+
+        
+    } 
 }
 
 /// trigger_key_event

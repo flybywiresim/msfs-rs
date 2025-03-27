@@ -18,7 +18,7 @@ impl sys::sGaugeDrawData {
 }
 
 use crate::sim_connect::{SimConnect, SimConnectRecv};
-pub use msfs_derive::{gauge, standalone_module};
+pub use msfs_derive::{gauge, standalone_module, system};
 
 /// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.
 #[derive(Debug)]
@@ -42,6 +42,113 @@ pub enum MSFSEvent<'a> {
 pub unsafe fn wrap_executor<E, T>(executor: *mut E, handle: impl FnOnce(&mut E) -> T) -> T {
     handle(&mut *executor)
 }
+
+
+pub struct SystemsData {
+    pub delta_time: f32,
+    pub event: MSFSEvent<'static>,
+}
+
+pub struct System {
+    executor: *mut SystemExecutor,
+    rx: futures::channel::mpsc::Receiver<SystemsData>,
+}
+pub struct SystemExecutor {
+    pub fs_ctx: Option<sys::FsContext>,
+    pub executor: executor::Executor<System, SystemsData>,
+}
+
+impl System {
+     pub fn open_simconnect<'a>(
+        &self,
+        name: &str,
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
+    {
+        let executor = self.executor;
+        let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
+            let executor = unsafe { &mut *executor };
+            let recv =
+                unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
+            let data: SystemsData = SystemsData {
+                delta_time: 0.,
+                event: MSFSEvent::SimConnect(recv),
+            };
+            executor
+                .executor
+                .send(Some(data))
+                .unwrap();
+        })?;
+        Ok(sim)
+    } 
+
+    pub fn next_event(&mut self) -> impl futures::Future<Output = Option<SystemsData>> + '_ {
+        use futures::stream::StreamExt;
+        async move { self.rx.next().await }
+    }
+}
+
+impl SystemExecutor {
+    pub fn handle_systems(
+        &mut self,
+        ctx: sys::FsContext,
+        delta_time: f32
+    ) -> bool {
+        
+           
+            self.fs_ctx = Some(ctx);
+         /*    self.executor
+                .start(Box::new(move |rx| System { executor, rx }))
+                .unwrap(); */
+            let data: SystemsData = SystemsData {
+                delta_time,
+                event: MSFSEvent::PreUpdate,
+            };
+        
+            self.executor.send(Some(data)).unwrap();
+          /*   sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
+            service_id => {
+                if let Some(data) = match service_id {
+                    sys::PANEL_SERVICE_POST_INSTALL => Some(MSFSEvent::PostInstall),
+                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(MSFSEvent::PreInitialize),
+                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(MSFSEvent::PostInitialize),
+                    sys::PANEL_SERVICE_PRE_UPDATE => Some(MSFSEvent::PreUpdate),
+                    sys::PANEL_SERVICE_POST_UPDATE => Some(MSFSEvent::PostUpdate),
+                    sys::PANEL_SERVICE_PRE_DRAW => Some(MSFSEvent::PreDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_POST_DRAW => Some(MSFSEvent::PostDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_PRE_KILL => Some(MSFSEvent::PreKill),
+                    _ => None,
+                } {
+                    self.executor.send(Some(data)).is_ok()
+                } else {
+                    true
+                } */
+            true
+        
+    }
+
+    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sys::sSystemInstallData) -> bool {
+        let executor = self as *mut SystemExecutor;
+        self.fs_ctx = Some(ctx);
+        self.executor
+            .start(Box::new(move |rx| System { executor, rx }))
+            .is_ok()
+        
+    }
+
+    pub fn handle_systems_kill(&mut self) -> bool {
+        let data: SystemsData = SystemsData {
+            delta_time: 0.,
+            event: MSFSEvent::PreKill,
+        };
+    
+        self.executor.send(Some(data)).is_ok()
+    }
+}
+
 
 /// Gauge
 pub struct Gauge {
