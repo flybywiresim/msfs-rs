@@ -5,7 +5,11 @@ fn main() {
 
     // build nanovg wrapper
     if wasm {
-        std::env::set_var("AR", "llvm-ar");
+
+        unsafe {
+            std::env::set_var("AR", "llvm-ar");
+        }
+
         cc::Build::new()
             .compiler("clang")
             .flag(format!("--sysroot={msfs_sdk}/WASM/wasi-sysroot"))

@@ -1,8 +1,8 @@
 [package]
 name = "msfs_derive"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["snek"]
-edition = "2018"
+edition = "2024"
 description = "This crate provides macros for MSFS"
 license = "MIT"
 
