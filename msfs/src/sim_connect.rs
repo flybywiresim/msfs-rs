@@ -534,6 +534,61 @@ impl<'a> SimConnect<'a> {
         }
         Ok(())
     }
+
+    /// Load a .FLT file from disk
+    pub fn load_flight(&mut self, flight_file_path: &str) -> Result<()> {
+        let flight_file_path = std::ffi::CString::new(flight_file_path).unwrap();
+
+        unsafe {
+            map_err(sys::SimConnect_FlightLoad(
+                self.handle,
+                flight_file_path.as_ptr(),
+            ))?;
+        }
+        Ok(())
+    }
+
+    /// Save the current sim state to a .FLT file
+    pub fn save_flight(
+        &mut self,
+        flight_file_path: &str,
+        title: Option<&str>,
+        description: Option<&str>,
+    ) -> Result<()> {
+        let flight_file_path = std::ffi::CString::new(flight_file_path).unwrap();
+        let title = title.map(|x| std::ffi::CString::new(x).unwrap());
+        let description = description.map(|x| std::ffi::CString::new(x).unwrap());
+
+        unsafe {
+            map_err(sys::SimConnect_FlightSave(
+                self.handle,
+                flight_file_path.as_ptr(),
+                title
+                    .as_ref()
+                    .map(|x| x.as_ptr())
+                    .unwrap_or(std::ptr::null()),
+                description
+                    .as_ref()
+                    .map(|x| x.as_ptr())
+                    .unwrap_or(std::ptr::null()),
+                0,
+            ))?;
+        }
+        Ok(())
+    }
+
+    /// Load a .PLN file from disk
+    pub fn load_flight_plan(&mut self, flight_plan_file_path: &str) -> Result<()> {
+        let flight_plan_file_path = std::ffi::CString::new(flight_plan_file_path).unwrap();
+
+        unsafe {
+            map_err(sys::SimConnect_FlightPlanLoad(
+                self.handle,
+                flight_plan_file_path.as_ptr(),
+            ))?;
+        }
+        Ok(())
+    }
 }
 
 impl Drop for SimConnect<'_> {
