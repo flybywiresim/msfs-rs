@@ -80,7 +80,11 @@ htmlgauge00=WasmInstrument/WasmInstrument.html?wasm_module=gauge_logic.wasm&wasm
 ---
 
 ## Getting started
-* [Check out the examples](examples/)
+```bash
+$ cd examples/nvg
+$ cargo build --target wasm32-wasip1
+```
+* [Check out the other examples](examples/)
 * [Download the MSFS SDK](https://docs.flightsimulator.com/html/Introduction/SDK_Overview.htm)
 
 ## Further reading
