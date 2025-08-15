@@ -40,8 +40,8 @@ fn main() {
             .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
             .rustified_enum("SIMCONNECT_EXCEPTION")
             .impl_debug(false)
-            // `opaque_type` added to avoid alignmnet errors. Theese alignment errors are caused
-            // because virutal methods are not well supported in rust-bindgen.
+            // `opaque_type` added to avoid alignment errors. These alignment errors are caused
+            // because virtual methods are not well supported in rust-bindgen.
             .opaque_type("IGaugeCDrawableCreateParameters")
             .opaque_type("IGaugeCDrawableDrawParameters")
             .opaque_type("IGaugeCDrawable")
