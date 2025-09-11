@@ -2,16 +2,16 @@
 name = "msfs"
 version = "0.1.0"
 authors = ["snek"]
-edition = "2018"
+edition = "2024"
 description = "Rust bindings for the MSFS SDK"
 license = "MIT"
 
 [dependencies]
-msfs_derive = { path = "../msfs_derive", version = "0.2.0" }
+msfs_derive = { path = "../msfs_derive" }
 futures = "0.3"
 libc = "0.2"
 
 [build-dependencies]
 bindgen = "0.72"
-msfs_sdk = { path = "../msfs_sdk", version = "0.1.0" }
-cc = "1.0"
+msfs_sdk = { path = "../msfs_sdk" }
+cc = "1.2"

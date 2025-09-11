@@ -1,6 +1,6 @@
 [package]
 authors = ["snek"]
-edition = "2018"
+edition = "2024"
 name = "log"
 version = "0.1.0"
 

@@ -1,10 +1,10 @@
-extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use std::collections::HashMap;
 use syn::{
+    Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
     parse::{Parse, ParseStream, Result as SynResult},
-    parse_macro_input, Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
+    parse_macro_input,
 };
 
 /// Declare a standalone module.
@@ -40,19 +40,15 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
             },
         };
 
-        #[no_mangle]
-        pub extern "C" fn module_init() {
-            unsafe {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn module_init() {
                 ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_init());
             }
-        }
 
-        #[no_mangle]
-        pub extern "C" fn module_deinit() {
-            unsafe {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn module_deinit() {
                 ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_deinit());
             }
-        }
     };
 
     TokenStream::from(output)
