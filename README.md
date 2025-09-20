@@ -74,7 +74,7 @@ texture=$SCREEN_1
 background_color=0,0,255
 htmlgauge00=WasmInstrument/WasmInstrument.html?wasm_module=gauge_logic.wasm&wasm_gauge=Demo, 0,0,1024,768
 ```
-<img width="700" alt="grafik" src="https://github.com/user-attachments/assets/babe0670-51bf-4a33-8fc6-5e282667febe" />
+![Screenshot showing a Rust output in the ingame console](/img/proof.png)
 
 
 ---
