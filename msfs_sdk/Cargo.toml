@@ -2,7 +2,7 @@
 name = "msfs_sdk"
 version = "0.1.0"
 authors = ["snek"]
-edition = "2018"
+edition = "2024"
 description = "Crate to find MSFS SDK"
 license = "MIT"
 

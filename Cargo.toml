@@ -1,7 +1,4 @@
 [workspace]
-members = [
-  "msfs",
-  "msfs_sdk",
-  "msfs_derive",
-]
+resolver = "3"
+members = ["msfs", "msfs_sdk", "msfs_derive"]
 exclude = ["examples"]

@@ -1,4 +1,4 @@
-use futures::{channel::mpsc, Future};
+use futures::{Future, channel::mpsc};
 use std::pin::Pin;
 use std::task::Poll;
 

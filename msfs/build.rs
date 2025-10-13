@@ -5,7 +5,10 @@ fn main() {
 
     // build nanovg wrapper
     if wasm {
-        std::env::set_var("AR", "llvm-ar");
+        unsafe {
+            std::env::set_var("AR", "llvm-ar");
+        }
+
         cc::Build::new()
             .compiler("clang")
             .flag(format!("--sysroot={msfs_sdk}/WASM/wasi-sysroot"))
@@ -39,7 +42,10 @@ fn main() {
             .blocklist_function("nvgStrokePaint")
             .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
             .rustified_enum("SIMCONNECT_EXCEPTION")
-            .impl_debug(false)
+            .derive_hash(true)
+            .derive_eq(true)
+            .derive_partialeq(true)
+            .wrap_unsafe_ops(true)
             // `opaque_type` added to avoid alignment errors. These alignment errors are caused
             // because virtual methods are not well supported in rust-bindgen.
             .opaque_type("IGaugeCDrawableCreateParameters")
@@ -49,7 +55,13 @@ fn main() {
             .opaque_type("ISerializableGaugeCCallback")
             .opaque_type("IAircraftCCallback")
             .opaque_type("IPanelCCallback")
-            .opaque_type("IFSXPanelCCallback");
+            .opaque_type("IFSXPanelCCallback")
+            // Rust type ergonomics
+            .new_type_alias("SIMCONNECT_DATA_REQUEST_ID")
+            .new_type_alias("SIMCONNECT_DATA_DEFINITION_ID")
+            .rustified_enum("SIMCONNECT_FACILITY_LIST_TYPE")
+            .rustified_enum("SIMCONNECT_FACILITY_DATA_TYPE")
+            .rustified_enum("SIMCONNECT_CLIENT_DATA_DEFINITION_ID");
 
         if wasm {
             bindings = bindings.clang_arg("-D_MSFS_WASM 1");

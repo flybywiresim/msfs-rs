@@ -1,14 +1,14 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::sys;
-use std::any::TypeId;
-use std::collections::HashMap;
-use std::pin::Pin;
+
+use std::{any::TypeId, collections::HashMap, ffi, pin::Pin, ptr};
 
 pub use sys::SIMCONNECT_OBJECT_ID_USER;
 
 pub use msfs_derive::sim_connect_client_data_definition as client_data_definition;
 pub use msfs_derive::sim_connect_data_definition as data_definition;
+pub use msfs_derive::sim_connect_facility_definition as facility_definition;
 
 pub type DataXYZ = sys::SIMCONNECT_DATA_XYZ;
 pub type InitPosition = sys::SIMCONNECT_DATA_INITPOSITION;
@@ -25,6 +25,18 @@ pub trait ClientDataDefinition: 'static {
     fn get_definitions() -> Vec<(usize, usize, f32)>;
 }
 
+/// A trait implemented by the `facility_definition` attribute.
+pub trait FacilityDefinition: 'static {
+    #[doc(hidden)]
+    type RawType;
+
+    #[doc(hidden)]
+    fn add_facility_definitions(
+        handle: sys::HANDLE,
+        define_id: sys::SIMCONNECT_DATA_DEFINITION_ID,
+    ) -> Result<()>;
+}
+
 /// Rusty HRESULT wrapper.
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -38,7 +50,7 @@ impl std::error::Error for HResult {}
 
 pub type Result<T> = std::result::Result<T, HResult>;
 #[inline(always)]
-fn map_err(result: sys::HRESULT) -> Result<()> {
+pub fn map_err(result: sys::HRESULT) -> Result<()> {
     if result >= 0 {
         Ok(())
     } else {
@@ -54,6 +66,13 @@ pub struct SimConnect<'a> {
     callback: Box<SimConnectCallback<'a>>,
     data_definitions: HashMap<TypeId, sys::SIMCONNECT_DATA_DEFINITION_ID>,
     client_data_definitions: HashMap<TypeId, sys::SIMCONNECT_CLIENT_DATA_DEFINITION_ID>,
+    facility_data_definitions: HashMap<
+        TypeId,
+        (
+            sys::SIMCONNECT_DATA_REQUEST_ID,
+            sys::SIMCONNECT_DATA_DEFINITION_ID,
+        ),
+    >,
     event_id_counter: sys::DWORD,
     client_data_id_counter: sys::DWORD,
 }
@@ -87,6 +106,7 @@ impl<'a> SimConnect<'a> {
                 callback: Box::new(callback),
                 data_definitions: HashMap::new(),
                 client_data_definitions: HashMap::new(),
+                facility_data_definitions: HashMap::new(),
                 event_id_counter: 0,
                 client_data_id_counter: 0,
             });
@@ -108,32 +128,29 @@ impl<'a> SimConnect<'a> {
 
     fn get_define_id<T: DataDefinition>(&mut self) -> Result<sys::SIMCONNECT_DATA_DEFINITION_ID> {
         let handle = self.handle;
-        SimConnect::get_id::<T, _, _>(
-            &mut self.data_definitions,
-            |define_id: sys::SIMCONNECT_DATA_DEFINITION_ID| {
-                /*
+        SimConnect::get_id::<T, _, _>(&mut self.data_definitions, |define_id| {
+            /*
+            unsafe {
+                map_err(sys::SimConnect_ClearDataDefinition(handle, define_id))?;
+            }
+            */
+            for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
+                let datum_name = std::ffi::CString::new(*datum_name).unwrap();
+                let units_type = std::ffi::CString::new(*units_type).unwrap();
                 unsafe {
-                    map_err(sys::SimConnect_ClearDataDefinition(handle, define_id))?;
+                    map_err(sys::SimConnect_AddToDataDefinition(
+                        handle,
+                        define_id,
+                        datum_name.as_ptr(),
+                        units_type.as_ptr(),
+                        *datatype,
+                        *epsilon,
+                        sys::SIMCONNECT_UNUSED,
+                    ))?;
                 }
-                */
-                for (datum_name, units_type, epsilon, datatype) in T::DEFINITIONS {
-                    let datum_name = std::ffi::CString::new(*datum_name).unwrap();
-                    let units_type = std::ffi::CString::new(*units_type).unwrap();
-                    unsafe {
-                        map_err(sys::SimConnect_AddToDataDefinition(
-                            handle,
-                            define_id,
-                            datum_name.as_ptr(),
-                            units_type.as_ptr(),
-                            *datatype,
-                            *epsilon,
-                            sys::SIMCONNECT_UNUSED,
-                        ))?;
-                    }
-                }
-                Ok(())
-            },
-        )
+            }
+            Ok(())
+        })
     }
 
     fn get_client_data_define_id<T: ClientDataDefinition>(
@@ -179,6 +196,20 @@ impl<'a> SimConnect<'a> {
         })
     }
 
+    fn get_facility_define_id<T: FacilityDefinition>(
+        &mut self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<(
+        sys::SIMCONNECT_DATA_REQUEST_ID,
+        sys::SIMCONNECT_DATA_DEFINITION_ID,
+    )> {
+        let handle = self.handle;
+
+        self.get_facility_id::<T, _>(request_id, |define_id| {
+            T::add_facility_definitions(handle, define_id)
+        })
+    }
+
     fn get_id<T: 'static, U: std::convert::TryFrom<usize> + Copy, F: Fn(U) -> Result<()>>(
         map: &mut HashMap<TypeId, U>,
         insert_fn: F,
@@ -190,6 +221,28 @@ impl<'a> SimConnect<'a> {
                 insert_fn(maybe_id)?;
                 entry.insert(maybe_id);
                 Ok(maybe_id)
+            }
+            std::collections::hash_map::Entry::Occupied(entry) => Ok(*entry.get()),
+        }
+    }
+
+    fn get_facility_id<T: 'static, F: Fn(sys::SIMCONNECT_DATA_DEFINITION_ID) -> Result<()>>(
+        &mut self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+        insert_fn: F,
+    ) -> Result<(
+        sys::SIMCONNECT_DATA_REQUEST_ID,
+        sys::SIMCONNECT_DATA_DEFINITION_ID,
+    )> {
+        let key = TypeId::of::<T>();
+        let maybe_id =
+            sys::SIMCONNECT_DATA_DEFINITION_ID(self.facility_data_definitions.len() as u32);
+
+        match self.facility_data_definitions.entry(key) {
+            std::collections::hash_map::Entry::Vacant(entry) => {
+                insert_fn(maybe_id)?;
+                entry.insert((request_id, maybe_id));
+                Ok((request_id, maybe_id))
             }
             std::collections::hash_map::Entry::Occupied(entry) => Ok(*entry.get()),
         }
@@ -589,6 +642,71 @@ impl<'a> SimConnect<'a> {
         }
         Ok(())
     }
+
+    // Request information about facilities of a given type within the reality bubble cache.
+    pub fn request_facilities_list_ex1(
+        &mut self,
+        facility_list_type: sys::SIMCONNECT_FACILITY_LIST_TYPE,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_RequestFacilitiesList_EX1(
+                self.handle,
+                facility_list_type,
+                request_id,
+            ))?;
+        }
+
+        Ok(())
+    }
+
+    // Request information about all facilities of a given type.
+    pub fn request_facilities_list(
+        &mut self,
+        facility_list_type: sys::SIMCONNECT_FACILITY_LIST_TYPE,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+    ) -> Result<()> {
+        unsafe {
+            map_err(sys::SimConnect_RequestFacilitiesList(
+                self.handle,
+                facility_list_type,
+                request_id,
+            ))?;
+        }
+
+        Ok(())
+    }
+
+    // Request information about a specific facility.
+    pub fn request_facility_data<T: FacilityDefinition>(
+        &mut self,
+        request_id: sys::SIMCONNECT_DATA_REQUEST_ID,
+        icao: &str,
+        region: Option<&str>,
+    ) -> Result<()> {
+        let (_, define_id) = self.get_facility_define_id::<T>(request_id)?;
+
+        let icao = ffi::CString::new(icao).unwrap();
+        let region = match region {
+            Some(x) => {
+                let c_str = ffi::CString::new(x).unwrap();
+                c_str.as_ptr()
+            }
+            None => ptr::null(),
+        };
+
+        unsafe {
+            map_err(sys::SimConnect_RequestFacilityData(
+                self.handle,
+                define_id,
+                request_id,
+                icao.as_ptr(),
+                region,
+            ))?;
+        }
+
+        Ok(())
+    }
 }
 
 impl Drop for SimConnect<'_> {
@@ -641,6 +759,16 @@ macro_rules! recv {
                 SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_ASSIGNED_OBJECT_ID,
                 SIMCONNECT_RECV_ASSIGNED_OBJECT_ID,
                 AssignedObjectId
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_AIRPORT_LIST,
+                SIMCONNECT_RECV_AIRPORT_LIST,
+                AirportList
+            ),
+            (
+                SIMCONNECT_RECV_ID_SIMCONNECT_RECV_ID_FACILITY_DATA,
+                SIMCONNECT_RECV_FACILITY_DATA,
+                FacilityData
             ),
         }
     };
@@ -738,9 +866,9 @@ impl sys::SIMCONNECT_RECV_SIMOBJECT_DATA {
     /// Convert a SimObjectData event into the data it contains.
     pub fn into<T: DataDefinition>(&self, sim: &SimConnect) -> Option<&T> {
         let define_id = sim.data_definitions[&TypeId::of::<T>()];
-        if define_id == self.dwDefineID {
+        if define_id == sys::SIMCONNECT_DATA_DEFINITION_ID(self.dwDefineID) {
             // UB: creates unaligned reference
-            Some(unsafe { &*(std::ptr::addr_of!(self.dwData) as *const T) })
+            Some(unsafe { &*(&raw const self.dwData as *const T) })
         } else {
             None
         }
@@ -758,10 +886,49 @@ impl sys::SIMCONNECT_RECV_CLIENT_DATA {
         let define_id = sim.client_data_definitions[&TypeId::of::<T>()];
         if define_id == self._base.dwDefineID {
             // UB: creates unaligned reference
-            Some(unsafe { &*(std::ptr::addr_of!(self._base.dwData) as *const T) })
+            Some(unsafe { &*(&raw const self._base.dwData as *const T) })
         } else {
             None
         }
+    }
+}
+
+impl sys::SIMCONNECT_RECV_AIRPORT_LIST {
+    pub fn id(&self) -> sys::DWORD {
+        self._base.dwRequestID
+    }
+
+    pub fn data(&self) -> &[sys::SIMCONNECT_DATA_FACILITY_AIRPORT] {
+        let array_size = self._base.dwArraySize as usize;
+        let data_ptr: *const sys::SIMCONNECT_DATA_FACILITY_AIRPORT = self.rgData.as_ptr();
+
+        unsafe { std::slice::from_raw_parts(data_ptr, array_size) }
+    }
+}
+
+impl sys::SIMCONNECT_RECV_FACILITY_DATA {
+    /// The ID for this data.
+    pub fn id(&self) -> sys::SIMCONNECT_DATA_REQUEST_ID {
+        sys::SIMCONNECT_DATA_REQUEST_ID(self.UserRequestId)
+    }
+
+    pub fn into<T>(&self, sim: &SimConnect) -> Option<T>
+    where
+        T: FacilityDefinition,
+        T: From<T::RawType>,
+    {
+        // todo: fix this check for children of FacilityDefinition
+        // Check if this facility type has been defined/requested
+        // if sim
+        //     .facility_data_definitions
+        //     .contains_key(&TypeId::of::<T>())
+        // {
+        // read raw data and
+        let raw_data = unsafe { std::ptr::read(&raw const self.Data as *const T::RawType) };
+        Some(raw_data.into())
+        // } else {
+        //     None
+        // }
     }
 }
 
@@ -788,4 +955,10 @@ pub enum Period {
 pub struct ClientDataArea<T: ClientDataDefinition> {
     client_id: sys::SIMCONNECT_CLIENT_DATA_ID,
     phantom: std::marker::PhantomData<T>,
+}
+
+impl From<usize> for sys::SIMCONNECT_DATA_DEFINITION_ID {
+    fn from(value: usize) -> Self {
+        Self(value as u32)
+    }
 }
