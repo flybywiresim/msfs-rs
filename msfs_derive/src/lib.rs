@@ -221,6 +221,128 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
     TokenStream::from(output)
 }
 
+/// Declare a gauge callback using the new MSFS 2024 gauge API.
+/// This generates the new-style callbacks: `NAME_gauge_init`, `NAME_gauge_update`,
+/// `NAME_gauge_draw`, `NAME_gauge_kill`, and `NAME_gauge_mouse_handler`.
+///
+/// ```rs
+/// use futures::stream::{Stream, StreamExt};
+/// // Declare and export MSFS 2024 gauge callbacks
+/// #[msfs::gauge2024]
+/// async fn FOO(mut gauge: msfs::Gauge2024) -> Result<(), Box<dyn std::error::Error>> {
+///   while let Some(event) = gauge.next_event().await {
+///     match event.event {
+///       msfs::Gauge2024Event::Init(install_data) => { /* initialization */ }
+///       msfs::Gauge2024Event::Update => { /* update logic, no drawing */ }
+///       msfs::Gauge2024Event::Draw(draw_data) => { /* drawing */ }
+///       msfs::Gauge2024Event::Kill => { /* cleanup */ }
+///       msfs::Gauge2024Event::Mouse { x, y, flags } => { /* mouse input */ }
+///       _ => {}
+///     }
+///   }
+///   Ok(())
+/// }
+/// ```
+///
+/// The macro can also be given a parameter, `name`, to rename the exported functions.
+/// ```rs
+/// // Declare and export FOO_gauge_init, FOO_gauge_update, etc.
+/// #[msfs::gauge2024(name=FOO)]
+/// async fn xyz(...) {}
+/// ```
+#[proc_macro_attribute]
+pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(args as GaugeArgs);
+    let input = parse_macro_input!(item as ItemFn);
+
+    let rusty_name = input.sig.ident.clone();
+    let executor_name = format_ident!(
+        "{}_executor_do_not_use_or_you_will_be_fired",
+        input.sig.ident
+    );
+
+    let extern_name = args.name.unwrap_or_else(|| input.sig.ident.to_string());
+    let extern_gauge_init = format_ident!("{}_gauge_init", extern_name);
+    let extern_gauge_update = format_ident!("{}_gauge_update", extern_name);
+    let extern_gauge_draw = format_ident!("{}_gauge_draw", extern_name);
+    let extern_gauge_kill = format_ident!("{}_gauge_kill", extern_name);
+    let extern_mouse_handler = format_ident!("{}_gauge_mouse_handler", extern_name);
+
+    let output = quote! {
+        #input
+
+        // SAFETY: it is safe to create references of this static since all WASM modules are single threaded
+        // and there is only 1 reference in use at all times
+        #[allow(non_upper_case_globals)]
+        static mut #executor_name: ::msfs::Gauge2024Executor = ::msfs::Gauge2024Executor {
+            fs_ctx: None,
+            executor: ::msfs::executor::Executor {
+                handle: |gauge| std::boxed::Box::pin(#rusty_name(gauge)),
+                tx: None,
+                future: None,
+            },
+        };
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_gauge_init(
+            ctx: ::msfs::sys::FsContext,
+            p_install_data: *const ::msfs::sys::sGaugeInstallData,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_init(ctx, p_install_data))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_gauge_update(
+            ctx: ::msfs::sys::FsContext,
+            d_time: std::os::raw::c_float,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_update(ctx, d_time))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_gauge_draw(
+            ctx: ::msfs::sys::FsContext,
+            p_draw_data: *const ::msfs::sys::sGaugeDrawData,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_draw(ctx, p_draw_data))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_gauge_kill(
+            ctx: ::msfs::sys::FsContext,
+        ) -> bool {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_kill(ctx))
+            }
+        }
+
+        #[doc(hidden)]
+        #[no_mangle]
+        pub extern "C" fn #extern_mouse_handler(
+            ctx: ::msfs::sys::FsContext,
+            fx: std::os::raw::c_float,
+            fy: std::os::raw::c_float,
+            i_flags: std::os::raw::c_int,
+        ) {
+            unsafe {
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_mouse(ctx, fx, fy, i_flags));
+            }
+        }
+    };
+
+    TokenStream::from(output)
+}
+
 fn parse_struct_fields(
     input: &mut ItemStruct,
     attributes: &[&str],
