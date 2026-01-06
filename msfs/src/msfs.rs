@@ -1,5 +1,26 @@
 use crate::{executor, sys};
 
+impl sys::sGaugeInstallData {
+    /// Get the width of the target gauge texture.
+    pub fn width(&self) -> usize {
+        self.iSizeX as usize
+    }
+
+    /// Get the height of the target gauge texture.
+    pub fn height(&self) -> usize {
+        self.iSizeY as usize
+    }
+
+    /// Get the optional parameter string passed to the gauge.
+    pub fn parameters(&self) -> Option<&std::ffi::CStr> {
+        if self.strParameters.is_null() {
+            None
+        } else {
+            Some(unsafe { std::ffi::CStr::from_ptr(self.strParameters) })
+        }
+    }
+}
+
 impl sys::sGaugeDrawData {
     /// Get the width of the target instrument texture.
     pub fn width(&self) -> usize {
@@ -18,7 +39,7 @@ impl sys::sGaugeDrawData {
 }
 
 use crate::sim_connect::{SimConnect, SimConnectRecv};
-pub use msfs_derive::{gauge, standalone_module};
+pub use msfs_derive::{gauge, gauge2024, standalone_module, system};
 
 /// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.
 #[derive(Debug)]
@@ -42,6 +63,113 @@ pub enum MSFSEvent<'a> {
 pub unsafe fn wrap_executor<E, T>(executor: *mut E, handle: impl FnOnce(&mut E) -> T) -> T {
     handle(&mut *executor)
 }
+
+
+pub struct SystemsData {
+    pub delta_time: f32,
+    pub event: MSFSEvent<'static>,
+}
+
+pub struct System {
+    executor: *mut SystemExecutor,
+    rx: futures::channel::mpsc::Receiver<SystemsData>,
+}
+pub struct SystemExecutor {
+    pub fs_ctx: Option<sys::FsContext>,
+    pub executor: executor::Executor<System, SystemsData>,
+}
+
+impl System {
+     pub fn open_simconnect<'a>(
+        &self,
+        name: &str,
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
+    {
+        let executor = self.executor;
+        let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
+            let executor = unsafe { &mut *executor };
+            let recv =
+                unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
+            let data: SystemsData = SystemsData {
+                delta_time: 0.,
+                event: MSFSEvent::SimConnect(recv),
+            };
+            executor
+                .executor
+                .send(Some(data))
+                .unwrap();
+        })?;
+        Ok(sim)
+    } 
+
+    pub fn next_event(&mut self) -> impl futures::Future<Output = Option<SystemsData>> + '_ {
+        use futures::stream::StreamExt;
+        async move { self.rx.next().await }
+    }
+}
+
+impl SystemExecutor {
+    pub fn handle_systems(
+        &mut self,
+        ctx: sys::FsContext,
+        delta_time: f32
+    ) -> bool {
+        
+           
+            self.fs_ctx = Some(ctx);
+         /*    self.executor
+                .start(Box::new(move |rx| System { executor, rx }))
+                .unwrap(); */
+            let data: SystemsData = SystemsData {
+                delta_time,
+                event: MSFSEvent::PreUpdate,
+            };
+        
+            self.executor.send(Some(data)).unwrap();
+          /*   sys::PANEL_SERVICE_POST_KILL => self.executor.send(None).is_ok(),
+            service_id => {
+                if let Some(data) = match service_id {
+                    sys::PANEL_SERVICE_POST_INSTALL => Some(MSFSEvent::PostInstall),
+                    sys::PANEL_SERVICE_PRE_INITIALIZE => Some(MSFSEvent::PreInitialize),
+                    sys::PANEL_SERVICE_POST_INITIALIZE => Some(MSFSEvent::PostInitialize),
+                    sys::PANEL_SERVICE_PRE_UPDATE => Some(MSFSEvent::PreUpdate),
+                    sys::PANEL_SERVICE_POST_UPDATE => Some(MSFSEvent::PostUpdate),
+                    sys::PANEL_SERVICE_PRE_DRAW => Some(MSFSEvent::PreDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_POST_DRAW => Some(MSFSEvent::PostDraw(unsafe {
+                        &*(p_data as *const sys::sGaugeDrawData)
+                    })),
+                    sys::PANEL_SERVICE_PRE_KILL => Some(MSFSEvent::PreKill),
+                    _ => None,
+                } {
+                    self.executor.send(Some(data)).is_ok()
+                } else {
+                    true
+                } */
+            true
+        
+    }
+
+    pub fn handle_systems_init(&mut self, ctx: sys::FsContext, parameters: sys::sSystemInstallData) -> bool {
+        let executor = self as *mut SystemExecutor;
+        self.fs_ctx = Some(ctx);
+        self.executor
+            .start(Box::new(move |rx| System { executor, rx }))
+            .is_ok()
+        
+    }
+
+    pub fn handle_systems_kill(&mut self) -> bool {
+        let data: SystemsData = SystemsData {
+            delta_time: 0.,
+            event: MSFSEvent::PreKill,
+        };
+    
+        self.executor.send(Some(data)).is_ok()
+    }
+}
+
 
 /// Gauge
 pub struct Gauge {
@@ -133,6 +261,152 @@ impl GaugeExecutor {
         self.executor
             .send(Some(MSFSEvent::Mouse { x, y, flags }))
             .unwrap();
+    }
+}
+
+/// Event data for MSFS 2024 gauges, containing delta time and the event type.
+pub struct Gauge2024Data<'a> {
+    pub delta_time: f32,
+    pub event: Gauge2024Event<'a>,
+}
+
+/// Events dispatched to MSFS 2024 gauges.
+#[derive(Debug)]
+pub enum Gauge2024Event<'a> {
+    /// Gauge initialization event with install data.
+    Init(&'a sys::sGaugeInstallData),
+    /// Gauge update event (called each frame, no drawing allowed).
+    Update,
+    /// Gauge draw event (called each frame, drawing is allowed).
+    Draw(&'a sys::sGaugeDrawData),
+    /// Gauge kill/cleanup event.
+    Kill,
+    /// Mouse input event.
+    Mouse { x: f32, y: f32, flags: i32 },
+    /// SimConnect event.
+    SimConnect(SimConnectRecv<'a>),
+}
+
+/// Handle to an MSFS 2024 gauge used in async gauge callbacks.
+pub struct Gauge2024 {
+    executor: *mut Gauge2024Executor,
+    rx: futures::channel::mpsc::Receiver<Gauge2024Data<'static>>,
+}
+
+impl Gauge2024 {
+    /// Send a request to the Microsoft Flight Simulator server to open up communications with a new client.
+    pub fn open_simconnect<'a>(
+        &self,
+        name: &str,
+    ) -> Result<std::pin::Pin<Box<crate::sim_connect::SimConnect<'a>>>, Box<dyn std::error::Error>>
+    {
+        let executor = self.executor;
+        let sim = crate::sim_connect::SimConnect::open(name, move |_sim, recv| {
+            let executor = unsafe { &mut *executor };
+            let recv =
+                unsafe { std::mem::transmute::<SimConnectRecv<'_>, SimConnectRecv<'static>>(recv) };
+            let data = Gauge2024Data {
+                delta_time: 0.,
+                event: Gauge2024Event::SimConnect(recv),
+            };
+            executor
+                .executor
+                .send(Some(data))
+                .unwrap();
+        })?;
+        Ok(sim)
+    }
+
+    /// Create a NanoVG rendering context. See `Context` for more details.
+    #[cfg(any(target_arch = "wasm32", doc))]
+    pub fn create_nanovg(&self) -> Option<crate::nvg::Context> {
+        crate::nvg::Context::create(unsafe { (*self.executor).fs_ctx.unwrap() })
+    }
+
+    /// Consume the next event from MSFS.
+    pub fn next_event(&mut self) -> impl futures::Future<Output = Option<Gauge2024Data<'_>>> + '_ {
+        use futures::stream::StreamExt;
+        async move { self.rx.next().await }
+    }
+}
+
+#[doc(hidden)]
+pub struct Gauge2024Executor {
+    pub fs_ctx: Option<sys::FsContext>,
+    pub executor: executor::Executor<Gauge2024, Gauge2024Data<'static>>,
+}
+
+#[doc(hidden)]
+impl Gauge2024Executor {
+    pub fn handle_gauge_init(
+        &mut self,
+        ctx: sys::FsContext,
+        p_install_data: *const sys::sGaugeInstallData,
+    ) -> bool {
+        let executor = self as *mut Gauge2024Executor;
+        self.fs_ctx = Some(ctx);
+        if self.executor
+            .start(Box::new(move |rx| Gauge2024 { executor, rx }))
+            .is_err()
+        {
+            return false;
+        }
+        let data = Gauge2024Data {
+            delta_time: 0.,
+            event: Gauge2024Event::Init(unsafe { &*p_install_data }),
+        };
+        // Transmute to static lifetime - safe because we process synchronously
+        let data = unsafe { std::mem::transmute::<Gauge2024Data<'_>, Gauge2024Data<'static>>(data) };
+        self.executor.send(Some(data)).is_ok()
+    }
+
+    pub fn handle_gauge_update(
+        &mut self,
+        ctx: sys::FsContext,
+        delta_time: f32,
+    ) -> bool {
+        self.fs_ctx = Some(ctx);
+        let data = Gauge2024Data {
+            delta_time,
+            event: Gauge2024Event::Update,
+        };
+        self.executor.send(Some(data)).is_ok()
+    }
+
+    pub fn handle_gauge_draw(
+        &mut self,
+        ctx: sys::FsContext,
+        p_draw_data: *const sys::sGaugeDrawData,
+    ) -> bool {
+        self.fs_ctx = Some(ctx);
+        let data = Gauge2024Data {
+            delta_time: unsafe { (*p_draw_data).dt as f32 },
+            event: Gauge2024Event::Draw(unsafe { &*p_draw_data }),
+        };
+        // Transmute to static lifetime - safe because we process synchronously
+        let data = unsafe { std::mem::transmute::<Gauge2024Data<'_>, Gauge2024Data<'static>>(data) };
+        self.executor.send(Some(data)).is_ok()
+    }
+
+    pub fn handle_gauge_kill(&mut self, ctx: sys::FsContext) -> bool {
+        self.fs_ctx = Some(ctx);
+        let data = Gauge2024Data {
+            delta_time: 0.,
+            event: Gauge2024Event::Kill,
+        };
+        if !self.executor.send(Some(data)).is_ok() {
+            return false;
+        }
+        self.executor.send(None).is_ok()
+    }
+
+    pub fn handle_mouse(&mut self, ctx: sys::FsContext, x: f32, y: f32, flags: i32) {
+        self.fs_ctx = Some(ctx);
+        let data = Gauge2024Data {
+            delta_time: 0.,
+            event: Gauge2024Event::Mouse { x, y, flags },
+        };
+        let _ = self.executor.send(Some(data));
     }
 }
 
