@@ -30,6 +30,7 @@ fn main() {
             .clang_arg("-fms-extensions")
             .clang_arg("-fvisibility=default")
             .clang_arg("-xc++")
+            .clang_arg("-std=c++17")
             .clang_arg("-v")
             .header("src/bindgen_support/wrapper.h")
             .blocklist_function("nvgFillColor")
@@ -38,7 +39,17 @@ fn main() {
             .blocklist_function("nvgStrokePaint")
             .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
             .rustified_enum("SIMCONNECT_EXCEPTION")
-            .impl_debug(false);
+            .impl_debug(false)
+            // `opaque_type` added to avoid alignment errors. These alignment errors are caused
+            // because virtual methods are not well supported in rust-bindgen.
+            .opaque_type("IGaugeCDrawableCreateParameters")
+            .opaque_type("IGaugeCDrawableDrawParameters")
+            .opaque_type("IGaugeCDrawable")
+            .opaque_type("IGaugeCCallback")
+            .opaque_type("ISerializableGaugeCCallback")
+            .opaque_type("IAircraftCCallback")
+            .opaque_type("IPanelCCallback")
+            .opaque_type("IFSXPanelCCallback");
 
         if wasm {
             bindings = bindings.clang_arg("-D_MSFS_WASM 1");
