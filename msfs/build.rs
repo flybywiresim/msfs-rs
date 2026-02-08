@@ -5,7 +5,10 @@ fn main() {
 
     // build nanovg wrapper
     if wasm {
-        std::env::set_var("AR", "llvm-ar");
+        unsafe {
+            std::env::set_var("AR", "llvm-ar");
+        }
+
         cc::Build::new()
             .compiler("clang")
             .flag(format!("--sysroot={msfs_sdk}/WASM/wasi-sysroot"))
@@ -39,6 +42,7 @@ fn main() {
             .blocklist_function("nvgStrokePaint")
             .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
             .rustified_enum("SIMCONNECT_EXCEPTION")
+            .layout_tests(false)
             .impl_debug(false)
             // `opaque_type` added to avoid alignment errors. These alignment errors are caused
             // because virtual methods are not well supported in rust-bindgen.
