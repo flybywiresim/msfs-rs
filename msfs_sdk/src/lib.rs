@@ -7,5 +7,7 @@ pub fn calculate_msfs_sdk_path() -> Result<String, &'static str> {
             return Ok(p.to_string());
         }
     }
-    Err("Could not locate MSFS SDK. Make sure you have it installed or try setting the MSFS_SDK env var.")
+    Err(
+        "Could not locate MSFS SDK. Make sure you have it installed or try setting the MSFS_SDK env var.",
+    )
 }

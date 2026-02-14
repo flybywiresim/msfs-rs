@@ -3,8 +3,9 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use std::collections::HashMap;
 use syn::{
+    Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
     parse::{Parse, ParseStream, Result as SynResult},
-    parse_macro_input, Expr, Ident, ItemFn, ItemStruct, Lit, Meta, Token, Type,
+    parse_macro_input,
 };
 
 /// Declare a standalone module.
@@ -40,14 +41,14 @@ pub fn standalone_module(_args: TokenStream, item: TokenStream) -> TokenStream {
             },
         };
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn module_init() {
             unsafe {
                 ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_init());
             }
         }
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn module_deinit() {
             unsafe {
                 ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_deinit());
@@ -125,7 +126,7 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
         };
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_gauge_name(
             ctx: ::msfs::sys::FsContext,
             service_id: std::os::raw::c_int,
@@ -137,14 +138,14 @@ pub fn gauge(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_mouse_name(
             fx: std::os::raw::c_float,
             fy: std::os::raw::c_float,
             i_flags: std::os::raw::c_uint,
         ) {
             unsafe {
-                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_mouse(fx, fy, i_flags));
+               ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_mouse(fx, fy, i_flags));
             }
          }
     };

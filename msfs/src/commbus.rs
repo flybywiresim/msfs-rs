@@ -110,11 +110,7 @@ impl<'a> CommBusEvent<'a> {
                 this.callback.as_ref() as *const _ as *mut _,
             )
         };
-        if res {
-            Some(this)
-        } else {
-            None
-        }
+        if res { Some(this) } else { None }
     }
 
     extern "C" fn c_callback(args: *const ffi::c_char, size: ffi::c_uint, ctx: *mut ffi::c_void) {
