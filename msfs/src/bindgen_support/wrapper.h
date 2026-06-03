@@ -7,3 +7,10 @@
 #include <MSFS/MSFS_CommBus.h>
 #include <MSFS/Render/nanovg.h>
 #include <SimConnect.h>
+
+#ifdef INCLUDE_MSFS_2024
+#include <MSFS/MSFS_Vars.h>
+#include <MSFS/MSFS_SystemContext.h>
+#include <MSFS/MSFS_Events.h>
+#include <MSFS/Types/MSFS_EventsEnum.h>
+#endif
