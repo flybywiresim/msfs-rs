@@ -15,3 +15,7 @@ libc = "0.2"
 bindgen = "0.72"
 msfs_sdk = { path = "../msfs_sdk", version = "0.2.0" }
 cc = "1.0"
+
+[features]
+msfs_2024 = ["msfs_sdk/msfs_2024", "msfs_derive/msfs_2024"]
+

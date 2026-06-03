@@ -7,3 +7,7 @@ description = "Crate to find MSFS SDK"
 license = "MIT"
 
 [dependencies]
+
+[features]
+msfs_2024 = []
+
