@@ -3,7 +3,7 @@ use crate::{executor, sys};
 use crate::sim_connect::{SimConnect, SimConnectRecv};
 pub use msfs_derive::system;
 
-/// Used in Systems to dispatch lifetime events, mouse events, and SimConnect events.
+/// Used in Systems to dispatch lifetime events and SimConnect events.
 #[derive(Debug)]
 pub enum MSFS2024SystemEvent<'a> {
     Init(&'a sys::sSystemInstallData),
@@ -94,7 +94,7 @@ impl SystemExecutor {
     }
 }
 
-/// Used in Gauges to dispatch lifetime events, mouse events, and SimConnect events.
+/// Used in MSFS 2024 Gauges to dispatch lifetime events, mouse events, and SimConnect events.
 #[derive(Debug)]
 pub enum MSFS2024GaugeEvent<'a> {
     Init(&'a sys::sGaugeInstallData),
