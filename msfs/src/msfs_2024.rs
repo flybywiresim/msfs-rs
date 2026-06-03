@@ -1,7 +1,7 @@
 use crate::{executor, sys};
 
 use crate::sim_connect::{SimConnect, SimConnectRecv};
-pub use msfs_derive::system;
+pub use msfs_derive::{gauge2024, system};
 
 /// Used in Systems to dispatch lifetime events and SimConnect events.
 #[derive(Debug)]
@@ -196,7 +196,7 @@ impl Gauge2024Executor {
             .is_ok()
     }
 
-    pub fn handle_mouse(&mut self, x: f32, y: f32, flags: u32) {
+    pub fn handle_mouse(&mut self, _ctx: sys::FsContext, x: f32, y: f32, flags: u32) {
         self.executor
             .send(Some(MSFS2024GaugeEvent::Mouse { x, y, flags }))
             .unwrap();
