@@ -304,7 +304,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
         };
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_gauge_init(
             ctx: ::msfs::sys::FsContext,
             p_install_data: *const ::msfs::sys::sGaugeInstallData,
@@ -315,7 +315,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_gauge_update(
             ctx: ::msfs::sys::FsContext,
             d_time: std::os::raw::c_float,
@@ -326,7 +326,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_gauge_draw(
             ctx: ::msfs::sys::FsContext,
             p_draw_data: *const ::msfs::sys::sGaugeDrawData,
@@ -337,7 +337,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_gauge_kill(
             ctx: ::msfs::sys::FsContext,
         ) -> bool {
@@ -347,7 +347,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[doc(hidden)]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn #extern_mouse_handler(
             ctx: ::msfs::sys::FsContext,
             fx: std::os::raw::c_float,
