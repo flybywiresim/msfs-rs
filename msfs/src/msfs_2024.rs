@@ -101,7 +101,7 @@ pub enum MSFS2024GaugeEvent<'a> {
     Update(std::os::raw::c_float),
     Draw(&'a sys::sGaugeDrawData),
     Kill,
-    Mouse { x: f32, y: f32, flags: u32 },
+    Mouse { x: f32, y: f32, flags: i32 },
     SimConnect(SimConnectRecv<'a>),
 }
 
@@ -196,7 +196,7 @@ impl Gauge2024Executor {
             .is_ok()
     }
 
-    pub fn handle_mouse(&mut self, _ctx: sys::FsContext, x: f32, y: f32, flags: u32) {
+    pub fn handle_mouse(&mut self, _ctx: sys::FsContext, x: f32, y: f32, flags: i32) {
         self.executor
             .send(Some(MSFS2024GaugeEvent::Mouse { x, y, flags }))
             .unwrap();
