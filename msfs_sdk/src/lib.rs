@@ -1,6 +1,6 @@
 pub fn calculate_msfs_sdk_path() -> Result<String, String> {
     let sdk_env_key = if cfg!(feature = "msfs_2024") {
-        "MSFS_2024_SDK"
+        "MSFS2024_SDK"
     } else {
         "MSFS_SDK"
     };
