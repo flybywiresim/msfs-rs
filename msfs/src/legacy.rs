@@ -79,6 +79,28 @@ impl AircraftVariable {
     }
 }
 
+pub struct NamedVariableApi(sys::FsNamedVarId, sys::FsUnitId);
+impl NamedVariableApi {
+    pub fn from(name: &str, units: &str) -> Self {
+        let name = std::ffi::CString::new(name).unwrap();
+        let units = std::ffi::CString::new(units).unwrap();
+        let var = unsafe { sys::fsVarsRegisterNamedVar(name.as_ptr()) };
+        let unit = unsafe { sys::fsVarsGetUnitId(units.as_ptr()) };
+        Self(var, unit)
+    }
+
+    pub fn get<T: SimVarF64>(&self) -> T {
+        let mut v = 0.0;
+        unsafe { sys::fsVarsNamedVarGet(self.0, self.1, &mut v) };
+        T::from(v)
+    }
+
+    pub fn set(&self, v: impl SimVarF64) {
+        let v = v.to();
+        unsafe { sys::fsVarsNamedVarSet(self.0, self.1, v) };
+    }
+}
+
 /// register_named_variable
 /// set_named_variable_typed_value
 /// get_named_variable_value
