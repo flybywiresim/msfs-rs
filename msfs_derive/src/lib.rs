@@ -211,7 +211,7 @@ pub fn system(args: TokenStream, item: TokenStream) -> TokenStream {
             p_install_data: *const ::msfs::sys::sSystemInstallData,
         ) -> bool {
             unsafe {
-                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_systems_init(ctx, p_install_data))
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_systems_init(ctx, &*p_install_data))
             }
         }
 
@@ -310,7 +310,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
             p_install_data: *const ::msfs::sys::sGaugeInstallData,
         ) -> bool {
             unsafe {
-                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_init(ctx, p_install_data))
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_init(ctx, &*p_install_data))
             }
         }
 
@@ -332,7 +332,7 @@ pub fn gauge2024(args: TokenStream, item: TokenStream) -> TokenStream {
             p_draw_data: *const ::msfs::sys::sGaugeDrawData,
         ) -> bool {
             unsafe {
-                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_draw(ctx, p_draw_data))
+                ::msfs::wrap_executor(&raw mut #executor_name, |e| e.handle_gauge_draw(ctx, &*p_draw_data))
             }
         }
 
