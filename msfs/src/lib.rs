@@ -30,10 +30,14 @@
 //! ```
 
 mod msfs;
+#[cfg(feature = "msfs_2024")]
+mod msfs_2024;
 pub mod sim_connect;
 pub mod sys;
 
 pub use msfs::*;
+#[cfg(feature = "msfs_2024")]
+pub use msfs_2024::*;
 
 #[cfg(any(target_arch = "wasm32", doc))]
 pub mod legacy;

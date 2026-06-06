@@ -59,6 +59,10 @@ fn main() {
             bindings = bindings.clang_arg("-D_MSFS_WASM 1");
         }
 
+        if cfg!(feature = "msfs_2024") {
+            bindings = bindings.clang_arg("-DINCLUDE_MSFS_2024");
+        }
+
         bindings
             .generate()
             .unwrap()
