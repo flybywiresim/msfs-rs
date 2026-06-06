@@ -90,7 +90,7 @@ pub struct GaugeExecutor {
 
 #[doc(hidden)]
 impl GaugeExecutor {
-    pub fn handle_gauge(
+    pub unsafe fn handle_gauge(
         &mut self,
         ctx: sys::FsContext,
         service_id: std::os::raw::c_int,

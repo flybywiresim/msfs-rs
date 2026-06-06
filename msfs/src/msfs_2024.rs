@@ -60,7 +60,7 @@ pub struct SystemExecutor {
 
 #[doc(hidden)]
 impl SystemExecutor {
-    pub fn handle_systems_init(
+    pub unsafe fn handle_systems_init(
         &mut self,
         ctx: sys::FsContext,
         p_install_data: *const sys::sSystemInstallData,
@@ -153,7 +153,7 @@ pub struct Gauge2024Executor {
 
 #[doc(hidden)]
 impl Gauge2024Executor {
-    pub fn handle_gauge_init(
+    pub unsafe fn handle_gauge_init(
         &mut self,
         ctx: sys::FsContext,
         p_install_data: *const sys::sGaugeInstallData,
@@ -179,7 +179,7 @@ impl Gauge2024Executor {
             .is_ok()
     }
 
-    pub fn handle_gauge_draw(
+    pub unsafe fn handle_gauge_draw(
         &mut self,
         _ctx: sys::FsContext,
         p_draw_data: *const sys::sGaugeDrawData,
